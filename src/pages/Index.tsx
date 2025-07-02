@@ -6,17 +6,21 @@ import MysteryBoxSection from "@/components/MysteryBoxSection";
 import GameSection from "@/components/GameSection";
 import ImpactTracker from "@/components/ImpactTracker";
 import Footer from "@/components/Footer";
+import MobileNavigation from "@/components/MobileNavigation";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <HeroSection />
-      <FoodListings />
-      <MysteryBoxSection />
-      <GameSection />
-      <ImpactTracker />
-      <Footer />
+      <div className="pb-20"> {/* Add bottom padding for mobile navigation */}
+        <HeroSection />
+        <FoodListings />
+        <MysteryBoxSection />
+        <GameSection />
+        <ImpactTracker />
+        <Footer />
+      </div>
+      <MobileNavigation />
     </div>
   );
 };
