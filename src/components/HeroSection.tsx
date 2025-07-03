@@ -1,13 +1,25 @@
-
 import { Leaf, Clock, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleStartSaving = () => {
     navigate("/auth");
+  };
+
+  const handleForBusinesses = () => {
+    // Check if user is an approved partner
+    const isApprovedPartner = user?.isPartner === true;
+    
+    if (isApprovedPartner) {
+      navigate("/business-dashboard");
+    } else {
+      navigate("/partner-application");
+    }
   };
 
   return (
@@ -61,7 +73,12 @@ const HeroSection = () => {
               >
                 Start Saving Food
               </Button>
-              <Button variant="outline" size="lg" className="text-base px-8 py-3">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="text-base px-8 py-3"
+                onClick={handleForBusinesses}
+              >
                 For Businesses
               </Button>
             </div>
