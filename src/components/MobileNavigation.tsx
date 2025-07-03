@@ -1,29 +1,34 @@
 
 import { Home, Search, ShoppingBag, Trophy, User } from "lucide-react";
-import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const MobileNavigation = () => {
-  const [activeTab, setActiveTab] = useState("home");
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const tabs = [
-    { id: "home", label: "Home", icon: Home },
-    { id: "discover", label: "Discover", icon: Search },
-    { id: "orders", label: "Orders", icon: ShoppingBag },
-    { id: "impact", label: "Impact", icon: Trophy },
-    { id: "profile", label: "Profile", icon: User },
+    { id: "home", label: "Home", icon: Home, path: "/" },
+    { id: "discover", label: "Discover", icon: Search, path: "/discover" },
+    { id: "orders", label: "Orders", icon: ShoppingBag, path: "/orders" },
+    { id: "impact", label: "Impact", icon: Trophy, path: "/impact" },
+    { id: "profile", label: "Profile", icon: User, path: "/profile" },
   ];
+
+  const handleTabClick = (path: string) => {
+    navigate(path);
+  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-pb z-50">
       <div className="flex items-center justify-around py-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
+          const isActive = location.pathname === tab.path;
           
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabClick(tab.path)}
               className={`flex flex-col items-center justify-center px-3 py-2 min-w-0 flex-1 transition-colors ${
                 isActive 
                   ? "text-orange-500" 
