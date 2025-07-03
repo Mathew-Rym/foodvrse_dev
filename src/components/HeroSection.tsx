@@ -1,8 +1,15 @@
 
 import { Leaf, Clock, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
+  const handleStartSaving = () => {
+    navigate("/auth");
+  };
+
   return (
     <section className="bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 py-12 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,7 +54,11 @@ const HeroSection = () => {
 
             {/* CTA */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-base px-8 py-3">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-base px-8 py-3"
+                onClick={handleStartSaving}
+              >
                 Start Saving Food
               </Button>
               <Button variant="outline" size="lg" className="text-base px-8 py-3">
