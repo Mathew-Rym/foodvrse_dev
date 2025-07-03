@@ -1,0 +1,278 @@
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Building2, Mail, Phone, MapPin, Clock, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+
+const PartnerApplication = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    businessName: "",
+    ownerName: "",
+    email: "",
+    phone: "",
+    address: "",
+    businessType: "",
+    description: "",
+    operatingHours: "",
+    expectedWaste: ""
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Simulate application submission
+    toast({
+      title: "Application Submitted!",
+      description: "We'll review your application and get back to you within 2-3 business days.",
+    });
+    
+    // In a real app, this would send data to backend
+    console.log("Partner application submitted:", formData);
+    
+    // Redirect back to home after submission
+    setTimeout(() => {
+      navigate("/");
+    }, 2000);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-4">
+        <div className="flex items-center gap-3 mb-4">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => navigate("/")}
+            className="text-white hover:bg-white/20"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          <h1 className="text-xl font-bold">Become a Partner</h1>
+        </div>
+        <p className="text-white/90 text-sm">
+          Join FoodVrse and help reduce food waste while growing your business
+        </p>
+      </div>
+
+      {/* Benefits Section */}
+      <div className="p-4">
+        <div className="bg-white rounded-lg p-4 mb-6 shadow-sm">
+          <h2 className="text-lg font-semibold mb-4">Why Partner with Us?</h2>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <span className="text-green-600 text-sm">💰</span>
+              </div>
+              <span className="text-sm text-gray-700">Reduce food waste costs by up to 70%</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <Users className="w-4 h-4 text-blue-600" />
+              </div>
+              <span className="text-sm text-gray-700">Reach new customers in your area</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                <span className="text-orange-600 text-sm">🌱</span>
+              </div>
+              <span className="text-sm text-gray-700">Make a positive environmental impact</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Application Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <Building2 className="w-4 h-4" />
+              Business Information
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Business Name *
+                </label>
+                <input
+                  type="text"
+                  name="businessName"
+                  required
+                  value={formData.businessName}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="Your restaurant or business name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Owner Name *
+                </label>
+                <input
+                  type="text"
+                  name="ownerName"
+                  required
+                  value={formData.ownerName}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="Your full name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Business Type *
+                </label>
+                <select
+                  name="businessType"
+                  required
+                  value={formData.businessType}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value="">Select business type</option>
+                  <option value="restaurant">Restaurant</option>
+                  <option value="bakery">Bakery</option>
+                  <option value="cafe">Cafe</option>
+                  <option value="grocery">Grocery Store</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              Contact Information
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="business@example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  required
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="+254 700 000 000"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Business Address *
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  required
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="Street, City, Kenya"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Additional Details
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Operating Hours
+                </label>
+                <input
+                  type="text"
+                  name="operatingHours"
+                  value={formData.operatingHours}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="e.g., Mon-Sun 9AM-9PM"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Expected Daily Food Surplus
+                </label>
+                <input
+                  type="text"
+                  name="expectedWaste"
+                  value={formData.expectedWaste}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="e.g., 5-10 meals per day"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tell us about your business
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="Brief description of your business and why you want to partner with us"
+                />
+              </div>
+            </div>
+          </div>
+
+          <Button 
+            type="submit" 
+            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3"
+            size="lg"
+          >
+            Submit Application
+          </Button>
+        </form>
+
+        <div className="mt-6 text-center text-sm text-gray-500">
+          <p>Questions? Contact us at partner@foodvrse.com</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PartnerApplication;

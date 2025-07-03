@@ -1,9 +1,13 @@
+
 import { User, Settings, Heart, HelpCircle, LogOut, MapPin, Bell, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MobileLayout from "@/components/MobileLayout";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
+  const navigate = useNavigate();
+
   const menuItems = [
     { icon: Settings, label: "Account Settings", action: "settings" },
     { icon: MapPin, label: "Delivery Addresses", action: "addresses" },
@@ -12,6 +16,10 @@ const Profile = () => {
     { icon: Heart, label: "Favorite Restaurants", action: "favorites" },
     { icon: HelpCircle, label: "Help & Support", action: "help" },
   ];
+
+  const handlePartnerClick = () => {
+    navigate("/partner-application");
+  };
 
   return (
     <MobileLayout>
@@ -71,7 +79,12 @@ const Profile = () => {
             <p className="text-sm text-white/90 mb-3">
               Join our mission to reduce food waste. List your restaurant and start making an impact.
             </p>
-            <Button variant="secondary" size="sm" className="bg-white text-orange-600 hover:bg-gray-100">
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              className="bg-white text-orange-600 hover:bg-gray-100"
+              onClick={handlePartnerClick}
+            >
               Learn More
             </Button>
           </div>

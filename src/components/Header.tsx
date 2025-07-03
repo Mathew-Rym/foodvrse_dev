@@ -1,8 +1,15 @@
 
 import { ShoppingBag, User, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const navigate = useNavigate();
+
+  const handlePartnerClick = () => {
+    navigate("/partner-application");
+  };
+
   return (
     <header className="bg-white shadow-sm border-b border-orange-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -32,7 +39,11 @@ const Header = () => {
               <User className="w-4 h-4" />
               <span className="hidden sm:inline">Profile</span>
             </Button>
-            <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+            <Button 
+              size="sm" 
+              className="bg-gradient-to-r from-orange-500 to-red-500 text-white"
+              onClick={handlePartnerClick}
+            >
               Become a Partner
             </Button>
           </div>
