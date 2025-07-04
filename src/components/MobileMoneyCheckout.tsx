@@ -19,7 +19,7 @@ interface MobileMoneyCheckoutProps {
 
 const MobileMoneyCheckout = ({ isOpen, onClose }: MobileMoneyCheckoutProps) => {
   const [paymentStep, setPaymentStep] = useState<'form' | 'processing' | 'success'>('form');
-  const { totalPrice, clearCart } = useCart();
+  const { totalPrice, completeOrder } = useCart();
   
   const form = useForm<MobileMoneyFormData>({
     defaultValues: {
@@ -35,7 +35,7 @@ const MobileMoneyCheckout = ({ isOpen, onClose }: MobileMoneyCheckoutProps) => {
     setTimeout(() => {
       setPaymentStep('success');
       setTimeout(() => {
-        clearCart();
+        completeOrder();
         onClose();
         setPaymentStep('form');
       }, 2000);

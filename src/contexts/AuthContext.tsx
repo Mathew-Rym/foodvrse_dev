@@ -5,13 +5,16 @@ interface User {
   id: string;
   email: string;
   name: string;
+  photo?: string;
   isPartner?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string, name: string) => Promise<void>;
   logout: () => void;
+  updateProfile: (updates: Partial<User>) => void;
   isAuthenticated: boolean;
 }
 
@@ -33,15 +36,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
 
   const login = async (email: string, password: string) => {
-    // Mock login logic - in a real app this would make an API call
     console.log('Login attempt:', email);
     
-    // Mock user data - you can modify this for testing
     const mockUser: User = {
       id: '1',
       email: email,
       name: 'John Doe',
-      isPartner: email.includes('partner') // Simple logic to test partner status
+      isPartner: email.includes('partner')
+    };
+    
+    setUser(mockUser);
+  };
+
+  const signup = async (email: string, password: string, name: string) => {
+    console.log('Signup attempt:', email, name);
+    
+    const mockUser: User = {
+      id: '1',
+      email: email,
+      name: name,
+      isPartner: email.includes('partner')
     };
     
     setUser(mockUser);
@@ -51,12 +65,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(null);
   };
 
+  const updateProfile = (updates: Partial<User>) => {
+    if (user) {
+      setUser({ ...user, ...updates });
+    }
+  };
+
   const isAuthenticated = user !== null;
 
   const value = {
     user,
     login,
+    signup,
     logout,
+    updateProfile,
     isAuthenticated
   };
 

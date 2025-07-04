@@ -18,12 +18,25 @@ interface AddOn {
   description: string;
 }
 
+interface Order {
+  id: string;
+  items: CartItem[];
+  addOns: AddOn[];
+  total: number;
+  status: 'preparing' | 'ready' | 'completed';
+  pickup: string;
+  date: string;
+  restaurant: string;
+}
+
 interface CartContextType {
   items: CartItem[];
-  addToCart: (item: Omit<CartItem, 'quantity'>) => void;
+  orders: Order[];
+  addToCart: (item: Omit<CartItem, 'quantity'>, requiresAuth?: boolean) => void;
   removeFromCart: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
+  completeOrder: () => void;
   totalItems: number;
   totalPrice: number;
   showAddOnPopup: boolean;
@@ -31,6 +44,9 @@ interface CartContextType {
   selectedAddOns: AddOn[];
   addAddOn: (addOn: AddOn) => void;
   removeAddOn: (addOnId: string) => void;
+  showOrderCompletePopup: boolean;
+  setShowOrderCompletePopup: (show: boolean) => void;
+  currentOrder: Order | null;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -49,10 +65,18 @@ interface CartProviderProps {
 
 export const CartProvider = ({ children }: CartProviderProps) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [showAddOnPopup, setShowAddOnPopup] = useState(false);
   const [selectedAddOns, setSelectedAddOns] = useState<AddOn[]>([]);
+  const [showOrderCompletePopup, setShowOrderCompletePopup] = useState(false);
+  const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
 
-  const addToCart = (item: Omit<CartItem, 'quantity'>) => {
+  const addToCart = (item: Omit<CartItem, 'quantity'>, requiresAuth = false) => {
+    if (requiresAuth) {
+      // This will be handled by the component calling this function
+      return;
+    }
+
     setItems(prevItems => {
       const existingItem = prevItems.find(i => i.id === item.id);
       if (existingItem) {
@@ -82,6 +106,27 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     );
   };
 
+  const completeOrder = () => {
+    if (items.length === 0) return;
+
+    const newOrder: Order = {
+      id: `ORD-${Date.now()}`,
+      items: [...items],
+      addOns: [...selectedAddOns],
+      total: totalPrice,
+      status: 'preparing',
+      pickup: items[0]?.pickup || 'TBD',
+      date: new Date().toLocaleDateString(),
+      restaurant: items[0]?.vendor || 'Restaurant'
+    };
+
+    setOrders(prev => [newOrder, ...prev]);
+    setCurrentOrder(newOrder);
+    setItems([]);
+    setSelectedAddOns([]);
+    setShowOrderCompletePopup(true);
+  };
+
   const clearCart = () => {
     setItems([]);
     setSelectedAddOns([]);
@@ -101,17 +146,22 @@ export const CartProvider = ({ children }: CartProviderProps) => {
 
   const value = {
     items,
+    orders,
     addToCart,
     removeFromCart,
     updateQuantity,
     clearCart,
+    completeOrder,
     totalItems,
     totalPrice,
     showAddOnPopup,
     setShowAddOnPopup,
     selectedAddOns,
     addAddOn,
-    removeAddOn
+    removeAddOn,
+    showOrderCompletePopup,
+    setShowOrderCompletePopup,
+    currentOrder
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

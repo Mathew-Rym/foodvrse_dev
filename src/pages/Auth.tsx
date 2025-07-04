@@ -6,7 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 interface AuthFormData {
@@ -18,8 +18,9 @@ interface AuthFormData {
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
-  const { login } = useAuth();
+  const { login, signup } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const form = useForm<AuthFormData>({
     defaultValues: {
@@ -31,8 +32,15 @@ const Auth = () => {
 
   const onSubmit = async (data: AuthFormData) => {
     try {
-      await login(data.email, data.password);
-      navigate('/');
+      if (isSignUp) {
+        await signup(data.email, data.password, data.name || '');
+      } else {
+        await login(data.email, data.password);
+      }
+      
+      // Redirect to the page they came from or home
+      const from = location.state?.from?.pathname || '/';
+      navigate(from);
     } catch (error) {
       console.error('Authentication error:', error);
     }
@@ -67,6 +75,7 @@ const Auth = () => {
               <FormField
                 control={form.control}
                 name="name"
+                rules={{ required: 'Name is required' }}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
@@ -82,6 +91,13 @@ const Auth = () => {
             <FormField
               control={form.control}
               name="email"
+              rules={{ 
+                required: 'Email is required',
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Please enter a valid email'
+                }
+              }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
@@ -96,6 +112,13 @@ const Auth = () => {
             <FormField
               control={form.control}
               name="password"
+              rules={{ 
+                required: 'Password is required',
+                minLength: {
+                  value: 6,
+                  message: 'Password must be at least 6 characters'
+                }
+              }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>

@@ -8,6 +8,7 @@ import ImpactTracker from "@/components/ImpactTracker";
 import Footer from "@/components/Footer";
 import MobileNavigation from "@/components/MobileNavigation";
 import AddOnPopup from "@/components/AddOnPopup";
+import OrderCompletePopup from "@/components/OrderCompletePopup";
 import LocationNotification from "@/components/LocationNotification";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -28,6 +29,7 @@ const Index = () => {
       </div>
       {isAuthenticated && <MobileNavigation />}
       <AddOnPopup />
+      <OrderCompletePopup />
     </div>
   );
 };

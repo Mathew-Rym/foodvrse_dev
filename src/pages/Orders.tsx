@@ -1,38 +1,12 @@
+
 import { Clock, MapPin, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MobileLayout from "@/components/MobileLayout";
+import { useCart } from "@/contexts/CartContext";
 
 const Orders = () => {
-  const orders = [
-    {
-      id: "ORD-001",
-      restaurant: "Java House",
-      items: "Breakfast Mystery Box",
-      status: "ready",
-      pickup: "7:00 AM - 10:00 AM",
-      price: 350,
-      date: "Today"
-    },
-    {
-      id: "ORD-002",
-      restaurant: "Healthy U",
-      items: "Wellness Box",
-      status: "preparing",
-      pickup: "12:00 PM - 3:00 PM",
-      price: 450,
-      date: "Today"
-    },
-    {
-      id: "ORD-003",
-      restaurant: "Artcaffe",
-      items: "Baker's Choice",
-      status: "completed",
-      pickup: "Yesterday",
-      price: 250,
-      date: "Yesterday"
-    }
-  ];
+  const { orders } = useCart();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -59,7 +33,9 @@ const Orders = () => {
               <div className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="font-semibold text-gray-900">{order.items}</h3>
+                    <h3 className="font-semibold text-gray-900">
+                      {order.items.map(item => item.title).join(', ')}
+                    </h3>
                     <p className="text-sm text-gray-600">{order.restaurant}</p>
                   </div>
                   <Badge className={getStatusColor(order.status)}>
@@ -79,7 +55,7 @@ const Orders = () => {
                 </div>
 
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-                  <span className="font-semibold text-gray-900">KSh {order.price}</span>
+                  <span className="font-semibold text-gray-900">KSh {order.total}</span>
                   {order.status === "ready" && (
                     <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
                       Ready for Pickup

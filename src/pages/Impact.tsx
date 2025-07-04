@@ -1,4 +1,6 @@
-import { Leaf, Trophy, Users, TrendingUp } from "lucide-react";
+
+import { Leaf, Trophy, Users, TrendingUp, Share2, UserPlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MobileLayout from "@/components/MobileLayout";
 
@@ -24,6 +26,37 @@ const Impact = () => {
     { name: "Emma L.", meals: 41, rank: 4 },
     { name: "Alex R.", meals: 38, rank: 5 },
   ];
+
+  const handleShareImpact = () => {
+    const shareText = `I've saved 47 meals and prevented 28.2kg of CO₂ emissions with FoodVrse! Join me in fighting food waste. #FoodWasteWarrior #SaveTheFood`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'My Food Waste Impact',
+        text: shareText,
+        url: window.location.origin
+      });
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      navigator.clipboard.writeText(`${shareText} ${window.location.origin}`);
+      alert('Impact shared to clipboard!');
+    }
+  };
+
+  const handleInviteFriends = () => {
+    const inviteText = `Join me on FoodVrse and help fight food waste together! We can save food, money, and the environment. ${window.location.origin}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'Join FoodVrse',
+        text: inviteText,
+        url: window.location.origin
+      });
+    } else {
+      navigator.clipboard.writeText(inviteText);
+      alert('Invite link copied to clipboard!');
+    }
+  };
 
   return (
     <MobileLayout>
@@ -51,6 +84,24 @@ const Impact = () => {
                 </div>
               );
             })}
+          </div>
+
+          {/* Social Actions */}
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <Button 
+              onClick={handleShareImpact}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              Share Impact
+            </Button>
+            <Button 
+              onClick={handleInviteFriends}
+              className="bg-gradient-to-r from-green-500 to-teal-500 text-white"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Invite Friends
+            </Button>
           </div>
 
           {/* Achievements */}

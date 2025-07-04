@@ -1,16 +1,29 @@
 
-import { User, MapPin, Info } from "lucide-react";
+import { User, MapPin, Info, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
+import { useGeolocation } from "@/hooks/useGeolocation";
 import CartSheet from "./CartSheet";
 import LocationSearch from "./LocationSearch";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Header = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { totalItems } = useCart();
+  const { latitude, longitude } = useGeolocation();
   const [currentLocation, setCurrentLocation] = useState("Nairobi, Kenya");
+
+  // Update location display when geolocation is available
+  useEffect(() => {
+    if (latitude && longitude) {
+      // In a real app, you'd reverse geocode these coordinates
+      setCurrentLocation(`${latitude.toFixed(3)}, ${longitude.toFixed(3)}`);
+    }
+  }, [latitude, longitude]);
 
   const handlePartnerClick = () => {
     navigate("/partner-application");
@@ -52,7 +65,7 @@ const Header = () => {
               <LocationSearch onLocationSelect={handleLocationSelect} />
             </div>
             <div className="flex items-center space-x-2 text-gray-600">
-              <MapPin className="w-4 h-4" />
+              <MapPin className={`w-4 h-4 ${latitude && longitude ? 'text-green-500' : ''}`} />
               <span className="text-sm">{currentLocation}</span>
             </div>
           </div>
@@ -78,10 +91,21 @@ const Header = () => {
                 </Button>
               </>
             ) : (
-              <Button variant="ghost" size="sm" className="flex items-center space-x-1" onClick={handleAuthClick}>
-                <User className="w-4 h-4" />
-                <span className="hidden sm:inline">Sign In</span>
-              </Button>
+              <>
+                {totalItems > 0 && (
+                  <Button variant="ghost" size="sm" className="flex items-center space-x-1 relative">
+                    <ShoppingBag className="w-4 h-4" />
+                    <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs">
+                      {totalItems}
+                    </Badge>
+                    <span className="hidden sm:inline">Cart</span>
+                  </Button>
+                )}
+                <Button variant="ghost" size="sm" className="flex items-center space-x-1" onClick={handleAuthClick}>
+                  <User className="w-4 h-4" />
+                  <span className="hidden sm:inline">Sign In</span>
+                </Button>
+              </>
             )}
             <Button 
               size="sm" 
