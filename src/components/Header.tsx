@@ -1,13 +1,24 @@
 
-import { ShoppingBag, User, MapPin } from "lucide-react";
+import { User, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import CartSheet from "./CartSheet";
 
 const Header = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const handlePartnerClick = () => {
     navigate("/partner-application");
+  };
+
+  const handleAuthClick = () => {
+    navigate("/auth");
+  };
+
+  const handleProfileClick = () => {
+    navigate("/profile");
   };
 
   return (
@@ -31,14 +42,20 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="sm" className="flex items-center space-x-1">
-              <ShoppingBag className="w-4 h-4" />
-              <span className="hidden sm:inline">Cart</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="flex items-center space-x-1">
-              <User className="w-4 h-4" />
-              <span className="hidden sm:inline">Profile</span>
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <CartSheet />
+                <Button variant="ghost" size="sm" className="flex items-center space-x-1" onClick={handleProfileClick}>
+                  <User className="w-4 h-4" />
+                  <span className="hidden sm:inline">Profile</span>
+                </Button>
+              </>
+            ) : (
+              <Button variant="ghost" size="sm" className="flex items-center space-x-1" onClick={handleAuthClick}>
+                <User className="w-4 h-4" />
+                <span className="hidden sm:inline">Sign In</span>
+              </Button>
+            )}
             <Button 
               size="sm" 
               className="bg-gradient-to-r from-orange-500 to-red-500 text-white"

@@ -1,11 +1,12 @@
-
 import { useState } from "react";
 import { Clock, MapPin, Star, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useCart } from "@/contexts/CartContext";
 
 const FoodListings = () => {
   const [filter, setFilter] = useState("all");
+  const { addToCart } = useCart();
 
   const listings = [
     {
@@ -104,6 +105,17 @@ const FoodListings = () => {
 
   const filteredListings = filter === "all" ? listings : listings.filter(l => l.category === filter);
 
+  const handleReserveNow = (listing: typeof listings[0]) => {
+    addToCart({
+      id: listing.id,
+      title: listing.title,
+      vendor: listing.vendor,
+      price: listing.discountedPrice,
+      originalPrice: listing.originalPrice,
+      pickup: listing.pickup
+    });
+  };
+
   return (
     <section className="py-12 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -190,7 +202,10 @@ const FoodListings = () => {
                 </div>
 
                 {/* Action Button */}
-                <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600">
+                <Button 
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600"
+                  onClick={() => handleReserveNow(listing)}
+                >
                   Reserve Now
                 </Button>
               </div>

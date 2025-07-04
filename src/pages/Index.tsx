@@ -7,12 +7,16 @@ import GameSection from "@/components/GameSection";
 import ImpactTracker from "@/components/ImpactTracker";
 import Footer from "@/components/Footer";
 import MobileNavigation from "@/components/MobileNavigation";
+import AddOnPopup from "@/components/AddOnPopup";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <div className="pb-20"> {/* Add bottom padding for mobile navigation */}
+      <div className={isAuthenticated ? "pb-20" : ""}> {/* Add bottom padding only if authenticated for mobile navigation */}
         <HeroSection />
         <FoodListings />
         <MysteryBoxSection />
@@ -20,7 +24,8 @@ const Index = () => {
         <ImpactTracker />
         <Footer />
       </div>
-      <MobileNavigation />
+      {isAuthenticated && <MobileNavigation />}
+      <AddOnPopup />
     </div>
   );
 };
