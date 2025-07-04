@@ -1,7 +1,14 @@
 
 import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const handleLinkClick = (path: string) => {
+    navigate(path);
+  };
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -28,10 +35,38 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li><a href="#" className="hover:text-white">How it Works</a></li>
-              <li><a href="#" className="hover:text-white">Become a Partner</a></li>
-              <li><a href="#" className="hover:text-white">Mystery Boxes</a></li>
-              <li><a href="#" className="hover:text-white">Impact Tracker</a></li>
+              <li>
+                <button 
+                  onClick={() => handleLinkClick("/food-waste")}
+                  className="hover:text-white text-left"
+                >
+                  How it Works
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => handleLinkClick("/partner-application")}
+                  className="hover:text-white text-left"
+                >
+                  Become a Partner
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => handleLinkClick("/")}
+                  className="hover:text-white text-left"
+                >
+                  Mystery Boxes
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => handleLinkClick("/impact")}
+                  className="hover:text-white text-left"
+                >
+                  Impact Tracker
+                </button>
+              </li>
             </ul>
           </div>
 
@@ -39,8 +74,22 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Support</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li><a href="#" className="hover:text-white">Help Center</a></li>
-              <li><a href="#" className="hover:text-white">Safety Guidelines</a></li>
+              <li>
+                <button 
+                  onClick={() => handleLinkClick("/profile")}
+                  className="hover:text-white text-left"
+                >
+                  Help Center
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => handleLinkClick("/food-waste")}
+                  className="hover:text-white text-left"
+                >
+                  Safety Guidelines
+                </button>
+              </li>
               <li><a href="#" className="hover:text-white">Terms of Service</a></li>
               <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
             </ul>

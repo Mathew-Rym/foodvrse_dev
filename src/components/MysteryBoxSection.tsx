@@ -2,37 +2,69 @@
 import { Sparkles, Clock, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const MysteryBoxSection = () => {
+  const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
   const mysteryBoxes = [
     {
+      id: 101,
       vendor: "Java House",
       title: "Breakfast Surprise",
       originalValue: "KSh 800-1200",
       price: 350,
+      originalPrice: 900,
       pickup: "7:00 AM - 10:00 AM",
       items: "Pastries, Coffee & Light Meal",
       gradient: "from-amber-400 to-orange-500"
     },
     {
+      id: 102,
       vendor: "Artcaffe",
       title: "Baker's Choice",
       originalValue: "KSh 600-900",
       price: 250,
+      originalPrice: 700,
       pickup: "5:00 PM - 7:00 PM",
       items: "Fresh Bread, Cakes & Treats",
       gradient: "from-pink-400 to-red-500"
     },
     {
+      id: 103,
       vendor: "Healthy U",
       title: "Wellness Box",
       originalValue: "KSh 1000-1500",
       price: 450,
+      originalPrice: 1200,
       pickup: "12:00 PM - 3:00 PM",
       items: "Salads, Smoothies & Snacks",
       gradient: "from-green-400 to-emerald-500"
     }
   ];
+
+  const handleGetMysteryBox = (box: any) => {
+    if (!isAuthenticated) {
+      navigate("/auth");
+      return;
+    }
+
+    const cartItem = {
+      id: box.id,
+      title: box.title,
+      vendor: box.vendor,
+      price: box.price,
+      originalPrice: box.originalPrice,
+      pickup: box.pickup
+    };
+
+    addToCart(cartItem);
+    console.log("Added mystery box to cart:", box.title);
+  };
 
   return (
     <section className="py-16 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
@@ -91,7 +123,10 @@ const MysteryBoxSection = () => {
                   </Badge>
                 </div>
 
-                <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 group-hover:scale-105 transition-transform">
+                <Button 
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 group-hover:scale-105 transition-transform"
+                  onClick={() => handleGetMysteryBox(box)}
+                >
                   <Sparkles className="w-4 h-4 mr-2" />
                   Get Mystery Box
                 </Button>
