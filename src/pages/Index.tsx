@@ -8,6 +8,7 @@ import ImpactTracker from "@/components/ImpactTracker";
 import Footer from "@/components/Footer";
 import MobileNavigation from "@/components/MobileNavigation";
 import AddOnPopup from "@/components/AddOnPopup";
+import LocationNotification from "@/components/LocationNotification";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
@@ -16,6 +17,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
+      <LocationNotification />
       <div className={isAuthenticated ? "pb-20" : ""}> {/* Add bottom padding only if authenticated for mobile navigation */}
         <HeroSection />
         <FoodListings />

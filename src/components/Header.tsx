@@ -1,13 +1,16 @@
 
-import { User, MapPin } from "lucide-react";
+import { User, MapPin, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import CartSheet from "./CartSheet";
+import LocationSearch from "./LocationSearch";
+import { useState } from "react";
 
 const Header = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const [currentLocation, setCurrentLocation] = useState("Nairobi, Kenya");
 
   const handlePartnerClick = () => {
     navigate("/partner-application");
@@ -19,6 +22,15 @@ const Header = () => {
 
   const handleProfileClick = () => {
     navigate("/profile");
+  };
+
+  const handleFoodWasteClick = () => {
+    navigate("/food-waste");
+  };
+
+  const handleLocationSelect = (location: { lat: number; lng: number; address: string }) => {
+    setCurrentLocation(location.address);
+    console.log('Selected location:', location);
   };
 
   return (
@@ -34,14 +46,29 @@ const Header = () => {
             <span className="text-xs text-gray-500 hidden sm:block">Good food deserves a second chance</span>
           </div>
 
-          {/* Location */}
-          <div className="flex items-center space-x-2 text-gray-600">
-            <MapPin className="w-4 h-4" />
-            <span className="text-sm">Nairobi, Kenya</span>
+          {/* Location with Search */}
+          <div className="flex items-center space-x-4">
+            <div className="hidden md:block">
+              <LocationSearch onLocationSelect={handleLocationSelect} />
+            </div>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <MapPin className="w-4 h-4" />
+              <span className="text-sm">{currentLocation}</span>
+            </div>
           </div>
 
           {/* Actions */}
           <div className="flex items-center space-x-3">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="flex items-center space-x-1 text-orange-600 hover:text-orange-700"
+              onClick={handleFoodWasteClick}
+            >
+              <Info className="w-4 h-4" />
+              <span className="hidden sm:inline">About Food Waste</span>
+            </Button>
+            
             {isAuthenticated ? (
               <>
                 <CartSheet />

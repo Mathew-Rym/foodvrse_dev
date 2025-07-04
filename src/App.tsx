@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import PartnerApplication from "./pages/PartnerApplication";
 import BusinessDashboard from "./pages/BusinessDashboard";
 import Auth from "./pages/Auth";
+import FoodWaste from "./pages/FoodWaste";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="/partner-application" element={<PartnerApplication />} />
               <Route path="/business-dashboard" element={<BusinessDashboard />} />
+              <Route path="/food-waste" element={<FoodWaste />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
