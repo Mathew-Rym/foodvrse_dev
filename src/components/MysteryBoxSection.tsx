@@ -66,6 +66,10 @@ const MysteryBoxSection = () => {
     console.log("Added mystery box to cart:", box.title);
   };
 
+  const handleViewAllMysteryBoxes = () => {
+    navigate("/mystery-boxes");
+  };
+
   return (
     <section className="py-16 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -135,8 +139,21 @@ const MysteryBoxSection = () => {
           ))}
         </div>
 
+        {/* View All Button */}
+        <div className="text-center">
+          <Button 
+            size="lg"
+            variant="outline"
+            onClick={handleViewAllMysteryBoxes}
+            className="border-purple-300 text-purple-600 hover:bg-purple-50"
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
+            View All Mystery Boxes
+          </Button>
+        </div>
+
         {/* How it Works */}
-        <div className="bg-white rounded-2xl shadow-sm p-8">
+        <div className="bg-white rounded-2xl shadow-sm p-8 mt-12">
           <h3 className="text-xl font-bold text-gray-900 text-center mb-8">How Mystery Boxes Work</h3>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">

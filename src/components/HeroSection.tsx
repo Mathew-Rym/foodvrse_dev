@@ -12,13 +12,11 @@ const HeroSection = () => {
   };
 
   const handleForBusinesses = () => {
-    // Check if user is an approved partner
-    const isApprovedPartner = user?.isPartner === true;
-    
-    if (isApprovedPartner) {
+    // For now, open business dashboard for any logged in user
+    if (user) {
       navigate("/business-dashboard");
     } else {
-      navigate("/partner-application");
+      navigate("/auth");
     }
   };
 

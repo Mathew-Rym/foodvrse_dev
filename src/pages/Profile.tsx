@@ -1,5 +1,5 @@
 
-import { User, Settings, Heart, HelpCircle, LogOut, MapPin, Bell, CreditCard, Camera } from "lucide-react";
+import { User, Settings, Heart, HelpCircle, LogOut, MapPin, Bell, CreditCard, Camera, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ const Profile = () => {
   });
 
   const menuItems = [
+    { icon: Receipt, label: "My Orders", action: "orders" },
     { icon: Settings, label: "Account Settings", action: "settings" },
     { icon: MapPin, label: "Delivery Addresses", action: "addresses" },
     { icon: Bell, label: "Notifications", action: "notifications" },
@@ -50,6 +51,39 @@ const Profile = () => {
         updateProfile({ photo: photoUrl });
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleMenuClick = (action: string) => {
+    switch (action) {
+      case 'orders':
+        navigate('/orders');
+        break;
+      case 'settings':
+        setIsEditingProfile(true);
+        break;
+      case 'addresses':
+        console.log('Navigate to addresses');
+        // Placeholder for addresses page
+        break;
+      case 'notifications':
+        console.log('Navigate to notifications');
+        // Placeholder for notifications settings
+        break;
+      case 'payment':
+        console.log('Navigate to payment methods');
+        // Placeholder for payment methods
+        break;
+      case 'favorites':
+        console.log('Navigate to favorites');
+        // Placeholder for favorites page
+        break;
+      case 'help':
+        console.log('Navigate to help & support');
+        // Placeholder for help page
+        break;
+      default:
+        console.log('Unknown action:', action);
     }
   };
 
@@ -108,11 +142,7 @@ const Profile = () => {
               return (
                 <button
                   key={index}
-                  onClick={() => {
-                    if (item.action === 'settings') {
-                      setIsEditingProfile(true);
-                    }
-                  }}
+                  onClick={() => handleMenuClick(item.action)}
                   className={`w-full flex items-center gap-3 p-4 text-left hover:bg-gray-50 transition-colors ${
                     index !== menuItems.length - 1 ? "border-b border-gray-100" : ""
                   }`}
