@@ -1,5 +1,4 @@
-
-import { Trash2, Plus, Minus } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileLayout from "@/components/MobileLayout";
 import { useCart } from "@/contexts/CartContext";
