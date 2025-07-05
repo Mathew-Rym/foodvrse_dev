@@ -47,7 +47,7 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
       title: "Navigate Easily",
       content: "Use the bottom navigation to explore all features",
       highlight: "navigation",
-      position: { bottom: "180px", left: "50%" }
+      position: { bottom: "100px", left: "50%" }
     },
     {
       title: "Make an Impact!",
@@ -78,24 +78,18 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
       {/* Overlay */}
       <div className="fixed inset-0 bg-black bg-opacity-70 z-50" />
       
-      {/* Treasure chest shining spotlight effect */}
+      {/* Spotlight effect for highlighted element */}
       <div 
-        className="fixed z-50 pointer-events-none"
+        className="fixed z-50 pointer-events-none animate-pulse"
         style={{
           ...currentStepData.position,
           transform: currentStepData.position.left === "50%" ? "translateX(-50%)" : "none",
           width: "200px",
           height: "120px",
-          background: "linear-gradient(45deg, rgba(255, 215, 0, 0.3), rgba(255, 193, 7, 0.2), rgba(255, 235, 59, 0.3))",
-          border: "3px solid #ffd700",
+          background: "rgba(255, 255, 255, 0.1)",
+          border: "3px solid #f97316",
           borderRadius: "12px",
-          boxShadow: `
-            0 0 0 9999px rgba(0, 0, 0, 0.5),
-            0 0 30px rgba(255, 215, 0, 0.6),
-            inset 0 0 20px rgba(255, 235, 59, 0.3),
-            0 0 60px rgba(255, 193, 7, 0.4)
-          `,
-          animation: "treasureShine 2s ease-in-out infinite"
+          boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
         }}
       />
 
@@ -171,35 +165,6 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
           </div>
         </CardContent>
       </Card>
-
-      <style>{`
-        @keyframes treasureShine {
-          0% { 
-            box-shadow: 
-              0 0 0 9999px rgba(0, 0, 0, 0.5),
-              0 0 30px rgba(255, 215, 0, 0.6),
-              inset 0 0 20px rgba(255, 235, 59, 0.3),
-              0 0 60px rgba(255, 193, 7, 0.4);
-            border-color: #ffd700;
-          }
-          50% { 
-            box-shadow: 
-              0 0 0 9999px rgba(0, 0, 0, 0.5),
-              0 0 50px rgba(255, 215, 0, 0.8),
-              inset 0 0 30px rgba(255, 235, 59, 0.5),
-              0 0 80px rgba(255, 193, 7, 0.6);
-            border-color: #ffeb3b;
-          }
-          100% { 
-            box-shadow: 
-              0 0 0 9999px rgba(0, 0, 0, 0.5),
-              0 0 30px rgba(255, 215, 0, 0.6),
-              inset 0 0 20px rgba(255, 235, 59, 0.3),
-              0 0 60px rgba(255, 193, 7, 0.4);
-            border-color: #ffd700;
-          }
-        }
-      `}</style>
     </>
   );
 };
