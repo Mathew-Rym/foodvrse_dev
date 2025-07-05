@@ -80,7 +80,7 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
       
       {/* Spotlight effect for highlighted element */}
       <div 
-        className="fixed z-50 pointer-events-none"
+        className="fixed z-50 pointer-events-none animate-pulse"
         style={{
           ...currentStepData.position,
           transform: currentStepData.position.left === "50%" ? "translateX(-50%)" : "none",
@@ -90,7 +90,6 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
           border: "3px solid #f97316",
           borderRadius: "12px",
           boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
-          animation: "pulse 2s infinite"
         }}
       />
 
@@ -166,13 +165,6 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
           </div>
         </CardContent>
       </Card>
-
-      <style jsx>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 0.7; }
-          50% { opacity: 1; }
-        }
-      `}</style>
     </>
   );
 };
