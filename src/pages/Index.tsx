@@ -10,10 +10,13 @@ import MobileNavigation from "@/components/MobileNavigation";
 import AddOnPopup from "@/components/AddOnPopup";
 import OrderCompletePopup from "@/components/OrderCompletePopup";
 import LocationNotification from "@/components/LocationNotification";
+import OnboardingTour from "@/components/OnboardingTour";
 import { useAuth } from "@/contexts/AuthContext";
+import { useOnboarding } from "@/hooks/useOnboarding";
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
+  const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
 
   return (
     <div className="min-h-screen bg-white">
@@ -30,6 +33,12 @@ const Index = () => {
       {isAuthenticated && <MobileNavigation />}
       <AddOnPopup />
       <OrderCompletePopup />
+      {showOnboarding && (
+        <OnboardingTour 
+          onComplete={completeOnboarding}
+          onSkip={skipOnboarding}
+        />
+      )}
     </div>
   );
 };
