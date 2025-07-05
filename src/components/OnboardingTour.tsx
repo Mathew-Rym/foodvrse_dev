@@ -16,22 +16,44 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
     {
       title: "Welcome to FoodVrse!",
       content: "Tap a dish to learn its story",
-      highlight: "meal-cards"
+      highlight: "meal-cards",
+      position: { top: "45%", left: "50%" }
     },
     {
-      title: "Explore Amazing Dishes",
+      title: "Start Saving Food",
       content: "Tap meals to explore and discover amazing rescue dishes",
-      highlight: "food-listings"
+      highlight: "start-saving",
+      position: { top: "35%", left: "25%" }
     },
     {
-      title: "Discover More",
-      content: "Swipe to discover more sustainable options",
-      highlight: "navigation"
+      title: "Reserve Meals",
+      content: "Reserve your favorite rescue meals before they're gone",
+      highlight: "reserve-now",
+      position: { top: "55%", left: "75%" }
+    },
+    {
+      title: "Mystery Boxes",
+      content: "Try our surprise boxes filled with rescued ingredients",
+      highlight: "mystery-box",
+      position: { top: "65%", left: "50%" }
+    },
+    {
+      title: "Become a Partner",
+      content: "Businesses can join our mission to reduce food waste",
+      highlight: "business-partner",
+      position: { top: "20%", right: "20px" }
+    },
+    {
+      title: "Navigate Easily",
+      content: "Use the bottom navigation to explore all features",
+      highlight: "navigation",
+      position: { bottom: "100px", left: "50%" }
     },
     {
       title: "Make an Impact!",
       content: "Every meal you view supports the fight against food waste!",
-      highlight: "impact"
+      highlight: "impact",
+      position: { top: "50%", left: "50%" }
     }
   ];
 
@@ -49,9 +71,39 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
     }
   };
 
+  const currentStepData = steps[currentStep];
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white shadow-2xl">
+    <>
+      {/* Overlay */}
+      <div className="fixed inset-0 bg-black bg-opacity-70 z-50" />
+      
+      {/* Spotlight effect for highlighted element */}
+      <div 
+        className="fixed z-50 pointer-events-none"
+        style={{
+          ...currentStepData.position,
+          transform: currentStepData.position.left === "50%" ? "translateX(-50%)" : "none",
+          width: "200px",
+          height: "120px",
+          background: "rgba(255, 255, 255, 0.1)",
+          border: "3px solid #f97316",
+          borderRadius: "12px",
+          boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
+          animation: "pulse 2s infinite"
+        }}
+      />
+
+      {/* Tooltip Card */}
+      <Card 
+        className="fixed z-50 w-full max-w-sm bg-white shadow-2xl"
+        style={{
+          ...currentStepData.position,
+          transform: currentStepData.position.left === "50%" ? "translateX(-50%)" : "none",
+          marginTop: currentStepData.position.top ? "140px" : undefined,
+          marginBottom: currentStepData.position.bottom ? "140px" : undefined,
+        }}
+      >
         <CardContent className="p-6">
           <div className="flex justify-between items-center mb-4">
             <div className="text-sm text-gray-500">
@@ -64,10 +116,10 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
 
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-900 mb-2">
-              {steps[currentStep].title}
+              {currentStepData.title}
             </h2>
             <p className="text-gray-600 leading-relaxed">
-              {steps[currentStep].content}
+              {currentStepData.content}
             </p>
           </div>
 
@@ -114,7 +166,14 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
           </div>
         </CardContent>
       </Card>
-    </div>
+
+      <style jsx>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 0.7; }
+          50% { opacity: 1; }
+        }
+      `}</style>
+    </>
   );
 };
 

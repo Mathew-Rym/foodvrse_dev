@@ -1,4 +1,3 @@
-
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import FoodListings from "@/components/FoodListings";
@@ -11,6 +10,8 @@ import AddOnPopup from "@/components/AddOnPopup";
 import OrderCompletePopup from "@/components/OrderCompletePopup";
 import LocationNotification from "@/components/LocationNotification";
 import OnboardingTour from "@/components/OnboardingTour";
+import CookieConsent from "@/components/CookieConsent";
+import FeedbackFAB from "@/components/FeedbackFAB";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOnboarding } from "@/hooks/useOnboarding";
 
@@ -33,6 +34,8 @@ const Index = () => {
       {isAuthenticated && <MobileNavigation />}
       <AddOnPopup />
       <OrderCompletePopup />
+      <CookieConsent />
+      <FeedbackFAB />
       {showOnboarding && (
         <OnboardingTour 
           onComplete={completeOnboarding}
