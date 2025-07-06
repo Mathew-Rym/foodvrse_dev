@@ -6,11 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const FeedbackFAB = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [subject, setSubject] = useState('');
   const [feedback, setFeedback] = useState('');
+  const { isAuthenticated } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,11 +36,13 @@ const FeedbackFAB = () => {
 
   return (
     <>
-      {/* Floating Action Button with Gold Glow */}
+      {/* Floating Action Button with Gold Glow positioned above nav bar */}
       <Button
         id="feedback-fab"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 animate-pulse"
+        className={`fixed right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 animate-pulse ${
+          isAuthenticated ? 'bottom-24' : 'bottom-6'
+        }`}
         style={{
           boxShadow: '0 0 20px rgba(251, 191, 36, 0.6), 0 0 40px rgba(251, 191, 36, 0.4), 0 0 60px rgba(251, 191, 36, 0.2)',
           filter: 'drop-shadow(0 0 10px rgba(251, 191, 36, 0.8))'

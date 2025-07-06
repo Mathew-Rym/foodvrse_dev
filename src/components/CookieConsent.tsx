@@ -3,9 +3,11 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Cookie } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CookieConsent = () => {
   const [showBanner, setShowBanner] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const consent = localStorage.getItem('foodvrse-cookie-consent');
@@ -27,7 +29,7 @@ const CookieConsent = () => {
   if (!showBanner) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 p-4">
+    <div className={`fixed left-0 right-0 z-40 p-4 ${isAuthenticated ? 'bottom-20' : 'bottom-0'}`}>
       <Card className="bg-white shadow-lg border border-orange-200">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
