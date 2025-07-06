@@ -1,3 +1,4 @@
+
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import FoodListings from "@/components/FoodListings";
@@ -24,14 +25,24 @@ const Index = () => {
       <Header />
       <LocationNotification />
       <div className={isAuthenticated ? "pb-20" : ""}> {/* Add bottom padding only if authenticated for mobile navigation */}
-        <HeroSection />
-        <FoodListings />
-        <MysteryBoxSection />
+        <div id="hero-section">
+          <HeroSection />
+        </div>
+        <div id="food-listings">
+          <FoodListings />
+        </div>
+        <div id="mystery-box-section">
+          <MysteryBoxSection />
+        </div>
         <GameSection />
         <ImpactTracker />
         <Footer />
       </div>
-      {isAuthenticated && <MobileNavigation />}
+      {isAuthenticated && (
+        <div id="mobile-navigation">
+          <MobileNavigation />
+        </div>
+      )}
       <AddOnPopup />
       <OrderCompletePopup />
       <CookieConsent />

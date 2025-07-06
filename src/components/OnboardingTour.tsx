@@ -15,45 +15,39 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
   const steps = [
     {
       title: "Welcome to FoodVrse!",
-      content: "Tap a dish to learn its story",
-      highlight: "meal-cards",
+      content: "Discover amazing rescue meals and help reduce food waste",
+      targetId: "hero-section",
+      position: { top: "30%", left: "50%" }
+    },
+    {
+      title: "Browse Rescue Meals",
+      content: "Tap on meal cards to view details and reserve your favorites",
+      targetId: "food-listings",
       position: { top: "45%", left: "50%" }
     },
     {
-      title: "Start Saving Food",
-      content: "Tap meals to explore and discover amazing rescue dishes",
-      highlight: "start-saving",
-      position: { top: "35%", left: "25%" }
-    },
-    {
-      title: "Reserve Meals",
-      content: "Reserve your favorite rescue meals before they're gone",
-      highlight: "reserve-now",
-      position: { top: "55%", left: "75%" }
-    },
-    {
       title: "Mystery Boxes",
-      content: "Try our surprise boxes filled with rescued ingredients",
-      highlight: "mystery-box",
-      position: { top: "65%", left: "50%" }
+      content: "Try our surprise boxes filled with rescued ingredients at great prices",
+      targetId: "mystery-box-section",
+      position: { top: "60%", left: "50%" }
     },
     {
       title: "Become a Partner",
       content: "Businesses can join our mission to reduce food waste",
-      highlight: "business-partner",
+      targetId: "business-partner-link",
       position: { top: "20%", right: "20px" }
     },
     {
-      title: "Navigate Easily",
-      content: "Use the bottom navigation to explore all features",
-      highlight: "navigation",
-      position: { bottom: "100px", left: "50%" }
+      title: "Navigation",
+      content: "Use the bottom navigation to explore all features when signed in",
+      targetId: "mobile-navigation",
+      position: { bottom: "140px", left: "50%" }
     },
     {
-      title: "Make an Impact!",
-      content: "Every meal you view supports the fight against food waste!",
-      highlight: "impact",
-      position: { top: "50%", left: "50%" }
+      title: "Share Feedback",
+      content: "Got ideas? Use this button to share feedback anytime!",
+      targetId: "feedback-fab",
+      position: { bottom: "100px", right: "80px" }
     }
   ];
 
@@ -73,25 +67,41 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
 
   const currentStepData = steps[currentStep];
 
+  // Create spotlight effect for the target element
+  const createSpotlight = () => {
+    const targetElement = document.getElementById(currentStepData.targetId);
+    if (targetElement) {
+      const rect = targetElement.getBoundingClientRect();
+      return {
+        top: rect.top - 10,
+        left: rect.left - 10,
+        width: rect.width + 20,
+        height: rect.height + 20,
+      };
+    }
+    return null;
+  };
+
+  const spotlightStyle = createSpotlight();
+
   return (
     <>
-      {/* Overlay */}
+      {/* Dark overlay */}
       <div className="fixed inset-0 bg-black bg-opacity-70 z-50" />
       
       {/* Spotlight effect for highlighted element */}
-      <div 
-        className="fixed z-50 pointer-events-none animate-pulse"
-        style={{
-          ...currentStepData.position,
-          transform: currentStepData.position.left === "50%" ? "translateX(-50%)" : "none",
-          width: "200px",
-          height: "120px",
-          background: "rgba(255, 255, 255, 0.1)",
-          border: "3px solid #f97316",
-          borderRadius: "12px",
-          boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
-        }}
-      />
+      {spotlightStyle && (
+        <div 
+          className="fixed z-50 pointer-events-none border-4 border-orange-400 rounded-lg shadow-lg animate-pulse"
+          style={{
+            top: `${spotlightStyle.top}px`,
+            left: `${spotlightStyle.left}px`,
+            width: `${spotlightStyle.width}px`,
+            height: `${spotlightStyle.height}px`,
+            boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 20px rgba(249, 115, 22, 0.6)',
+          }}
+        />
+      )}
 
       {/* Tooltip Card */}
       <Card 
@@ -99,8 +109,8 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
         style={{
           ...currentStepData.position,
           transform: currentStepData.position.left === "50%" ? "translateX(-50%)" : "none",
-          marginTop: currentStepData.position.top ? "140px" : undefined,
-          marginBottom: currentStepData.position.bottom ? "140px" : undefined,
+          marginTop: currentStepData.position.top ? "20px" : undefined,
+          marginBottom: currentStepData.position.bottom ? "20px" : undefined,
         }}
       >
         <CardContent className="p-6">
