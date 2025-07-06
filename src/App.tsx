@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { BusinessItemsProvider } from "@/contexts/BusinessItemsContext";
+import FeedbackFAB from "@/components/FeedbackFAB";
 import Index from "./pages/Index";
 import Discover from "./pages/Discover";
 import Cart from "./pages/Cart";
@@ -48,6 +49,7 @@ const App = () => (
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <FeedbackFAB />
             </BrowserRouter>
           </TooltipProvider>
         </CartProvider>

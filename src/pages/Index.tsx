@@ -12,7 +12,6 @@ import OrderCompletePopup from "@/components/OrderCompletePopup";
 import LocationNotification from "@/components/LocationNotification";
 import OnboardingTour from "@/components/OnboardingTour";
 import CookieConsent from "@/components/CookieConsent";
-import FeedbackFAB from "@/components/FeedbackFAB";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOnboarding } from "@/hooks/useOnboarding";
 
@@ -46,7 +45,6 @@ const Index = () => {
       <AddOnPopup />
       <OrderCompletePopup />
       <CookieConsent />
-      <FeedbackFAB />
       {showOnboarding && (
         <OnboardingTour 
           onComplete={completeOnboarding}

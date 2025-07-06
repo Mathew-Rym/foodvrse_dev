@@ -95,7 +95,7 @@ const Header = () => {
                 {totalItems > 0 && (
                   <Button variant="ghost" size="sm" className="flex items-center space-x-1 relative">
                     <ShoppingBag className="w-4 h-4" />
-                    <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs">
+                    <Badge className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-5 h-5 flex items-center justify-center p-0">
                       {totalItems}
                     </Badge>
                     <span className="hidden sm:inline">Cart</span>
