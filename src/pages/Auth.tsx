@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Building } from 'lucide-react';
+import { ArrowLeft, Building, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AuthFormData {
@@ -86,27 +86,49 @@ const Auth = () => {
           </DialogDescription>
         </DialogHeader>
 
+        {/* Account Type Selection - Only show when not in business mode */}
         {!isBusinessAuth && (
-          <div className="flex gap-2 mb-4">
+          <div className="space-y-3 mb-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-3">Choose your account type:</p>
+            </div>
+            
+            {/* Consumer Option */}
+            <div className="p-3 border rounded-lg bg-green-50 border-green-200">
+              <div className="flex items-center gap-3 mb-2">
+                <ShoppingBag className="w-5 h-5 text-green-600" />
+                <div>
+                  <h3 className="font-medium text-green-800">Save Money</h3>
+                  <p className="text-xs text-green-600">Click here to buy discounted food</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Business Option */}
             <Button
               variant="outline"
-              className="flex-1"
+              className="w-full p-4 h-auto flex items-start gap-3 border-orange-200 bg-orange-50 hover:bg-orange-100"
               onClick={() => setIsBusinessAuth(true)}
             >
-              <Building className="w-4 h-4 mr-2" />
-              Business Login
+              <Building className="w-5 h-5 text-orange-600 mt-0.5" />
+              <div className="text-left">
+                <div className="font-medium text-orange-800">Business/Sell</div>
+                <div className="text-xs text-orange-600">Click here to list your food items</div>
+              </div>
             </Button>
           </div>
         )}
 
+        {/* Business Mode - Show switch back option */}
         {isBusinessAuth && (
-          <div className="flex gap-2 mb-4">
+          <div className="mb-4">
             <Button
               variant="outline"
-              className="flex-1"
+              className="w-full flex items-center gap-2"
               onClick={() => setIsBusinessAuth(false)}
             >
-              Consumer Login
+              <ShoppingBag className="w-4 h-4" />
+              Switch to Consumer Login
             </Button>
           </div>
         )}
