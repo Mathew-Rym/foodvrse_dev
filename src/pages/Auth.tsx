@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Building } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AuthFormData {
@@ -18,6 +18,7 @@ interface AuthFormData {
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isBusinessAuth, setIsBusinessAuth] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
   const { login, signup } = useAuth();
   const navigate = useNavigate();
@@ -39,9 +40,13 @@ const Auth = () => {
         await login(data.email, data.password);
       }
       
-      // Redirect to the page they came from or home
-      const from = location.state?.from?.pathname || '/';
-      navigate(from);
+      // Redirect based on auth type
+      if (isBusinessAuth) {
+        navigate('/business-dashboard');
+      } else {
+        const from = location.state?.from?.pathname || '/';
+        navigate(from);
+      }
     } catch (error) {
       console.error('Authentication error:', error);
     }
@@ -50,7 +55,7 @@ const Auth = () => {
   const handleGoogleSignIn = () => {
     // Mock Google sign-in
     toast.success('Google Sign-In coming soon!');
-    console.log('Google sign-in clicked');
+    console.log('Google sign-in clicked', isBusinessAuth ? 'for business' : 'for consumer');
   };
 
   const handleClose = () => {
@@ -66,15 +71,45 @@ const Auth = () => {
             <Button variant="ghost" size="sm" onClick={handleClose}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <DialogTitle>{isSignUp ? 'Create Account' : 'Sign In'}</DialogTitle>
+            <DialogTitle>
+              {isBusinessAuth ? 'Business Sign In' : (isSignUp ? 'Create Account' : 'Sign In')}
+            </DialogTitle>
           </div>
           <DialogDescription>
-            {isSignUp 
-              ? 'Join FoodVrse to start saving food and money' 
-              : 'Welcome back to FoodVrse'
+            {isBusinessAuth 
+              ? 'Access your business dashboard and manage your listings'
+              : (isSignUp 
+                ? 'Join FoodVrse to start saving food and money' 
+                : 'Welcome back to FoodVrse'
+              )
             }
           </DialogDescription>
         </DialogHeader>
+
+        {!isBusinessAuth && (
+          <div className="flex gap-2 mb-4">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setIsBusinessAuth(true)}
+            >
+              <Building className="w-4 h-4 mr-2" />
+              Business Login
+            </Button>
+          </div>
+        )}
+
+        {isBusinessAuth && (
+          <div className="flex gap-2 mb-4">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setIsBusinessAuth(false)}
+            >
+              Consumer Login
+            </Button>
+          </div>
+        )}
 
         <div className="space-y-4">
           {/* Google Sign-In Button */}
@@ -167,24 +202,29 @@ const Auth = () => {
                 type="submit" 
                 className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white"
               >
-                {isSignUp ? 'Create Account' : 'Sign In'}
+                {isBusinessAuth 
+                  ? 'Access Business Dashboard'
+                  : (isSignUp ? 'Create Account' : 'Sign In')
+                }
               </Button>
             </form>
           </Form>
         </div>
 
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
-            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button
-              type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-orange-600 hover:text-orange-700 font-medium"
-            >
-              {isSignUp ? 'Sign In' : 'Sign Up'}
-            </button>
-          </p>
-        </div>
+        {!isBusinessAuth && (
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-orange-600 hover:text-orange-700 font-medium"
+              >
+                {isSignUp ? 'Sign In' : 'Sign Up'}
+              </button>
+            </p>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   ArrowLeft, 
   Package, 
@@ -11,38 +12,54 @@ import {
   Plus,
   Edit,
   Eye,
-  BarChart3
+  BarChart3,
+  Trash2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useBusinessItems } from "@/contexts/BusinessItemsContext";
+import AddItemModal from "@/components/AddItemModal";
+import Analytics from "@/components/Analytics";
+import { toast } from "sonner";
 
 const BusinessDashboard = () => {
   const navigate = useNavigate();
-  const [activeListings, setActiveListings] = useState([
-    {
-      id: 1,
-      name: "Mixed Pastries Box",
-      originalPrice: 800,
-      discountPrice: 400,
-      quantity: 5,
-      pickupTime: "4:00 PM - 6:00 PM",
-      status: "active"
-    },
-    {
-      id: 2,
-      name: "Fresh Salad Bundle",
-      originalPrice: 600,
-      discountPrice: 300,
-      quantity: 3,
-      pickupTime: "5:00 PM - 7:00 PM",
-      status: "low_stock"
-    }
-  ]);
+  const { items, addItem, updateItem, deleteItem } = useBusinessItems();
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [editingItem, setEditingItem] = useState<any>(null);
 
   const stats = {
     totalSales: 45600,
     itemsSold: 234,
     co2Saved: 167,
     avgRating: 4.7
+  };
+
+  const handleAddItem = (newItem: any) => {
+    addItem(newItem);
+    toast.success('Item added and now visible to customers!');
+  };
+
+  const handleEditItem = (item: any) => {
+    setEditingItem(item);
+  };
+
+  const handleUpdateItem = (updates: any) => {
+    if (editingItem) {
+      updateItem(editingItem.id, updates);
+      setEditingItem(null);
+      toast.success('Item updated successfully!');
+    }
+  };
+
+  const handleDeleteItem = (id: number) => {
+    deleteItem(id);
+    toast.success('Item deleted successfully!');
+  };
+
+  const handleContactSupport = () => {
+    window.open('https://wa.me/1234567890?text=Hello, I need help with my FoodVrse business account', '_blank');
+    toast.success('Opening WhatsApp to contact support...');
   };
 
   return (
@@ -112,11 +129,17 @@ const BusinessDashboard = () => {
         <div className="bg-white rounded-lg p-4 shadow-sm mb-6">
           <h3 className="font-semibold mb-3">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-3">
-            <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+            <Button 
+              className="bg-gradient-to-r from-orange-500 to-red-500 text-white"
+              onClick={() => setShowAddModal(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add New Item
             </Button>
-            <Button variant="outline">
+            <Button 
+              variant="outline"
+              onClick={() => setShowAnalytics(true)}
+            >
               <BarChart3 className="w-4 h-4 mr-2" />
               View Analytics
             </Button>
@@ -126,22 +149,19 @@ const BusinessDashboard = () => {
         {/* Active Listings */}
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">Active Listings</h3>
-            <Button variant="ghost" size="sm">
-              <Eye className="w-4 h-4" />
-            </Button>
+            <h3 className="font-semibold">Active Listings ({items.length})</h3>
           </div>
 
           <div className="space-y-3">
-            {activeListings.map((item) => (
+            {items.map((item) => (
               <div key={item.id} className="border border-gray-200 rounded-lg p-3">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-gray-900">{item.name}</h4>
+                  <h4 className="font-medium text-gray-900">{item.title}</h4>
                   <Badge 
                     variant={item.status === 'active' ? 'default' : 'destructive'}
                     className={item.status === 'active' ? 'bg-green-100 text-green-700' : ''}
                   >
-                    {item.status === 'active' ? 'Active' : 'Low Stock'}
+                    {item.status === 'active' ? 'Active' : item.quantity <= 2 ? 'Low Stock' : 'Sold Out'}
                   </Badge>
                 </div>
                 
@@ -149,7 +169,7 @@ const BusinessDashboard = () => {
                   <div className="flex items-center gap-4">
                     <span>
                       <span className="line-through">KSh {item.originalPrice}</span>
-                      <span className="ml-2 font-medium text-orange-600">KSh {item.discountPrice}</span>
+                      <span className="ml-2 font-medium text-orange-600">KSh {item.price}</span>
                     </span>
                     <span>Qty: {item.quantity}</span>
                   </div>
@@ -158,11 +178,25 @@ const BusinessDashboard = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1 text-sm text-gray-600">
                     <Clock className="w-3 h-3" />
-                    <span>{item.pickupTime}</span>
+                    <span>{item.pickup}</span>
                   </div>
-                  <Button variant="ghost" size="sm">
-                    <Edit className="w-4 h-4" />
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleEditItem(item)}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleDeleteItem(item.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -175,11 +209,82 @@ const BusinessDashboard = () => {
           <p className="text-sm text-white/90 mb-3">
             Contact our partner support team for assistance with your listings or account.
           </p>
-          <Button variant="secondary" size="sm" className="bg-white text-blue-600 hover:bg-gray-100">
+          <Button 
+            variant="secondary" 
+            size="sm" 
+            className="bg-white text-blue-600 hover:bg-gray-100"
+            onClick={handleContactSupport}
+          >
             Contact Support
           </Button>
         </div>
       </div>
+
+      {/* Add Item Modal */}
+      <AddItemModal 
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onAddItem={handleAddItem}
+      />
+
+      {/* Analytics Modal */}
+      <Dialog open={showAnalytics} onOpenChange={setShowAnalytics}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Business Analytics</DialogTitle>
+          </DialogHeader>
+          <Analytics />
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Item Modal */}
+      {editingItem && (
+        <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Item</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Quantity</label>
+                <input 
+                  type="number" 
+                  className="w-full mt-1 p-2 border rounded"
+                  defaultValue={editingItem.quantity}
+                  onChange={(e) => setEditingItem({...editingItem, quantity: Number(e.target.value)})}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Status</label>
+                <select 
+                  className="w-full mt-1 p-2 border rounded"
+                  defaultValue={editingItem.status}
+                  onChange={(e) => setEditingItem({...editingItem, status: e.target.value})}
+                >
+                  <option value="active">Active</option>
+                  <option value="low_stock">Low Stock</option>
+                  <option value="sold_out">Sold Out</option>
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setEditingItem(null)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => handleUpdateItem(editingItem)}
+                  className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white"
+                >
+                  Update
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
