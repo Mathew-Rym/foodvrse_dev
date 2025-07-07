@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,16 +12,19 @@ import {
   Edit,
   Eye,
   BarChart3,
-  Trash2
+  Trash2,
+  LogOut
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useBusinessItems } from "@/contexts/BusinessItemsContext";
+import { useAuth } from "@/contexts/AuthContext";
 import AddItemModal from "@/components/AddItemModal";
 import Analytics from "@/components/Analytics";
 import { toast } from "sonner";
 
 const BusinessDashboard = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const { items, addItem, updateItem, deleteItem } = useBusinessItems();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
@@ -62,6 +64,12 @@ const BusinessDashboard = () => {
     toast.success('Opening WhatsApp to contact support...');
   };
 
+  const handleSignOut = () => {
+    logout();
+    navigate('/');
+    toast.success('Signed out successfully');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -81,7 +89,17 @@ const BusinessDashboard = () => {
               <p className="text-white/90 text-sm">Mama's Kitchen</p>
             </div>
           </div>
-          <Badge className="bg-green-500 text-white">Active Partner</Badge>
+          <div className="flex items-center gap-2">
+            <Badge className="bg-green-500 text-white">Active Partner</Badge>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleSignOut}
+              className="text-white hover:bg-white/20"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
 

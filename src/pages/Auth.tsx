@@ -20,7 +20,7 @@ const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isBusinessAuth, setIsBusinessAuth] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
-  const { loginConsumer, loginBusiness, signupConsumer, signupBusiness } = useAuth();
+  const { loginConsumer, loginBusiness, signupConsumer } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -35,12 +35,8 @@ const Auth = () => {
   const onSubmit = async (data: AuthFormData) => {
     try {
       if (isBusinessAuth) {
-        // Business authentication
-        if (isSignUp) {
-          await signupBusiness(data.email, data.password, data.name || '');
-        } else {
-          await loginBusiness(data.email, data.password);
-        }
+        // Business authentication (login only)
+        await loginBusiness(data.email, data.password);
         navigate('/business-dashboard');
       } else {
         // Consumer authentication
@@ -77,6 +73,10 @@ const Auth = () => {
     resetForm();
   };
 
+  const handleBecomePartner = () => {
+    navigate('/partner-application');
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
@@ -86,7 +86,7 @@ const Auth = () => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <DialogTitle>
-              {isBusinessAuth ? 'Business Account' : 'Consumer Account'}
+              {isBusinessAuth ? 'Business Login' : 'Consumer Account'}
             </DialogTitle>
           </div>
           <DialogDescription>
@@ -169,7 +169,8 @@ const Auth = () => {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {isSignUp && (
+              {/* Only show name field for consumer signup */}
+              {isSignUp && !isBusinessAuth && (
                 <FormField
                   control={form.control}
                   name="name"
@@ -236,9 +237,9 @@ const Auth = () => {
                     : 'bg-gradient-to-r from-green-500 to-green-600'
                 }`}
               >
-                {isSignUp 
-                  ? `Create ${isBusinessAuth ? 'Business' : 'Consumer'} Account`
-                  : `Sign In as ${isBusinessAuth ? 'Business' : 'Consumer'}`
+                {isBusinessAuth 
+                  ? 'Sign In as Business'
+                  : (isSignUp ? 'Create Consumer Account' : 'Sign In as Consumer')
                 }
               </Button>
             </form>
@@ -246,18 +247,31 @@ const Auth = () => {
         </div>
 
         <div className="text-center">
-          <p className="text-sm text-gray-600">
-            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button
-              type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className={`font-medium ${
-                isBusinessAuth ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'
-              }`}
-            >
-              {isSignUp ? 'Sign In' : 'Sign Up'}
-            </button>
-          </p>
+          {isBusinessAuth ? (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">
+                Don't have a business account?
+              </p>
+              <Button
+                variant="outline"
+                onClick={handleBecomePartner}
+                className="w-full text-orange-600 border-orange-200 hover:bg-orange-50"
+              >
+                Become a Partner
+              </Button>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-600">
+              {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="font-medium text-green-600 hover:text-green-700"
+              >
+                {isSignUp ? 'Sign In' : 'Sign Up'}
+              </button>
+            </p>
+          )}
         </div>
       </DialogContent>
     </Dialog>
