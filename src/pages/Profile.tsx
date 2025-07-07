@@ -1,5 +1,4 @@
-
-import { User, Settings, Heart, HelpCircle, LogOut, MapPin, Bell, CreditCard, Camera, Receipt, Trash2 } from "lucide-react";
+import { User, Settings, Heart, HelpCircle, LogOut, MapPin, Bell, CreditCard, Camera, Receipt, Trash2, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -18,10 +17,17 @@ const Profile = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showPaymentMethods, setShowPaymentMethods] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [showAddPayment, setShowAddPayment] = useState(false);
+  const [editingPayment, setEditingPayment] = useState<any>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     email: user?.email || ''
+  });
+
+  const [newPaymentData, setNewPaymentData] = useState({
+    type: 'M-Pesa',
+    number: ''
   });
 
   // Mock data for favorites and payment methods
@@ -79,15 +85,51 @@ const Profile = () => {
     toast.success('Removed from favorites');
   };
 
-  const handleAddPaymentMethod = (type: string, details: string) => {
+  const handleAddPaymentMethod = () => {
+    if (!newPaymentData.number) {
+      toast.error('Please enter payment details');
+      return;
+    }
+
     const newMethod = {
       id: Date.now(),
-      type,
-      number: details,
+      type: newPaymentData.type,
+      number: newPaymentData.number,
       default: paymentMethods.length === 0
     };
     setPaymentMethods(prev => [...prev, newMethod]);
+    setNewPaymentData({ type: 'M-Pesa', number: '' });
+    setShowAddPayment(false);
     toast.success('Payment method added!');
+  };
+
+  const handleEditPaymentMethod = (method: any) => {
+    setEditingPayment({ ...method });
+  };
+
+  const handleSaveEditPayment = () => {
+    setPaymentMethods(prev => 
+      prev.map(method => 
+        method.id === editingPayment.id ? editingPayment : method
+      )
+    );
+    setEditingPayment(null);
+    toast.success('Payment method updated!');
+  };
+
+  const handleRemovePaymentMethod = (id: number) => {
+    setPaymentMethods(prev => prev.filter(method => method.id !== id));
+    toast.success('Payment method removed!');
+  };
+
+  const handleSetDefaultPayment = (id: number) => {
+    setPaymentMethods(prev => 
+      prev.map(method => ({
+        ...method,
+        default: method.id === id
+      }))
+    );
+    toast.success('Default payment method updated!');
   };
 
   const handleMenuClick = (action: string) => {
@@ -293,7 +335,7 @@ const Profile = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Payment Methods Dialog */}
+        {/* Enhanced Payment Methods Dialog */}
         <Dialog open={showPaymentMethods} onOpenChange={setShowPaymentMethods}>
           <DialogContent>
             <DialogHeader>
@@ -302,36 +344,147 @@ const Profile = () => {
                 Manage your payment options
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-80 overflow-y-auto">
               {paymentMethods.map((method) => (
                 <div key={method.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium">{method.type}</p>
                     <p className="text-sm text-gray-600">{method.number}</p>
                     {method.default && <Badge className="mt-1 bg-green-100 text-green-700">Default</Badge>}
                   </div>
+                  <div className="flex gap-2">
+                    {!method.default && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSetDefaultPayment(method.id)}
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        Set Default
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditPaymentMethod(method)}
+                      className="text-gray-600 hover:text-gray-700"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemovePaymentMethod(method.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
-              <div className="grid grid-cols-2 gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => handleAddPaymentMethod('M-Pesa', '254700000000')}
-                  className="text-green-600 border-green-200"
-                >
-                  Add M-Pesa
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => handleAddPaymentMethod('Credit Card', '**** **** **** 5678')}
-                  className="text-blue-600 border-blue-200"
-                >
-                  Add Card
-                </Button>
-              </div>
-              <Button onClick={() => setShowPaymentMethods(false)} className="w-full">
+              {paymentMethods.length === 0 && (
+                <p className="text-center text-gray-500 py-4">No payment methods added yet</p>
+              )}
+            </div>
+            <div className="flex gap-2 pt-4 border-t">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowAddPayment(true)}
+                className="flex-1"
+              >
+                Add Payment Method
+              </Button>
+              <Button onClick={() => setShowPaymentMethods(false)} variant="outline">
                 Done
               </Button>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Payment Method Dialog */}
+        <Dialog open={showAddPayment} onOpenChange={setShowAddPayment}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Payment Method</DialogTitle>
+              <DialogDescription>
+                Add a new payment option
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Payment Type</label>
+                <select 
+                  value={newPaymentData.type}
+                  onChange={(e) => setNewPaymentData({ ...newPaymentData, type: e.target.value })}
+                  className="w-full p-2 border rounded-lg"
+                >
+                  <option value="M-Pesa">M-Pesa</option>
+                  <option value="Credit Card">Credit Card</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  {newPaymentData.type === 'M-Pesa' ? 'Phone Number' : 'Card Number'}
+                </label>
+                <Input
+                  value={newPaymentData.number}
+                  onChange={(e) => setNewPaymentData({ ...newPaymentData, number: e.target.value })}
+                  placeholder={newPaymentData.type === 'M-Pesa' ? '254700000000' : '**** **** **** 1234'}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleAddPaymentMethod} className="flex-1">
+                  Add Payment Method
+                </Button>
+                <Button variant="outline" onClick={() => setShowAddPayment(false)} className="flex-1">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Payment Method Dialog */}
+        <Dialog open={!!editingPayment} onOpenChange={() => setEditingPayment(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Payment Method</DialogTitle>
+              <DialogDescription>
+                Update your payment information
+              </DialogDescription>
+            </DialogHeader>
+            {editingPayment && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Payment Type</label>
+                  <select 
+                    value={editingPayment.type}
+                    onChange={(e) => setEditingPayment({ ...editingPayment, type: e.target.value })}
+                    className="w-full p-2 border rounded-lg"
+                  >
+                    <option value="M-Pesa">M-Pesa</option>
+                    <option value="Credit Card">Credit Card</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    {editingPayment.type === 'M-Pesa' ? 'Phone Number' : 'Card Number'}
+                  </label>
+                  <Input
+                    value={editingPayment.number}
+                    onChange={(e) => setEditingPayment({ ...editingPayment, number: e.target.value })}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleSaveEditPayment} className="flex-1">
+                    Save Changes
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditingPayment(null)} className="flex-1">
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
 

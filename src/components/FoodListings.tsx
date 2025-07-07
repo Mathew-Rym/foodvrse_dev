@@ -1,11 +1,14 @@
+
 import { useState } from "react";
-import { Clock, MapPin, Star, Leaf } from "lucide-react";
+import { Clock, MapPin, Star, Leaf, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 
 const FoodListings = () => {
   const [filter, setFilter] = useState("all");
+  const [favorites, setFavorites] = useState<number[]>([]);
   const { addToCart } = useCart();
 
   const listings = [
@@ -116,6 +119,16 @@ const FoodListings = () => {
     });
   };
 
+  const handleToggleFavorite = (listingId: number, listingName: string) => {
+    if (favorites.includes(listingId)) {
+      setFavorites(prev => prev.filter(id => id !== listingId));
+      toast.success(`Removed ${listingName} from favorites`);
+    } else {
+      setFavorites(prev => [...prev, listingId]);
+      toast.success(`Added ${listingName} to favorites`);
+    }
+  };
+
   return (
     <section className="py-12 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -125,7 +138,6 @@ const FoodListings = () => {
           <p className="text-lg text-gray-600">Fresh deals updated every hour</p>
         </div>
 
-        {/* Category Filters */}
         <div className="flex flex-wrap gap-2 justify-center mb-8">
           {categories.map((category) => (
             <Button
@@ -143,18 +155,34 @@ const FoodListings = () => {
           ))}
         </div>
 
-        {/* Listings Grid */}
+        {/* Listings Grid with Favorite Buttons */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredListings.map((listing) => (
             <div key={listing.id} className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden">
-              {/* Image */}
+              {/* Image with Favorite Button */}
               <div className={`h-48 bg-gradient-to-br ${listing.image} relative`}>
                 <div className="absolute top-3 left-3">
                   <Badge className="bg-green-500 text-white">
                     {Math.round(((listing.originalPrice - listing.discountedPrice) / listing.originalPrice) * 100)}% OFF
                   </Badge>
                 </div>
-                <div className="absolute top-3 right-3">
+                <div className="absolute top-3 right-3 flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleToggleFavorite(listing.id, listing.title)}
+                    className={`p-2 rounded-full ${
+                      favorites.includes(listing.id)
+                        ? "bg-red-500 text-white hover:bg-red-600"
+                        : "bg-white/90 text-gray-700 hover:bg-white"
+                    }`}
+                  >
+                    <Heart 
+                      className={`w-4 h-4 ${
+                        favorites.includes(listing.id) ? "fill-current" : ""
+                      }`} 
+                    />
+                  </Button>
                   <Badge variant="secondary" className="bg-white/90 text-gray-700 flex items-center gap-1">
                     <Leaf className="w-3 h-3 text-green-500" />
                     {listing.co2Saved}kg CO₂
@@ -164,19 +192,16 @@ const FoodListings = () => {
 
               {/* Content */}
               <div className="p-4 space-y-3">
-                {/* Title and Vendor */}
                 <div>
                   <h3 className="font-semibold text-lg text-gray-900">{listing.title}</h3>
                   <p className="text-gray-600 text-sm">{listing.vendor}</p>
                 </div>
 
-                {/* Price */}
                 <div className="flex items-center gap-2">
                   <span className="text-xl font-bold text-green-600">KSh {listing.discountedPrice}</span>
                   <span className="text-sm line-through text-gray-400">KSh {listing.originalPrice}</span>
                 </div>
 
-                {/* Details */}
                 <div className="space-y-2 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4" />
@@ -192,7 +217,6 @@ const FoodListings = () => {
                   </div>
                 </div>
 
-                {/* Dietary Tags */}
                 <div className="flex flex-wrap gap-1">
                   {listing.dietary.map((diet, index) => (
                     <Badge key={index} variant="outline" className="text-xs">
@@ -201,7 +225,6 @@ const FoodListings = () => {
                   ))}
                 </div>
 
-                {/* Action Button */}
                 <Button 
                   className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600"
                   onClick={() => handleReserveNow(listing)}
