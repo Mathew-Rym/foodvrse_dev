@@ -12,7 +12,7 @@ import { useState, useEffect } from "react";
 
 const Header = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { totalItems } = useCart();
   const { latitude, longitude } = useGeolocation();
   const [currentLocation, setCurrentLocation] = useState("Nairobi, Kenya");
@@ -34,7 +34,12 @@ const Header = () => {
   };
 
   const handleProfileClick = () => {
-    navigate("/profile");
+    // Check if user is a business user and redirect accordingly
+    if (user?.isPartner) {
+      navigate("/business-dashboard");
+    } else {
+      navigate("/profile");
+    }
   };
 
   const handleFoodWasteClick = () => {
@@ -87,7 +92,7 @@ const Header = () => {
                 <CartSheet />
                 <Button variant="ghost" size="sm" className="flex items-center space-x-1" onClick={handleProfileClick}>
                   <User className="w-4 h-4" />
-                  <span className="hidden sm:inline">Profile</span>
+                  <span className="hidden sm:inline">{user?.isPartner ? 'Dashboard' : 'Profile'}</span>
                 </Button>
               </>
             ) : (
