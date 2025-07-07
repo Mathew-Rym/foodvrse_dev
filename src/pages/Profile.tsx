@@ -1,22 +1,40 @@
 
-import { User, Settings, Heart, HelpCircle, LogOut, MapPin, Bell, CreditCard, Camera, Receipt } from "lucide-react";
+import { User, Settings, Heart, HelpCircle, LogOut, MapPin, Bell, CreditCard, Camera, Receipt, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import MobileLayout from "@/components/MobileLayout";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user, logout, updateProfile } = useAuth();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showPaymentMethods, setShowPaymentMethods] = useState(false);
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     email: user?.email || ''
   });
+
+  // Mock data for favorites and payment methods
+  const [favorites, setFavorites] = useState([
+    { id: 1, name: "Mama's Kitchen", location: "Downtown", rating: 4.8 },
+    { id: 2, name: "Green Cafe", location: "Westlands", rating: 4.5 },
+    { id: 3, name: "Pizza Corner", location: "CBD", rating: 4.7 }
+  ]);
+
+  const [paymentMethods, setPaymentMethods] = useState([
+    { id: 1, type: "M-Pesa", number: "254712345678", default: true },
+    { id: 2, type: "Credit Card", number: "**** **** **** 1234", default: false }
+  ]);
 
   const menuItems = [
     { icon: Receipt, label: "My Orders", action: "orders" },
@@ -40,6 +58,7 @@ const Profile = () => {
   const handleSaveProfile = () => {
     updateProfile(profileData);
     setIsEditingProfile(false);
+    toast.success('Profile updated successfully!');
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,9 +68,26 @@ const Profile = () => {
       reader.onload = (e) => {
         const photoUrl = e.target?.result as string;
         updateProfile({ photo: photoUrl });
+        toast.success('Profile photo updated!');
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleRemoveFavorite = (id: number) => {
+    setFavorites(prev => prev.filter(fav => fav.id !== id));
+    toast.success('Removed from favorites');
+  };
+
+  const handleAddPaymentMethod = (type: string, details: string) => {
+    const newMethod = {
+      id: Date.now(),
+      type,
+      number: details,
+      default: paymentMethods.length === 0
+    };
+    setPaymentMethods(prev => [...prev, newMethod]);
+    toast.success('Payment method added!');
   };
 
   const handleMenuClick = (action: string) => {
@@ -63,24 +99,21 @@ const Profile = () => {
         setIsEditingProfile(true);
         break;
       case 'addresses':
-        console.log('Navigate to addresses');
-        // Placeholder for addresses page
+        toast.info('Address management coming soon!');
         break;
       case 'notifications':
-        console.log('Navigate to notifications');
-        // Placeholder for notifications settings
+        setShowNotifications(true);
         break;
       case 'payment':
-        console.log('Navigate to payment methods');
-        // Placeholder for payment methods
+        setShowPaymentMethods(true);
         break;
       case 'favorites':
-        console.log('Navigate to favorites');
-        // Placeholder for favorites page
+        setShowFavorites(true);
         break;
       case 'help':
-        console.log('Navigate to help & support');
-        // Placeholder for help page
+        // Open WhatsApp support
+        window.open('https://wa.me/1234567890?text=Hello, I need help with my FoodVrse account', '_blank');
+        toast.success('Opening WhatsApp support...');
         break;
       default:
         console.log('Unknown action:', action);
@@ -216,6 +249,126 @@ const Profile = () => {
                 </Button>
               </div>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Notifications Dialog */}
+        <Dialog open={showNotifications} onOpenChange={setShowNotifications}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Notification Settings</DialogTitle>
+              <DialogDescription>
+                Manage your notification preferences
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="font-medium">Push Notifications</label>
+                  <p className="text-sm text-gray-600">Get notified about order updates</p>
+                </div>
+                <Switch 
+                  checked={notificationsEnabled}
+                  onCheckedChange={setNotificationsEnabled}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="font-medium">Email Notifications</label>
+                  <p className="text-sm text-gray-600">Receive deals via email</p>
+                </div>
+                <Switch defaultChecked />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="font-medium">SMS Notifications</label>
+                  <p className="text-sm text-gray-600">Get SMS for urgent updates</p>
+                </div>
+                <Switch />
+              </div>
+              <Button onClick={() => setShowNotifications(false)} className="w-full">
+                Save Settings
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Payment Methods Dialog */}
+        <Dialog open={showPaymentMethods} onOpenChange={setShowPaymentMethods}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Payment Methods</DialogTitle>
+              <DialogDescription>
+                Manage your payment options
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              {paymentMethods.map((method) => (
+                <div key={method.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <p className="font-medium">{method.type}</p>
+                    <p className="text-sm text-gray-600">{method.number}</p>
+                    {method.default && <Badge className="mt-1 bg-green-100 text-green-700">Default</Badge>}
+                  </div>
+                </div>
+              ))}
+              <div className="grid grid-cols-2 gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleAddPaymentMethod('M-Pesa', '254700000000')}
+                  className="text-green-600 border-green-200"
+                >
+                  Add M-Pesa
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => handleAddPaymentMethod('Credit Card', '**** **** **** 5678')}
+                  className="text-blue-600 border-blue-200"
+                >
+                  Add Card
+                </Button>
+              </div>
+              <Button onClick={() => setShowPaymentMethods(false)} className="w-full">
+                Done
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Favorites Dialog */}
+        <Dialog open={showFavorites} onOpenChange={setShowFavorites}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Favorite Restaurants</DialogTitle>
+              <DialogDescription>
+                Your saved restaurants
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3 max-h-60 overflow-y-auto">
+              {favorites.map((favorite) => (
+                <div key={favorite.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <p className="font-medium">{favorite.name}</p>
+                    <p className="text-sm text-gray-600">{favorite.location}</p>
+                    <p className="text-sm text-yellow-600">⭐ {favorite.rating}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveFavorite(favorite.id)}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+              {favorites.length === 0 && (
+                <p className="text-center text-gray-500 py-4">No favorite restaurants yet</p>
+              )}
+            </div>
+            <Button onClick={() => setShowFavorites(false)} className="w-full">
+              Done
+            </Button>
           </DialogContent>
         </Dialog>
       </div>

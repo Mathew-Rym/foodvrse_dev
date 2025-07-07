@@ -37,6 +37,7 @@ interface CartContextType {
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
   completeOrder: () => void;
+  updateOrderStatus: (orderId: string, status: 'preparing' | 'ready' | 'completed') => void;
   totalItems: number;
   totalPrice: number;
   showAddOnPopup: boolean;
@@ -127,6 +128,14 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     setShowOrderCompletePopup(true);
   };
 
+  const updateOrderStatus = (orderId: string, status: 'preparing' | 'ready' | 'completed') => {
+    setOrders(prev => 
+      prev.map(order => 
+        order.id === orderId ? { ...order, status } : order
+      )
+    );
+  };
+
   const clearCart = () => {
     setItems([]);
     setSelectedAddOns([]);
@@ -152,6 +161,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     updateQuantity,
     clearCart,
     completeOrder,
+    updateOrderStatus,
     totalItems,
     totalPrice,
     showAddOnPopup,

@@ -2,12 +2,19 @@
 import { Home, Search, ShoppingBag, Trophy, User } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 
 const MobileNavigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { totalItems } = useCart();
+  const { isBusinessUser } = useAuth();
+
+  // Don't show navigation for business users
+  if (isBusinessUser) {
+    return null;
+  }
 
   const tabs = [
     { id: "home", label: "Home", icon: Home, path: "/" },
