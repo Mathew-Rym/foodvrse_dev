@@ -6,16 +6,20 @@ interface User {
   email: string;
   name: string;
   photo?: string;
-  isPartner?: boolean;
+  isPartner: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name: string) => Promise<void>;
+  loginConsumer: (email: string, password: string) => Promise<void>;
+  loginBusiness: (email: string, password: string) => Promise<void>;
+  signupConsumer: (email: string, password: string, name: string) => Promise<void>;
+  signupBusiness: (email: string, password: string, name: string) => Promise<void>;
   logout: () => void;
   updateProfile: (updates: Partial<User>) => void;
   isAuthenticated: boolean;
+  isBusinessUser: boolean;
+  isConsumerUser: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,27 +39,53 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = async (email: string, password: string) => {
-    console.log('Login attempt:', email);
+  const loginConsumer = async (email: string, password: string) => {
+    console.log('Consumer login attempt:', email);
     
     const mockUser: User = {
-      id: '1',
+      id: 'consumer_' + Date.now(),
       email: email,
-      name: 'John Doe',
-      isPartner: email.includes('partner')
+      name: 'Consumer User',
+      isPartner: false
     };
     
     setUser(mockUser);
   };
 
-  const signup = async (email: string, password: string, name: string) => {
-    console.log('Signup attempt:', email, name);
+  const loginBusiness = async (email: string, password: string) => {
+    console.log('Business login attempt:', email);
     
     const mockUser: User = {
-      id: '1',
+      id: 'business_' + Date.now(),
+      email: email,
+      name: 'Business Owner',
+      isPartner: true
+    };
+    
+    setUser(mockUser);
+  };
+
+  const signupConsumer = async (email: string, password: string, name: string) => {
+    console.log('Consumer signup attempt:', email, name);
+    
+    const mockUser: User = {
+      id: 'consumer_' + Date.now(),
       email: email,
       name: name,
-      isPartner: email.includes('partner')
+      isPartner: false
+    };
+    
+    setUser(mockUser);
+  };
+
+  const signupBusiness = async (email: string, password: string, name: string) => {
+    console.log('Business signup attempt:', email, name);
+    
+    const mockUser: User = {
+      id: 'business_' + Date.now(),
+      email: email,
+      name: name,
+      isPartner: true
     };
     
     setUser(mockUser);
@@ -72,14 +102,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const isAuthenticated = user !== null;
+  const isBusinessUser = user?.isPartner === true;
+  const isConsumerUser = user?.isPartner === false;
 
   const value = {
     user,
-    login,
-    signup,
+    loginConsumer,
+    loginBusiness,
+    signupConsumer,
+    signupBusiness,
     logout,
     updateProfile,
-    isAuthenticated
+    isAuthenticated,
+    isBusinessUser,
+    isConsumerUser
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

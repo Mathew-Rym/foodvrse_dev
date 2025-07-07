@@ -20,7 +20,7 @@ const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isBusinessAuth, setIsBusinessAuth] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
-  const { login, signup } = useAuth();
+  const { loginConsumer, loginBusiness, signupConsumer, signupBusiness } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -34,16 +34,21 @@ const Auth = () => {
 
   const onSubmit = async (data: AuthFormData) => {
     try {
-      if (isSignUp) {
-        await signup(data.email, data.password, data.name || '');
-      } else {
-        await login(data.email, data.password);
-      }
-      
-      // Redirect based on auth type
       if (isBusinessAuth) {
+        // Business authentication
+        if (isSignUp) {
+          await signupBusiness(data.email, data.password, data.name || '');
+        } else {
+          await loginBusiness(data.email, data.password);
+        }
         navigate('/business-dashboard');
       } else {
+        // Consumer authentication
+        if (isSignUp) {
+          await signupConsumer(data.email, data.password, data.name || '');
+        } else {
+          await loginConsumer(data.email, data.password);
+        }
         const from = location.state?.from?.pathname || '/';
         navigate(from);
       }
@@ -53,7 +58,6 @@ const Auth = () => {
   };
 
   const handleGoogleSignIn = () => {
-    // Mock Google sign-in
     toast.success('Google Sign-In coming soon!');
     console.log('Google sign-in clicked', isBusinessAuth ? 'for business' : 'for consumer');
   };
@@ -61,6 +65,16 @@ const Auth = () => {
   const handleClose = () => {
     setIsOpen(false);
     navigate('/');
+  };
+
+  const resetForm = () => {
+    form.reset();
+    setIsSignUp(false);
+  };
+
+  const handleAuthTypeSwitch = (toBusiness: boolean) => {
+    setIsBusinessAuth(toBusiness);
+    resetForm();
   };
 
   return (
@@ -72,66 +86,60 @@ const Auth = () => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <DialogTitle>
-              {isBusinessAuth ? 'Business Sign In' : (isSignUp ? 'Create Account' : 'Sign In')}
+              {isBusinessAuth ? 'Business Account' : 'Consumer Account'}
             </DialogTitle>
           </div>
           <DialogDescription>
             {isBusinessAuth 
-              ? 'Access your business dashboard and manage your listings'
+              ? 'Business login to manage your restaurant listings'
               : (isSignUp 
-                ? 'Join FoodVrse to start saving food and money' 
-                : 'Welcome back to FoodVrse'
+                ? 'Create a consumer account to buy discounted food' 
+                : 'Consumer login to access your orders and save money'
               )
             }
           </DialogDescription>
         </DialogHeader>
 
-        {/* Account Type Selection - Only show when not in business mode */}
-        {!isBusinessAuth && (
-          <div className="space-y-3 mb-4">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-3">Choose your account type:</p>
-            </div>
-            
-            {/* Consumer Option */}
-            <div className="p-3 border rounded-lg bg-green-50 border-green-200">
-              <div className="flex items-center gap-3 mb-2">
-                <ShoppingBag className="w-5 h-5 text-green-600" />
-                <div>
-                  <h3 className="font-medium text-green-800">Save Money</h3>
-                  <p className="text-xs text-green-600">Click here to buy discounted food</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Business Option */}
-            <Button
-              variant="outline"
-              className="w-full p-4 h-auto flex items-start gap-3 border-orange-200 bg-orange-50 hover:bg-orange-100"
-              onClick={() => setIsBusinessAuth(true)}
-            >
-              <Building className="w-5 h-5 text-orange-600 mt-0.5" />
-              <div className="text-left">
-                <div className="font-medium text-orange-800">Business/Sell</div>
-                <div className="text-xs text-orange-600">Click here to list your food items</div>
-              </div>
-            </Button>
+        {/* Account Type Selection */}
+        <div className="space-y-3 mb-4">
+          <div className="text-center">
+            <p className="text-sm text-gray-600 mb-3">Choose your account type:</p>
           </div>
-        )}
+          
+          {/* Consumer Option */}
+          <Button
+            variant={!isBusinessAuth ? "default" : "outline"}
+            className={`w-full p-4 h-auto flex items-start gap-3 ${
+              !isBusinessAuth 
+                ? 'bg-green-500 hover:bg-green-600 text-white border-green-500' 
+                : 'border-green-200 bg-green-50 hover:bg-green-100'
+            }`}
+            onClick={() => handleAuthTypeSwitch(false)}
+          >
+            <ShoppingBag className={`w-5 h-5 mt-0.5 ${!isBusinessAuth ? 'text-white' : 'text-green-600'}`} />
+            <div className="text-left">
+              <div className={`font-medium ${!isBusinessAuth ? 'text-white' : 'text-green-800'}`}>Save Money</div>
+              <div className={`text-xs ${!isBusinessAuth ? 'text-green-100' : 'text-green-600'}`}>Click here to buy discounted food</div>
+            </div>
+          </Button>
 
-        {/* Business Mode - Show switch back option */}
-        {isBusinessAuth && (
-          <div className="mb-4">
-            <Button
-              variant="outline"
-              className="w-full flex items-center gap-2"
-              onClick={() => setIsBusinessAuth(false)}
-            >
-              <ShoppingBag className="w-4 h-4" />
-              Switch to Consumer Login
-            </Button>
-          </div>
-        )}
+          {/* Business Option */}
+          <Button
+            variant={isBusinessAuth ? "default" : "outline"}
+            className={`w-full p-4 h-auto flex items-start gap-3 ${
+              isBusinessAuth 
+                ? 'bg-orange-500 hover:bg-orange-600 text-white border-orange-500' 
+                : 'border-orange-200 bg-orange-50 hover:bg-orange-100'
+            }`}
+            onClick={() => handleAuthTypeSwitch(true)}
+          >
+            <Building className={`w-5 h-5 mt-0.5 ${isBusinessAuth ? 'text-white' : 'text-orange-600'}`} />
+            <div className="text-left">
+              <div className={`font-medium ${isBusinessAuth ? 'text-white' : 'text-orange-800'}`}>Business/Sell</div>
+              <div className={`text-xs ${isBusinessAuth ? 'text-orange-100' : 'text-orange-600'}`}>Click here to list your food items</div>
+            </div>
+          </Button>
+        </div>
 
         <div className="space-y-4">
           {/* Google Sign-In Button */}
@@ -222,31 +230,35 @@ const Auth = () => {
 
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white"
+                className={`w-full text-white ${
+                  isBusinessAuth 
+                    ? 'bg-gradient-to-r from-orange-500 to-red-500' 
+                    : 'bg-gradient-to-r from-green-500 to-green-600'
+                }`}
               >
-                {isBusinessAuth 
-                  ? 'Access Business Dashboard'
-                  : (isSignUp ? 'Create Account' : 'Sign In')
+                {isSignUp 
+                  ? `Create ${isBusinessAuth ? 'Business' : 'Consumer'} Account`
+                  : `Sign In as ${isBusinessAuth ? 'Business' : 'Consumer'}`
                 }
               </Button>
             </form>
           </Form>
         </div>
 
-        {!isBusinessAuth && (
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-orange-600 hover:text-orange-700 font-medium"
-              >
-                {isSignUp ? 'Sign In' : 'Sign Up'}
-              </button>
-            </p>
-          </div>
-        )}
+        <div className="text-center">
+          <p className="text-sm text-gray-600">
+            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+            <button
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className={`font-medium ${
+                isBusinessAuth ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'
+              }`}
+            >
+              {isSignUp ? 'Sign In' : 'Sign Up'}
+            </button>
+          </p>
+        </div>
       </DialogContent>
     </Dialog>
   );
