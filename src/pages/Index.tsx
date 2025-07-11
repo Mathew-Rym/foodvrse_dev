@@ -12,6 +12,7 @@ import OrderCompletePopup from "@/components/OrderCompletePopup";
 import LocationNotification from "@/components/LocationNotification";
 import OnboardingTour from "@/components/OnboardingTour";
 import CookieConsent from "@/components/CookieConsent";
+import WelcomeMessage from "@/components/WelcomeMessage";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOnboarding } from "@/hooks/useOnboarding";
 
@@ -21,6 +22,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
+      <WelcomeMessage />
       <Header />
       <LocationNotification />
       <div className={`${isAuthenticated ? "pb-20" : ""} overflow-x-hidden`}> {/* Add overflow-x-hidden to prevent horizontal scroll */}

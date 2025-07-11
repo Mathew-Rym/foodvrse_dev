@@ -2,6 +2,7 @@ import { Leaf, Clock, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import VideoSection from "./VideoSection";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -84,48 +85,7 @@ const HeroSection = () => {
 
           {/* Visual */}
           <div className="relative order-first lg:order-last">
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="space-y-3 sm:space-y-4">
-                <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg">
-                  <div className="w-full h-24 sm:h-32 bg-gradient-to-br from-orange-200 to-red-200 rounded-lg mb-2 sm:mb-3"></div>
-                  <h3 className="font-semibold text-xs sm:text-sm">Pizza Mystery Box</h3>
-                  <p className="text-xs text-gray-600">Java House</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-green-600 font-bold text-sm sm:text-base">KSh 300</span>
-                    <span className="text-xs line-through text-gray-400">KSh 1000</span>
-                  </div>
-                </div>
-                <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg">
-                  <div className="w-full h-20 sm:h-24 bg-gradient-to-br from-green-200 to-yellow-200 rounded-lg mb-2 sm:mb-3"></div>
-                  <h3 className="font-semibold text-xs sm:text-sm">Fresh Salads</h3>
-                  <p className="text-xs text-gray-600">Healthy U</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-green-600 font-bold text-sm sm:text-base">KSh 200</span>
-                    <span className="text-xs line-through text-gray-400">KSh 600</span>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-3 sm:space-y-4 mt-6 sm:mt-8">
-                <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg">
-                  <div className="w-full h-20 sm:h-24 bg-gradient-to-br from-purple-200 to-pink-200 rounded-lg mb-2 sm:mb-3"></div>
-                  <h3 className="font-semibold text-xs sm:text-sm">Pastries & Bread</h3>
-                  <p className="text-xs text-gray-600">Artcaffe</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-green-600 font-bold text-sm sm:text-base">KSh 150</span>
-                    <span className="text-xs line-through text-gray-400">KSh 500</span>
-                  </div>
-                </div>
-                <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg">
-                  <div className="w-full h-24 sm:h-32 bg-gradient-to-br from-blue-200 to-indigo-200 rounded-lg mb-2 sm:mb-3"></div>
-                  <h3 className="font-semibold text-xs sm:text-sm">Grocery Bundle</h3>
-                  <p className="text-xs text-gray-600">Carrefour</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-green-600 font-bold text-sm sm:text-base">KSh 400</span>
-                    <span className="text-xs line-through text-gray-400">KSh 1200</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <VideoSection />
           </div>
         </div>
       </div>

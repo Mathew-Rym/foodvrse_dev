@@ -3,11 +3,17 @@ import { Search, Filter, MapPin, Heart, Star, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MobileLayout from "@/components/MobileLayout";
+import GoogleMapsSearch from "@/components/GoogleMapsSearch";
 import { useState } from "react";
 
 const Discover = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [currentLocation, setCurrentLocation] = useState({
+    address: "Nairobi, Kenya",
+    lat: -1.2921,
+    lng: 36.8219
+  });
 
   const categories = [
     { name: "Restaurants", count: 24, color: "bg-orange-100 text-orange-600", emoji: "🍽️" },
@@ -72,6 +78,11 @@ const Discover = () => {
     // Implement category filtering
   };
 
+  const handleLocationSelect = (location: { lat: number; lng: number; address: string }) => {
+    setCurrentLocation(location);
+    console.log("Location selected:", location);
+  };
+
   return (
     <MobileLayout>
       <div className="min-h-screen bg-gray-50 pb-20">
@@ -94,9 +105,15 @@ const Discover = () => {
             </Button>
           </div>
           
+          {/* Location Search */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+            <GoogleMapsSearch onLocationSelect={handleLocationSelect} />
+          </div>
+          
           <div className="flex items-center gap-2 text-gray-600">
             <MapPin className="w-4 h-4 text-green-500" />
-            <span className="text-sm">Nairobi, Kenya</span>
+            <span className="text-sm">{currentLocation.address}</span>
           </div>
         </div>
 

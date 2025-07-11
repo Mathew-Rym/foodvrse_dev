@@ -1,5 +1,5 @@
 
-import { Home, Search, ShoppingBag, Trophy, User } from "lucide-react";
+import { Home, Search, ShoppingBag, Trophy, User, Heart } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,7 +20,7 @@ const MobileNavigation = () => {
     { id: "home", label: "Home", icon: Home, path: "/" },
     { id: "discover", label: "Discover", icon: Search, path: "/discover" },
     { id: "cart", label: "Cart", icon: ShoppingBag, path: "/cart" },
-    { id: "impact", label: "Impact", icon: Trophy, path: "/impact" },
+    { id: "favorites", label: "Favorites", icon: Heart, path: "/favorites" },
     { id: "profile", label: "Profile", icon: User, path: "/profile" },
   ];
 

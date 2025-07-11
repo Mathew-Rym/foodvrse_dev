@@ -14,6 +14,7 @@ import Cart from "./pages/Cart";
 import Orders from "./pages/Orders";
 import Impact from "./pages/Impact";
 import Profile from "./pages/Profile";
+import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
 import PartnerApplication from "./pages/PartnerApplication";
 import BusinessDashboard from "./pages/BusinessDashboard";
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/impact" element={<Impact />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/favorites" element={<Favorites />} />
                 <Route path="/partner-application" element={<PartnerApplication />} />
                 <Route path="/business-dashboard" element={<BusinessDashboard />} />
                 <Route path="/food-waste" element={<FoodWaste />} />
