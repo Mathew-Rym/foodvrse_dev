@@ -357,7 +357,7 @@ const Auth = () => {
                   By creating your account, you agree to the{' '}
                   <button
                     type="button"
-                    onClick={() => window.open('/terms-of-service', '_blank')}
+                    onClick={() => navigate('/terms-of-service')}
                     className="text-green-600 hover:text-green-700 underline"
                   >
                     Terms of Service
@@ -365,7 +365,7 @@ const Auth = () => {
                   and{' '}
                   <button
                     type="button"
-                    onClick={() => window.open('/privacy-policy', '_blank')}
+                    onClick={() => navigate('/privacy-policy')}
                     className="text-green-600 hover:text-green-700 underline"
                   >
                     Privacy Policy
@@ -402,7 +402,7 @@ const Auth = () => {
                   I allow FoodVrse to store my email address and name according to our{' '}
                   <button
                     type="button"
-                    onClick={() => window.open('/privacy-policy', '_blank')}
+                    onClick={() => navigate('/privacy-policy')}
                     className="text-green-600 hover:text-green-700 underline"
                   >
                     privacy policy
@@ -425,7 +425,7 @@ const Auth = () => {
                   I agree with the{' '}
                   <button
                     type="button"
-                    onClick={() => window.open('/terms-of-service', '_blank')}
+                    onClick={() => navigate('/terms-of-service')}
                     className="text-green-600 hover:text-green-700 underline font-bold"
                   >
                     terms & conditions
@@ -433,7 +433,7 @@ const Auth = () => {
                   and the{' '}
                   <button
                     type="button"
-                    onClick={() => window.open('/privacy-policy', '_blank')}
+                    onClick={() => navigate('/privacy-policy')}
                     className="text-green-600 hover:text-green-700 underline font-bold"
                   >
                     privacy policy
