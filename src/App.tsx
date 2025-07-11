@@ -21,6 +21,11 @@ import BusinessDashboard from "./pages/BusinessDashboard";
 import Auth from "./pages/Auth";
 import FoodWaste from "./pages/FoodWaste";
 import MysteryBoxes from "./pages/MysteryBoxes";
+import HowItWorks from "./pages/HowItWorks";
+import ImpactTrackerPage from "./pages/ImpactTrackerPage";
+import HelpCenter from "./pages/HelpCenter";
+import SafetyGuidelines from "./pages/SafetyGuidelines";
+import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
@@ -47,6 +52,11 @@ const App = () => (
                 <Route path="/business-dashboard" element={<BusinessDashboard />} />
                 <Route path="/food-waste" element={<FoodWaste />} />
                 <Route path="/mystery-boxes" element={<MysteryBoxes />} />
+                <Route path="/how-it-works" element={<HowItWorks />} />
+                <Route path="/impact-tracker" element={<ImpactTrackerPage />} />
+                <Route path="/help-center" element={<HelpCenter />} />
+                <Route path="/safety-guidelines" element={<SafetyGuidelines />} />
+                <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
