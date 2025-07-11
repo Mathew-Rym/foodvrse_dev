@@ -47,6 +47,8 @@ export type Database = {
           average_rating: number | null
           business_logo_url: string | null
           business_name: string
+          carbon_credits_earned: number | null
+          co2_missed_kg: number | null
           created_at: string
           description: string | null
           email: string | null
@@ -70,6 +72,8 @@ export type Database = {
           average_rating?: number | null
           business_logo_url?: string | null
           business_name: string
+          carbon_credits_earned?: number | null
+          co2_missed_kg?: number | null
           created_at?: string
           description?: string | null
           email?: string | null
@@ -93,6 +97,8 @@ export type Database = {
           average_rating?: number | null
           business_logo_url?: string | null
           business_name?: string
+          carbon_credits_earned?: number | null
+          co2_missed_kg?: number | null
           created_at?: string
           description?: string | null
           email?: string | null
@@ -110,6 +116,42 @@ export type Database = {
           updated_at?: string
           user_id?: string
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      carbon_credit_waitlist: {
+        Row: {
+          business_id: string
+          business_name: string
+          business_type: string | null
+          contact_email: string
+          contact_phone: string | null
+          created_at: string | null
+          estimated_monthly_co2_kg: number | null
+          id: string
+          interested_features: string[] | null
+        }
+        Insert: {
+          business_id: string
+          business_name: string
+          business_type?: string | null
+          contact_email: string
+          contact_phone?: string | null
+          created_at?: string | null
+          estimated_monthly_co2_kg?: number | null
+          id?: string
+          interested_features?: string[] | null
+        }
+        Update: {
+          business_id?: string
+          business_name?: string
+          business_type?: string | null
+          contact_email?: string
+          contact_phone?: string | null
+          created_at?: string | null
+          estimated_monthly_co2_kg?: number | null
+          id?: string
+          interested_features?: string[] | null
         }
         Relationships: []
       }
@@ -173,6 +215,48 @@ export type Database = {
           id?: string
           updated_at?: string
           week_start_day?: number
+        }
+        Relationships: []
+      }
+      listing_performance: {
+        Row: {
+          business_id: string
+          co2_saved_kg: number | null
+          created_at: string | null
+          date: string | null
+          favorites: number | null
+          id: string
+          listing_id: string
+          purchases: number | null
+          revenue: number | null
+          updated_at: string | null
+          views: number | null
+        }
+        Insert: {
+          business_id: string
+          co2_saved_kg?: number | null
+          created_at?: string | null
+          date?: string | null
+          favorites?: number | null
+          id?: string
+          listing_id: string
+          purchases?: number | null
+          revenue?: number | null
+          updated_at?: string | null
+          views?: number | null
+        }
+        Update: {
+          business_id?: string
+          co2_saved_kg?: number | null
+          created_at?: string | null
+          date?: string | null
+          favorites?: number | null
+          id?: string
+          listing_id?: string
+          purchases?: number | null
+          revenue?: number | null
+          updated_at?: string | null
+          views?: number | null
         }
         Relationships: []
       }
