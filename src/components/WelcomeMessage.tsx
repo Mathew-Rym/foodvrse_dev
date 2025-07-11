@@ -18,15 +18,24 @@ const WelcomeMessage = ({ isFirstTime = false }: WelcomeMessageProps) => {
         setIsVisible(false);
       }, 10000);
       return () => clearTimeout(timer);
-    } else if (isAuthenticated && user) {
-      // Show welcome back message for returning users (7 seconds)
-      setIsVisible(true);
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-      }, 7000);
-      return () => clearTimeout(timer);
     }
-  }, [isFirstTime, isAuthenticated, user]);
+  }, [isFirstTime, isAuthenticated]);
+
+  // Separate effect for login events
+  useEffect(() => {
+    if (isAuthenticated && user && !isFirstTime) {
+      // Only show welcome back message on actual login (when auth state changes to authenticated)
+      const hasShownWelcome = sessionStorage.getItem('welcome_shown');
+      if (!hasShownWelcome) {
+        setIsVisible(true);
+        sessionStorage.setItem('welcome_shown', 'true');
+        const timer = setTimeout(() => {
+          setIsVisible(false);
+        }, 7000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isAuthenticated, user, isFirstTime]);
 
   if (!isVisible) return null;
 
