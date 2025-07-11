@@ -1,15 +1,19 @@
 
+import { useState } from "react";
 import { Sparkles, Clock, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { MysteryBagDetailPopup } from "./MysteryBagDetailPopup";
 
 const MysteryBoxSection = () => {
   const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [selectedBag, setSelectedBag] = useState<any>(null);
+  const [showDetailPopup, setShowDetailPopup] = useState(false);
 
   const mysteryBoxes = [
     {
@@ -21,7 +25,15 @@ const MysteryBoxSection = () => {
       originalPrice: 900,
       pickup: "7:00 AM - 10:00 AM",
       items: "Pastries, Coffee & Light Meal",
-      gradient: "from-amber-400 to-orange-500"
+      gradient: "from-amber-400 to-orange-500",
+      location: "Westlands",
+      address: "Sarit Centre, Westlands Road",
+      website: "https://javahouse.co.ke",
+      itemsLeft: 4,
+      rating: 4.6,
+      reviewCount: 171,
+      category: "Breakfast & Coffee",
+      description: "The Mystery Bag 🛍️: Rescue a selection of goodies from the nation's favourite coffee shop! ☕ You can expect to receive a mixture of pastries, sandwiches, and sweet treats 🥪🧁..."
     },
     {
       id: 102,
@@ -32,7 +44,15 @@ const MysteryBoxSection = () => {
       originalPrice: 700,
       pickup: "5:00 PM - 7:00 PM",
       items: "Fresh Bread, Cakes & Treats",
-      gradient: "from-pink-400 to-red-500"
+      gradient: "from-pink-400 to-red-500",
+      location: "Karen",
+      address: "Karen Shopping Centre, Karen Road",
+      website: "https://artcaffe.co.ke",
+      itemsLeft: 2,
+      rating: 4.4,
+      reviewCount: 89,
+      category: "Bread & Pastries",
+      description: "The Mystery Bag 🛍️: Rescue a selection of goodies from Kenya's premium bakery! 🥖 You can expect to receive a mixture of fresh bread, cakes, and sweet treats 🍰🧁..."
     },
     {
       id: 103,
@@ -43,7 +63,15 @@ const MysteryBoxSection = () => {
       originalPrice: 1200,
       pickup: "12:00 PM - 3:00 PM",
       items: "Salads, Smoothies & Snacks",
-      gradient: "from-green-400 to-emerald-500"
+      gradient: "from-green-400 to-emerald-500",
+      location: "Kilimani",
+      address: "Yaya Centre, Kilimani Road",
+      website: "https://healthyu.co.ke",
+      itemsLeft: 6,
+      rating: 4.8,
+      reviewCount: 245,
+      category: "Healthy Food",
+      description: "The Mystery Bag 🛍️: Rescue a selection of healthy goodies! 🥗 You can expect to receive a mixture of fresh salads, smoothies, and nutritious snacks 🥤🥕..."
     }
   ];
 
@@ -53,17 +81,8 @@ const MysteryBoxSection = () => {
       return;
     }
 
-    const cartItem = {
-      id: box.id,
-      title: box.title,
-      vendor: box.vendor,
-      price: box.price,
-      originalPrice: box.originalPrice,
-      pickup: box.pickup
-    };
-
-    addToCart(cartItem);
-    console.log("Added mystery box to cart:", box.title);
+    setSelectedBag(box);
+    setShowDetailPopup(true);
   };
 
   const handleViewAllMysteryBoxes = () => {
@@ -160,8 +179,8 @@ const MysteryBoxSection = () => {
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">
                 1
               </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Choose Your Box</h4>
-              <p className="text-gray-600 text-sm">Select from available mystery bags near you</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Choose Your Location</h4>
+              <p className="text-gray-600 text-sm">Select from available stores with mystery bags near you</p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">
@@ -180,6 +199,15 @@ const MysteryBoxSection = () => {
           </div>
         </div>
       </div>
+
+      {/* Mystery Bag Detail Popup */}
+      {selectedBag && (
+        <MysteryBagDetailPopup
+          isOpen={showDetailPopup}
+          onClose={() => setShowDetailPopup(false)}
+          bag={selectedBag}
+        />
+      )}
     </section>
   );
 };
