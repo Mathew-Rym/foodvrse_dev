@@ -5,10 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Building2, Mail, Phone, MapPin, Clock, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const PartnerApplication = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { toast: toastHook } = useToast();
   const [formData, setFormData] = useState({
     businessName: "",
     ownerName: "",
@@ -24,14 +25,31 @@ const PartnerApplication = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simulate application submission
-    toast({
+    // Create mailto link with form data
+    const subject = encodeURIComponent("New Partner Application - " + formData.businessName);
+    const body = encodeURIComponent(`
+New Partner Application:
+
+Business Name: ${formData.businessName}
+Owner Name: ${formData.ownerName}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Business Type: ${formData.businessType}
+Address: ${formData.address}
+Operating Hours: ${formData.operatingHours}
+Expected Daily Surplus: ${formData.expectedWaste}
+Business Description: ${formData.description}
+
+Please review this application.
+    `);
+    
+    const mailtoLink = `mailto:partner@foodvrse.com?subject=${subject}&body=${body}`;
+    window.open(mailtoLink, '_blank');
+    
+    toastHook({
       title: "Application Submitted!",
       description: "We'll review your application and get back to you within 2-3 business days.",
     });
-    
-    // In a real app, this would send data to backend
-    console.log("Partner application submitted:", formData);
     
     // Redirect back to home after submission
     setTimeout(() => {
@@ -75,7 +93,7 @@ const PartnerApplication = () => {
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                 <span className="text-green-600 text-sm">💰</span>
               </div>
-              <span className="text-sm text-gray-700">Reduce food waste costs by up to 70%</span>
+              <span className="text-sm text-gray-700">Make money on surplus food while reducing waste costs by up to 70%</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -105,15 +123,26 @@ const PartnerApplication = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Business Name *
                 </label>
-                <input
-                  type="text"
-                  name="businessName"
-                  required
-                  value={formData.businessName}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="Your restaurant or business name"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="businessName"
+                    required
+                    value={formData.businessName}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    placeholder="Your restaurant or business name"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                  onClick={() => toast.success('Google Maps search coming soon!')}
+                  >
+                    🗺️
+                  </Button>
+                </div>
               </div>
 
               <div>
@@ -139,7 +168,12 @@ const PartnerApplication = () => {
                   name="businessType"
                   required
                   value={formData.businessType}
-                  onChange={handleInputChange}
+                  onChange={(e) => {
+                    handleInputChange(e);
+                    if (e.target.value === 'other') {
+                      toast.info('Please describe your business type in the "Tell us about your business" section below. Examples: Food truck, Catering service, Hotel restaurant, etc.');
+                    }
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="">Select business type</option>
@@ -194,15 +228,26 @@ const PartnerApplication = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Business Address *
                 </label>
-                <input
-                  type="text"
-                  name="address"
-                  required
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="Street, City, Kenya"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="address"
+                    required
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    placeholder="Street, City, Kenya"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                    onClick={() => toast.success('Map location selector coming soon!')}
+                  >
+                    📍
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -216,38 +261,39 @@ const PartnerApplication = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Operating Hours
+                  Operating Hours *
                 </label>
-                <input
-                  type="text"
-                  name="operatingHours"
-                  value={formData.operatingHours}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="e.g., Mon-Sun 9AM-9PM"
-                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start text-left"
+                  onClick={() => toast.success('Hours selection popup coming soon!')}
+                >
+                  {formData.operatingHours || "Select operating days and hours"}
+                </Button>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Expected Daily Food Surplus
+                  Expected Daily Food Surplus *
                 </label>
-                <input
-                  type="text"
-                  name="expectedWaste"
-                  value={formData.expectedWaste}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="e.g., 5-10 meals per day"
-                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start text-left"
+                  onClick={() => toast.success('Surplus range selection coming soon!')}
+                >
+                  {formData.expectedWaste || "Select expected daily surplus range"}
+                </Button>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tell us about your business
+                  Tell us about your business *
                 </label>
                 <textarea
                   name="description"
+                  required
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={3}

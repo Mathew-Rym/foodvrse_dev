@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Building, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Building, ShoppingBag, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AuthFormData {
@@ -20,6 +21,11 @@ const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isBusinessAuth, setIsBusinessAuth] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
+  const [showTermsConsent, setShowTermsConsent] = useState(false);
+  const [showEmailSignup, setShowEmailSignup] = useState(false);
+  const [showLocationRequest, setShowLocationRequest] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const { loginConsumer, loginBusiness, signupConsumer } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,26 +42,84 @@ const Auth = () => {
     try {
       if (isBusinessAuth) {
         // Business authentication (login only)
-        await loginBusiness(data.email, data.password);
-        navigate('/business-dashboard');
+        try {
+          await loginBusiness(data.email, data.password);
+          navigate('/business-dashboard');
+        } catch (error) {
+          // If business login fails, redirect to partner application
+          toast.error('Business account not found. Please apply to become a partner first.');
+          navigate('/partner-application');
+        }
       } else {
         // Consumer authentication
         if (isSignUp) {
           await signupConsumer(data.email, data.password, data.name || '');
+          setShowEmailSignup(true);
         } else {
           await loginConsumer(data.email, data.password);
+          const from = location.state?.from?.pathname || '/';
+          navigate(from);
         }
-        const from = location.state?.from?.pathname || '/';
-        navigate(from);
       }
     } catch (error) {
       console.error('Authentication error:', error);
+      toast.error('Authentication failed. Please try again.');
     }
   };
 
   const handleGoogleSignIn = () => {
-    toast.success('Google Sign-In coming soon!');
-    console.log('Google sign-in clicked', isBusinessAuth ? 'for business' : 'for consumer');
+    if (!isBusinessAuth && isSignUp) {
+      setShowTermsConsent(true);
+    } else {
+      toast.success('Google Sign-In coming soon!');
+      console.log('Google sign-in clicked', isBusinessAuth ? 'for business' : 'for consumer');
+    }
+  };
+
+  const handleFacebookSignIn = () => {
+    if (!isBusinessAuth && isSignUp) {
+      setShowTermsConsent(true);
+    } else {
+      toast.success('Facebook Sign-In coming soon!');
+      console.log('Facebook sign-in clicked for consumer');
+    }
+  };
+
+  const handleTermsConsent = () => {
+    if (termsAccepted && privacyAccepted) {
+      setShowTermsConsent(false);
+      // Continue with signup process
+      toast.success('Terms accepted! Please complete your signup.');
+    } else {
+      toast.error('Please accept both terms and privacy policy to continue.');
+    }
+  };
+
+  const handleEmailSignupContinue = (subscribeToEmails: boolean) => {
+    if (subscribeToEmails) {
+      // Store email for marketing purposes
+      console.log('User subscribed to emails');
+    }
+    setShowEmailSignup(false);
+    setShowLocationRequest(true);
+  };
+
+  const handleLocationRequest = (allowLocation: boolean) => {
+    if (allowLocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log('Location accessed:', position.coords);
+          toast.success('Location access granted!');
+        },
+        (error) => {
+          console.log('Location access denied:', error);
+          toast.info('Location access was denied, but you can still use the app.');
+        }
+      );
+    }
+    setShowLocationRequest(false);
+    const from = location.state?.from?.pathname || '/';
+    navigate(from);
   };
 
   const handleClose = () => {
@@ -157,6 +221,21 @@ const Auth = () => {
             </svg>
             Continue with Google
           </Button>
+
+          {/* Facebook Sign-In Button - Only for consumers */}
+          {!isBusinessAuth && (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full flex items-center gap-2"
+              onClick={handleFacebookSignIn}
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              Continue with Facebook
+            </Button>
+          )}
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -261,19 +340,193 @@ const Auth = () => {
               </Button>
             </div>
           ) : (
-            <p className="text-sm text-gray-600">
-              {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="font-medium text-green-600 hover:text-green-700"
-              >
-                {isSignUp ? 'Sign In' : 'Sign Up'}
-              </button>
-            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">
+                {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+                <button
+                  type="button"
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  className="font-medium text-green-600 hover:text-green-700"
+                >
+                  {isSignUp ? 'Sign In' : 'Sign Up'}
+                </button>
+              </p>
+              {/* Terms and Privacy Policy Links for Signup */}
+              {isSignUp && (
+                <div className="text-xs text-gray-500 mt-2">
+                  By creating your account, you agree to the{' '}
+                  <button
+                    type="button"
+                    onClick={() => navigate('/terms-of-service')}
+                    className="text-green-600 hover:text-green-700 underline"
+                  >
+                    Terms of Service
+                  </button>{' '}
+                  and{' '}
+                  <button
+                    type="button"
+                    onClick={() => navigate('/privacy-policy')}
+                    className="text-green-600 hover:text-green-700 underline"
+                  >
+                    Privacy Policy
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </DialogContent>
+
+      {/* Terms Consent Modal */}
+      <Dialog open={showTermsConsent} onOpenChange={setShowTermsConsent}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Terms & Privacy Consent</DialogTitle>
+            <DialogDescription>
+              Please review and accept our terms to continue
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="flex items-start space-x-2">
+              <Checkbox
+                id="privacy-consent"
+                checked={privacyAccepted}
+                onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
+              />
+              <div className="grid gap-1.5 leading-none">
+                <label
+                  htmlFor="privacy-consent"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  I allow FoodVrse to store my email address and name according to our{' '}
+                  <button
+                    type="button"
+                    onClick={() => navigate('/privacy-policy')}
+                    className="text-green-600 hover:text-green-700 underline"
+                  >
+                    privacy policy
+                  </button>
+                </label>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-2">
+              <Checkbox
+                id="terms-consent"
+                checked={termsAccepted}
+                onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+              />
+              <div className="grid gap-1.5 leading-none">
+                <label
+                  htmlFor="terms-consent"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  I agree with the{' '}
+                  <button
+                    type="button"
+                    onClick={() => navigate('/terms-of-service')}
+                    className="text-green-600 hover:text-green-700 underline font-bold"
+                  >
+                    terms & conditions
+                  </button>{' '}
+                  and the{' '}
+                  <button
+                    type="button"
+                    onClick={() => navigate('/privacy-policy')}
+                    className="text-green-600 hover:text-green-700 underline font-bold"
+                  >
+                    privacy policy
+                  </button>
+                </label>
+              </div>
+            </div>
+
+            <Button 
+              onClick={handleTermsConsent}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              disabled={!termsAccepted || !privacyAccepted}
+            >
+              CONTINUE
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Email Signup Modal */}
+      <Dialog open={showEmailSignup} onOpenChange={setShowEmailSignup}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex justify-center mb-4">
+              <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center">
+                <span className="text-3xl">🥟</span>
+              </div>
+            </div>
+            <DialogTitle className="text-center text-xl font-bold">
+              Be the first to know
+            </DialogTitle>
+            <DialogDescription className="text-center text-sm">
+              Unlock new stores and amazing deals first! Get smart tips to maximize your savings, 
+              dive into inspiring impact stories, and even enjoy the odd food pun. Sign up now to 
+              get it all delivered straight to your inbox and start your rescue journey!
+              <br />
+              <span className="text-xs text-gray-400">(We promise you'll only get emails that matter)</span>
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-3">
+            <Button 
+              onClick={() => handleEmailSignupContinue(true)}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+            >
+              YES, PLEASE
+            </Button>
+            <Button 
+              variant="ghost"
+              onClick={() => handleEmailSignupContinue(false)}
+              className="w-full text-gray-600"
+            >
+              MAYBE LATER
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Location Request Modal */}
+      <Dialog open={showLocationRequest} onOpenChange={setShowLocationRequest}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                <MapPin className="w-8 h-8 text-blue-600" />
+              </div>
+            </div>
+            <DialogTitle className="text-center text-xl font-bold">
+              Enable Location
+            </DialogTitle>
+            <DialogDescription className="text-center text-sm">
+              Allow FoodVrse to access your location to find the best deals near you and 
+              help you discover amazing food offers in your area.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-3">
+            <Button 
+              onClick={() => handleLocationRequest(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Allow Location Access
+            </Button>
+            <Button 
+              variant="ghost"
+              onClick={() => handleLocationRequest(false)}
+              className="w-full text-gray-600"
+            >
+              Maybe Later
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 };
