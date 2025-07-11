@@ -1,61 +1,107 @@
 
-import { Search, Filter, MapPin, Heart, Star, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Filter, MapPin, Heart, Star, Clock, Map, List, Hand } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MobileLayout from "@/components/MobileLayout";
-import GoogleMapsSearch from "@/components/GoogleMapsSearch";
-import { useState } from "react";
+import { FilterPopup, FilterOptions } from "@/components/FilterPopup";
+import { LocationSelector } from "@/components/LocationSelector";
+import { CategoryCarousel } from "@/components/CategoryCarousel";
+import { StoreProfilePage } from "@/components/StoreProfilePage";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Discover = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [favorites, setFavorites] = useState<number[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [currentLocation, setCurrentLocation] = useState({
     address: "Nairobi, Kenya",
     lat: -1.2921,
-    lng: 36.8219
+    lng: 36.8219,
+    distance: 10
   });
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [showFilter, setShowFilter] = useState(false);
+  const [showLocationSelector, setShowLocationSelector] = useState(false);
+  const [showStoreProfile, setShowStoreProfile] = useState(false);
+  const [selectedStore, setSelectedStore] = useState<any>(null);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [categoryData, setCategoryData] = useState<any>({});
 
-  const categories = [
-    { name: "Restaurants", count: 24, color: "bg-orange-100 text-orange-600", emoji: "🍽️" },
-    { name: "Bakeries", count: 12, color: "bg-yellow-100 text-yellow-600", emoji: "🥖" },
-    { name: "Grocery", count: 8, color: "bg-green-100 text-green-600", emoji: "🛒" },
-    { name: "Cafes", count: 15, color: "bg-blue-100 text-blue-600", emoji: "☕" },
-  ];
-
-  const nearbyPlaces = [
+  // Mock data for demonstration
+  const mockStores = [
     {
-      id: 1,
-      name: "Java House Westlands",
+      id: "1",
+      name: "Java House",
+      location: "Westlands",
       type: "Restaurant",
       distance: "0.5 km",
       rating: 4.5,
       savings: "Up to 70%",
       pickup: "5:00 PM - 8:00 PM",
-      image: "🍕"
+      image: "🍕",
+      address: "Westlands Road, Nairobi",
+      website: "https://javahouseafrica.com",
+      yearsActive: 2,
+      mealsWasted: 1200,
+      currentOffers: [
+        { id: "1", title: "Magic Bag", pickup: "Today: 17:30 - 18:00", price: 250, itemsLeft: 4 }
+      ],
+      pastOffers: [
+        { id: "2", title: "Lunch Special", price: 300 }
+      ]
     },
     {
-      id: 2,
-      name: "Artcaffe Sarit",
+      id: "2", 
+      name: "Artcaffe",
+      location: "Sarit",
       type: "Cafe & Bakery",
       distance: "1.2 km",
       rating: 4.3,
       savings: "Up to 60%",
       pickup: "6:00 PM - 9:00 PM",
-      image: "🥐"
-    },
-    {
-      id: 3,
-      name: "Healthy U Junction",
-      type: "Health Food",
-      distance: "0.8 km",
-      rating: 4.7,
-      savings: "Up to 80%",
-      pickup: "4:00 PM - 7:00 PM",
-      image: "🥗"
+      image: "🥐",
+      address: "Sarit Centre, Nairobi",
+      website: "https://artcaffe.co.ke",
+      yearsActive: 3,
+      mealsWasted: 850,
+      currentOffers: [
+        { id: "3", title: "Pastry Bag", pickup: "Today: 18:00 - 19:00", price: 200, itemsLeft: 2 }
+      ],
+      pastOffers: []
     }
   ];
 
-  const toggleFavorite = (id: number) => {
+  const popularSearches = ["Pizza", "Burgers", "Bakery", "bread", "Healthy", "Desserts", "Coffee"];
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+
+      setCategories(data || []);
+      
+      // Initialize category data with mock items
+      const mockCategoryData: any = {};
+      data?.forEach(category => {
+        mockCategoryData[category.name] = mockStores;
+      });
+      setCategoryData(mockCategoryData);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      toast.error('Failed to load categories');
+    }
+  };
+
+  const toggleFavorite = (id: string) => {
     setFavorites(prev => 
       prev.includes(id) 
         ? prev.filter(fav => fav !== id)
@@ -65,22 +111,56 @@ const Discover = () => {
 
   const handleSearch = () => {
     console.log("Searching for:", searchQuery);
-    // Implement search functionality
+    // TODO: Implement search functionality
   };
 
   const handleFilter = () => {
-    console.log("Opening filters");
-    // Implement filter functionality
+    setShowFilter(true);
   };
 
-  const handleCategoryClick = (category: string) => {
-    console.log("Selected category:", category);
-    // Implement category filtering
+  const handleApplyFilters = (filters: FilterOptions) => {
+    console.log("Applied filters:", filters);
+    // TODO: Implement filter logic
+    toast.success("Filters applied");
   };
 
-  const handleLocationSelect = (location: { lat: number; lng: number; address: string }) => {
+  const handleLocationSelect = (location: { lat: number; lng: number; address: string; distance: number }) => {
     setCurrentLocation(location);
     console.log("Location selected:", location);
+    toast.success("Location updated");
+  };
+
+  const handleCategoryClick = (categoryName: string) => {
+    console.log("Selected category:", categoryName);
+    // TODO: Navigate to category page or filter
+  };
+
+  const handleSeeAllCategory = (categoryName: string) => {
+    console.log("See all for category:", categoryName);
+    // TODO: Navigate to category page
+  };
+
+  const handleItemClick = (itemId: string) => {
+    console.log("Item clicked:", itemId);
+    // TODO: Open item details
+  };
+
+  const handleStoreClick = (storeId: string) => {
+    const store = mockStores.find(s => s.id === storeId);
+    if (store) {
+      setSelectedStore(store);
+      setShowStoreProfile(true);
+    }
+  };
+
+  const handlePopularSearchClick = (searchTerm: string) => {
+    setSearchQuery(searchTerm);
+    handleSearch();
+  };
+
+  const handleDonate = () => {
+    // TODO: Implement donate functionality
+    toast.success("Thank you for your interest in donating!");
   };
 
   return (
@@ -88,6 +168,7 @@ const Discover = () => {
       <div className="min-h-screen bg-gray-50 pb-20">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-4 py-4">
+          {/* Search Bar */}
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -103,109 +184,203 @@ const Discover = () => {
             <Button variant="outline" size="sm" onClick={handleFilter}>
               <Filter className="w-4 h-4" />
             </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowLocationSelector(true)}
+            >
+              <MapPin className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* View Toggle Buttons */}
+          <div className="flex gap-2 mb-4">
+            <Button
+              variant={viewMode === 'map' ? 'default' : 'outline'}
+              className="flex-1"
+              onClick={() => setViewMode('map')}
+            >
+              <Map className="w-4 h-4 mr-2" />
+              Map
+            </Button>
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'outline'}
+              className="flex-1"
+              onClick={() => setViewMode('list')}
+            >
+              <List className="w-4 h-4 mr-2" />
+              List
+            </Button>
           </div>
           
-          {/* Location Search */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-            <GoogleMapsSearch onLocationSelect={handleLocationSelect} />
-          </div>
-          
-          <div className="flex items-center gap-2 text-gray-600">
-            <MapPin className="w-4 h-4 text-green-500" />
-            <span className="text-sm">{currentLocation.address}</span>
+          {/* Current Location */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-gray-600">
+              <MapPin className="w-4 h-4 text-green-500" />
+              <span className="text-sm">{currentLocation.address}</span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDonate}
+              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-none hover:from-yellow-500 hover:to-orange-600"
+            >
+              <Hand className="w-4 h-4 mr-1" />
+              Donate
+            </Button>
           </div>
         </div>
 
-        {/* Categories */}
-        <div className="p-4">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Browse Categories</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {categories.map((category) => (
-              <button
-                key={category.name}
-                onClick={() => handleCategoryClick(category.name)}
-                className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow text-left"
-              >
-                <div className={`w-12 h-12 rounded-lg ${category.color} flex items-center justify-center mb-3`}>
-                  <span className="text-lg">{category.emoji}</span>
-                </div>
-                <h3 className="font-medium text-gray-900">{category.name}</h3>
-                <p className="text-sm text-gray-500">{category.count} nearby</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Nearby Places */}
-        <div className="p-4">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Near You</h2>
-          <div className="space-y-3">
-            {nearbyPlaces.map((place) => (
-              <div key={place.id} className="bg-white rounded-lg p-4 shadow-sm">
-                <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
-                    {place.image}
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{place.name}</h3>
-                        <p className="text-sm text-gray-600">{place.type}</p>
-                      </div>
-                      <button
-                        onClick={() => toggleFavorite(place.id)}
-                        className={`p-1 ${favorites.includes(place.id) ? 'text-red-500' : 'text-gray-400'}`}
-                      >
-                        <Heart className={`w-5 h-5 ${favorites.includes(place.id) ? 'fill-current' : ''}`} />
-                      </button>
-                    </div>
-                    
-                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        <span>{place.distance}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                        <span>{place.rating}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        <span>{place.pickup}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between mt-3">
-                      <Badge className="bg-green-100 text-green-600">{place.savings}</Badge>
-                      <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
-                        View Deals
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+        {viewMode === 'map' ? (
+          /* Map View */
+          <div className="h-96 bg-gray-100 relative">
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <MapPin className="w-8 h-8 mx-auto mb-2 text-gray-600" />
+                <p className="text-sm text-gray-600">Map View</p>
+                <p className="text-xs text-gray-500">Shows stores with mystery bags near you</p>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Popular Searches */}
-        <div className="p-4">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Popular Searches</h2>
-          <div className="flex flex-wrap gap-2">
-            {["Pizza", "Burgers", "Sushi", "Healthy", "Desserts", "Coffee"].map((tag) => (
+            </div>
+            
+            {/* Store pins on map */}
+            {mockStores.map((store, index) => (
               <button
-                key={tag}
-                onClick={() => setSearchQuery(tag)}
-                className="px-3 py-1 border border-gray-300 rounded-full text-sm hover:bg-orange-50 hover:border-orange-300"
+                key={store.id}
+                className="absolute w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border-2 border-orange-500 cursor-pointer hover:scale-110 transition-transform"
+                style={{
+                  top: `${30 + index * 15}%`,
+                  left: `${25 + index * 20}%`
+                }}
+                onClick={() => handleStoreClick(store.id)}
               >
-                {tag}
+                <span className="text-lg">{store.image}</span>
               </button>
             ))}
           </div>
-        </div>
+        ) : (
+          /* List View */
+          <div className="space-y-6 p-4">
+            {/* Dynamic Categories */}
+            <div className="space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900">Browse by Category</h2>
+              
+              {categories.map((category) => (
+                <CategoryCarousel
+                  key={category.id}
+                  category={{
+                    name: category.name,
+                    icon: category.icon,
+                    color: category.color
+                  }}
+                  items={categoryData[category.name] || []}
+                  onSeeAll={handleSeeAllCategory}
+                  onItemClick={handleItemClick}
+                />
+              ))}
+            </div>
+
+            {/* Near You Section */}
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold text-gray-900">Near You</h2>
+              <div className="space-y-3">
+                {mockStores.map((store) => (
+                  <div 
+                    key={store.id} 
+                    className="bg-white rounded-lg p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => handleStoreClick(store.id)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
+                        {store.image}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h3 className="font-semibold text-gray-900">{store.name}</h3>
+                            <p className="text-sm text-gray-600">{store.type}</p>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFavorite(store.id);
+                            }}
+                            className={`p-1 ${favorites.includes(store.id) ? 'text-red-500' : 'text-gray-400'}`}
+                          >
+                            <Heart className={`w-5 h-5 ${favorites.includes(store.id) ? 'fill-current' : ''}`} />
+                          </button>
+                        </div>
+                        
+                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            <span>{store.distance}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-3 h-3 text-yellow-500 fill-current" />
+                            <span>{store.rating}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            <span>{store.pickup}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between mt-3">
+                          <Badge className="bg-green-100 text-green-600">{store.savings}</Badge>
+                          <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+                            View Deals
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Popular Searches */}
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold text-gray-900">Popular Searches</h2>
+              <div className="flex flex-wrap gap-2">
+                {popularSearches.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => handlePopularSearchClick(tag)}
+                    className="px-3 py-1 border border-gray-300 rounded-full text-sm hover:bg-orange-50 hover:border-orange-300 transition-colors"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Filter Popup */}
+      <FilterPopup
+        isOpen={showFilter}
+        onClose={() => setShowFilter(false)}
+        onApplyFilters={handleApplyFilters}
+      />
+
+      {/* Location Selector */}
+      <LocationSelector
+        isOpen={showLocationSelector}
+        onClose={() => setShowLocationSelector(false)}
+        onLocationSelect={handleLocationSelect}
+        currentLocation={currentLocation}
+      />
+
+      {/* Store Profile */}
+      {selectedStore && (
+        <StoreProfilePage
+          isOpen={showStoreProfile}
+          onClose={() => setShowStoreProfile(false)}
+          store={selectedStore}
+        />
+      )}
     </MobileLayout>
   );
 };

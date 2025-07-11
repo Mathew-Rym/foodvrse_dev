@@ -14,13 +14,254 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      business_profiles: {
+        Row: {
+          address: string
+          business_logo_url: string | null
+          business_name: string
+          created_at: string
+          description: string | null
+          email: string | null
+          id: string
+          latitude: number | null
+          location: string
+          longitude: number | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+          website_url: string | null
+        }
+        Insert: {
+          address: string
+          business_logo_url?: string | null
+          business_name: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          latitude?: number | null
+          location: string
+          longitude?: number | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+          website_url?: string | null
+        }
+        Update: {
+          address?: string
+          business_logo_url?: string | null
+          business_name?: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          latitude?: number | null
+          location?: string
+          longitude?: number | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_time_based: boolean | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_time_based?: boolean | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_time_based?: boolean | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mystery_bag_categories: {
+        Row: {
+          category_id: string
+          created_at: string
+          id: string
+          mystery_bag_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          id?: string
+          mystery_bag_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          mystery_bag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mystery_bag_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mystery_bag_categories_mystery_bag_id_fkey"
+            columns: ["mystery_bag_id"]
+            isOneToOne: false
+            referencedRelation: "mystery_bags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mystery_bags: {
+        Row: {
+          allergen_info: string | null
+          business_id: string
+          category_name: string | null
+          created_at: string
+          description: string | null
+          id: string
+          ingredients: string | null
+          is_active: boolean | null
+          items_available: number
+          original_price: number
+          pickup_date: string
+          pickup_end_time: string
+          pickup_start_time: string
+          price: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          allergen_info?: string | null
+          business_id: string
+          category_name?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          ingredients?: string | null
+          is_active?: boolean | null
+          items_available?: number
+          original_price: number
+          pickup_date?: string
+          pickup_end_time: string
+          pickup_start_time: string
+          price: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          allergen_info?: string | null
+          business_id?: string
+          category_name?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          ingredients?: string | null
+          is_active?: boolean | null
+          items_available?: number
+          original_price?: number
+          pickup_date?: string
+          pickup_end_time?: string
+          pickup_start_time?: string
+          price?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mystery_bags_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ratings: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          mystery_bag_id: string | null
+          order_id: string | null
+          rating: number
+          review_comment: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          mystery_bag_id?: string | null
+          order_id?: string | null
+          rating: number
+          review_comment?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          mystery_bag_id?: string | null
+          order_id?: string | null
+          rating?: number
+          review_comment?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_mystery_bag_id_fkey"
+            columns: ["mystery_bag_id"]
+            isOneToOne: false
+            referencedRelation: "mystery_bags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_mystery_bags_by_pickup_time: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          bag_id: string
+          pickup_category: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

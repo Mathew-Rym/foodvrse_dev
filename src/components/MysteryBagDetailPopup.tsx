@@ -63,7 +63,10 @@ export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetail
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-md mx-auto p-0 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-md mx-auto p-0 max-h-[90vh] overflow-y-auto" aria-describedby="mystery-bag-details">
+          <div className="sr-only" id="mystery-bag-details">
+            Mystery bag details for {bag.vendor}
+          </div>
           {/* Header with background image */}
           <div className={`relative bg-gradient-to-r ${bag.gradient} h-48 rounded-t-lg`}>
             {/* Navigation and actions */}
