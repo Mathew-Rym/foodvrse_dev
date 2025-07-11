@@ -345,6 +345,39 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string
+          id: string
+          message: string
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           business_id: string
@@ -413,6 +446,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payment_methods: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean | null
+          last_four: string | null
+          provider: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean | null
+          last_four?: string | null
+          provider?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean | null
+          last_four?: string | null
+          provider?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       platform_impact_metrics: {
         Row: {
@@ -569,6 +635,123 @@ export type Database = {
           user_id?: string
           week_end_date?: string
           week_start_date?: string
+        }
+        Relationships: []
+      }
+      user_favorites: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_impact: {
+        Row: {
+          badges_earned: string[] | null
+          created_at: string
+          current_streak: number | null
+          experience_points: number | null
+          id: string
+          level: number | null
+          longest_streak: number | null
+          total_co2_saved_kg: number | null
+          total_meals_saved: number | null
+          total_money_saved_ksh: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          badges_earned?: string[] | null
+          created_at?: string
+          current_streak?: number | null
+          experience_points?: number | null
+          id?: string
+          level?: number | null
+          longest_streak?: number | null
+          total_co2_saved_kg?: number | null
+          total_meals_saved?: number | null
+          total_money_saved_ksh?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          badges_earned?: string[] | null
+          created_at?: string
+          current_streak?: number | null
+          experience_points?: number | null
+          id?: string
+          level?: number | null
+          longest_streak?: number | null
+          total_co2_saved_kg?: number | null
+          total_meals_saved?: number | null
+          total_money_saved_ksh?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          address: string | null
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          email_notifications: boolean | null
+          id: string
+          latitude: number | null
+          location_name: string | null
+          longitude: number | null
+          notifications_enabled: boolean | null
+          phone: string | null
+          push_notifications: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          notifications_enabled?: boolean | null
+          phone?: string | null
+          push_notifications?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          notifications_enabled?: boolean | null
+          phone?: string | null
+          push_notifications?: boolean | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

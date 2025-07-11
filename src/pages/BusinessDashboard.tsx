@@ -25,7 +25,7 @@ import { toast } from "sonner";
 
 const BusinessDashboard = () => {
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
+  const { signOut, user } = useAuth();
   const { items, addItem, updateItem, deleteItem } = useBusinessItems();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
@@ -67,8 +67,8 @@ const BusinessDashboard = () => {
     toast.success('Opening WhatsApp to contact support...');
   };
 
-  const handleSignOut = () => {
-    logout();
+  const handleSignOut = async () => {
+    await signOut();
     navigate('/');
     toast.success('Signed out successfully');
   };

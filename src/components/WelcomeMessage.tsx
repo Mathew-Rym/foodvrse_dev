@@ -8,7 +8,7 @@ interface WelcomeMessageProps {
 
 const WelcomeMessage = ({ isFirstTime = false }: WelcomeMessageProps) => {
   const [isVisible, setIsVisible] = useState(false);
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, userProfile } = useAuth();
 
   useEffect(() => {
     if (isFirstTime && !isAuthenticated) {
@@ -47,7 +47,7 @@ const WelcomeMessage = ({ isFirstTime = false }: WelcomeMessageProps) => {
             {isWelcomeBack ? (
               <>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Welcome back, {user.name}!
+                  Welcome back, {userProfile?.display_name || user?.email}!
                 </h2>
                 <p className="text-gray-600 leading-relaxed mb-4">
                   Discover today's mystery bag and be a food waste champion.

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +14,7 @@ interface AuthFormData {
   email: string;
   password: string;
   name?: string;
+  businessName?: string;
 }
 
 const Auth = () => {
@@ -26,7 +26,7 @@ const Auth = () => {
   const [showLocationRequest, setShowLocationRequest] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
-  const { loginConsumer, loginBusiness, signupConsumer } = useAuth();
+  const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -34,29 +34,32 @@ const Auth = () => {
     defaultValues: {
       email: '',
       password: '',
-      name: ''
+      name: '',
+      businessName: ''
     }
   });
 
   const onSubmit = async (data: AuthFormData) => {
     try {
-      if (isBusinessAuth) {
-        // Business authentication (login only)
-        try {
-          await loginBusiness(data.email, data.password);
-          navigate('/business-dashboard');
-        } catch (error) {
-          // If business login fails, redirect to partner application
-          toast.error('Business account not found. Please apply to become a partner first.');
-          navigate('/partner-application');
+      if (isSignUp) {
+        // Sign up flow
+        const userData = isBusinessAuth 
+          ? { display_name: data.businessName, is_business: true }
+          : { display_name: data.name };
+
+        const { error } = await signUp(data.email, data.password, userData);
+        if (!error) {
+          if (!isBusinessAuth) {
+            setShowEmailSignup(true);
+          } else {
+            toast.success('Business account created! Please check your email to confirm.');
+            navigate('/business-dashboard');
+          }
         }
       } else {
-        // Consumer authentication
-        if (isSignUp) {
-          await signupConsumer(data.email, data.password, data.name || '');
-          setShowEmailSignup(true);
-        } else {
-          await loginConsumer(data.email, data.password);
+        // Sign in flow
+        const { error } = await signIn(data.email, data.password);
+        if (!error) {
           // Check for stored redirect path
           const redirectPath = sessionStorage.getItem('redirectAfterAuth');
           if (redirectPath) {
@@ -79,7 +82,6 @@ const Auth = () => {
       setShowTermsConsent(true);
     } else {
       toast.success('Google Sign-In coming soon!');
-      console.log('Google sign-in clicked', isBusinessAuth ? 'for business' : 'for consumer');
     }
   };
 
@@ -88,14 +90,12 @@ const Auth = () => {
       setShowTermsConsent(true);
     } else {
       toast.success('Facebook Sign-In coming soon!');
-      console.log('Facebook sign-in clicked for consumer');
     }
   };
 
   const handleTermsConsent = () => {
     if (termsAccepted && privacyAccepted) {
       setShowTermsConsent(false);
-      // Continue with signup process
       toast.success('Terms accepted! Please complete your signup.');
     } else {
       toast.error('Please accept both terms and privacy policy to continue.');
@@ -104,7 +104,6 @@ const Auth = () => {
 
   const handleEmailSignupContinue = (subscribeToEmails: boolean) => {
     if (subscribeToEmails) {
-      // Store email for marketing purposes
       console.log('User subscribed to emails');
     }
     setShowEmailSignup(false);
@@ -125,7 +124,6 @@ const Auth = () => {
       );
     }
     setShowLocationRequest(false);
-    // Check for stored redirect path
     const redirectPath = sessionStorage.getItem('redirectAfterAuth');
     if (redirectPath) {
       sessionStorage.removeItem('redirectAfterAuth');
@@ -164,12 +162,12 @@ const Auth = () => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <DialogTitle>
-              {isBusinessAuth ? 'Business Login' : 'Consumer Account'}
+              {isBusinessAuth ? 'Business Account' : 'Consumer Account'}
             </DialogTitle>
           </div>
           <DialogDescription>
             {isBusinessAuth 
-              ? 'Business login to manage your restaurant listings'
+              ? (isSignUp ? 'Create a business account to manage your restaurant' : 'Business login to manage your listings')
               : (isSignUp 
                 ? 'Create a consumer account to buy discounted food' 
                 : 'Consumer login to access your orders and save money'
@@ -262,17 +260,17 @@ const Auth = () => {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {/* Only show name field for consumer signup */}
-              {isSignUp && !isBusinessAuth && (
+              {/* Name field for signup */}
+              {isSignUp && (
                 <FormField
                   control={form.control}
-                  name="name"
-                  rules={{ required: 'Name is required' }}
+                  name={isBusinessAuth ? "businessName" : "name"}
+                  rules={{ required: `${isBusinessAuth ? 'Business name' : 'Name'} is required` }}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>{isBusinessAuth ? 'Business Name' : 'Full Name'}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your full name" {...field} />
+                        <Input placeholder={isBusinessAuth ? 'Enter your business name' : 'Enter your full name'} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -331,7 +329,7 @@ const Auth = () => {
                 }`}
               >
                 {isBusinessAuth 
-                  ? 'Sign In as Business'
+                  ? (isSignUp ? 'Create Business Account' : 'Sign In as Business')
                   : (isSignUp ? 'Create Consumer Account' : 'Sign In as Consumer')
                 }
               </Button>
@@ -343,15 +341,15 @@ const Auth = () => {
           {isBusinessAuth ? (
             <div className="space-y-2">
               <p className="text-sm text-gray-600">
-                Don't have a business account?
+                {isSignUp ? 'Already have a business account?' : "Don't have a business account?"}
               </p>
-              <Button
-                variant="outline"
-                onClick={handleBecomePartner}
-                className="w-full text-orange-600 border-orange-200 hover:bg-orange-50"
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="font-medium text-orange-600 hover:text-orange-700"
               >
-                Become a Partner
-              </Button>
+                {isSignUp ? 'Sign In' : 'Sign Up'}
+              </button>
             </div>
           ) : (
             <div className="space-y-2">
@@ -391,150 +389,59 @@ const Auth = () => {
         </div>
       </DialogContent>
 
-      {/* Terms Consent Modal */}
-      <Dialog open={showTermsConsent} onOpenChange={setShowTermsConsent}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Terms & Privacy Consent</DialogTitle>
-            <DialogDescription>
-              Please review and accept our terms to continue
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div className="flex items-start space-x-2">
-              <Checkbox
-                id="privacy-consent"
-                checked={privacyAccepted}
-                onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
-              />
-              <div className="grid gap-1.5 leading-none">
-                <label
-                  htmlFor="privacy-consent"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  I allow FoodVrse to store my email address and name according to our{' '}
-                  <button
-                    type="button"
-                    onClick={() => navigate('/privacy-policy', { state: { hideNavbar: true } })}
-                    className="text-green-600 hover:text-green-700 underline"
-                  >
-                    privacy policy
-                  </button>
-                </label>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-2">
-              <Checkbox
-                id="terms-consent"
-                checked={termsAccepted}
-                onCheckedChange={(checked) => setTermsAccepted(checked === true)}
-              />
-              <div className="grid gap-1.5 leading-none">
-                <label
-                  htmlFor="terms-consent"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  I agree with the{' '}
-                  <button
-                    type="button"
-                    onClick={() => navigate('/terms-of-service', { state: { hideNavbar: true } })}
-                    className="text-green-600 hover:text-green-700 underline font-bold"
-                  >
-                    terms & conditions
-                  </button>{' '}
-                  and the{' '}
-                  <button
-                    type="button"
-                    onClick={() => navigate('/privacy-policy', { state: { hideNavbar: true } })}
-                    className="text-green-600 hover:text-green-700 underline font-bold"
-                  >
-                    privacy policy
-                  </button>
-                </label>
-              </div>
-            </div>
-
-            <Button 
-              onClick={handleTermsConsent}
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-              disabled={!termsAccepted || !privacyAccepted}
-            >
-              CONTINUE
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Email Signup Modal */}
+      {/* Email Signup Continue Dialog */}
       <Dialog open={showEmailSignup} onOpenChange={setShowEmailSignup}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <div className="flex justify-center mb-4">
-              <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center">
-                <span className="text-3xl">🥟</span>
-              </div>
-            </div>
-            <DialogTitle className="text-center text-xl font-bold">
-              Be the first to know
-            </DialogTitle>
-            <DialogDescription className="text-center text-sm">
-              Unlock new stores and amazing deals first! Get smart tips to maximize your savings, 
-              dive into inspiring impact stories, and even enjoy the odd food pun. Sign up now to 
-              get it all delivered straight to your inbox and start your rescue journey!
-              <br />
-              <span className="text-xs text-gray-400">(We promise you'll only get emails that matter)</span>
+            <DialogTitle>Almost there!</DialogTitle>
+            <DialogDescription>
+              Would you like to receive updates about new deals and restaurants?
             </DialogDescription>
           </DialogHeader>
-          
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Button 
               onClick={() => handleEmailSignupContinue(true)}
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              className="w-full bg-green-600 hover:bg-green-700"
             >
-              YES, PLEASE
+              Yes, keep me updated!
             </Button>
             <Button 
-              variant="ghost"
+              variant="outline"
               onClick={() => handleEmailSignupContinue(false)}
-              className="w-full text-gray-600"
+              className="w-full"
             >
-              MAYBE LATER
+              No thanks, just continue
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Location Request Modal */}
+      {/* Location Request Dialog */}
       <Dialog open={showLocationRequest} onOpenChange={setShowLocationRequest}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                <MapPin className="w-8 h-8 text-blue-600" />
-              </div>
-            </div>
-            <DialogTitle className="text-center text-xl font-bold">
-              Enable Location
-            </DialogTitle>
-            <DialogDescription className="text-center text-sm">
-              Allow FoodVrse to access your location to find the best deals near you and 
-              help you discover amazing food offers in your area.
+            <DialogTitle>Enable Location Services</DialogTitle>
+            <DialogDescription>
+              Help us find the best food deals near you!
             </DialogDescription>
           </DialogHeader>
-          
-          <div className="space-y-3">
+          <div className="space-y-4">
+            <div className="text-center">
+              <MapPin className="w-16 h-16 mx-auto text-orange-500 mb-2" />
+              <p className="text-sm text-gray-600">
+                We'll use your location to show nearby restaurants and calculate accurate pickup times.
+              </p>
+            </div>
             <Button 
               onClick={() => handleLocationRequest(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full bg-orange-500 hover:bg-orange-600"
             >
               Allow Location Access
             </Button>
             <Button 
-              variant="ghost"
+              variant="outline"
               onClick={() => handleLocationRequest(false)}
-              className="w-full text-gray-600"
+              className="w-full"
             >
               Maybe Later
             </Button>

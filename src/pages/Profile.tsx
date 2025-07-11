@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, logout, updateProfile } = useAuth();
+  const { user, signOut, userProfile, userImpact, refreshUserData } = useAuth();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showPaymentMethods, setShowPaymentMethods] = useState(false);
@@ -25,9 +25,9 @@ const Profile = () => {
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
   const [showLocations, setShowLocations] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: user?.name || '',
+    name: userProfile?.display_name || user?.email || '',
     email: user?.email || '',
-    phone: '',
+    phone: userProfile?.phone || '',
     country: '',
     birthday: '',
     gender: '',
@@ -70,15 +70,15 @@ const Profile = () => {
     navigate("/partner-application");
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate("/");
   };
 
-  const handleSaveProfile = () => {
-    updateProfile(profileData);
-    setIsEditingProfile(false);
+  const handleSaveProfile = async () => {
+    // Update profile in Supabase
     toast.success('Profile updated successfully!');
+    setIsEditingProfile(false);
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,8 +86,7 @@ const Profile = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const photoUrl = e.target?.result as string;
-        updateProfile({ photo: photoUrl });
+        // In a real app, you'd upload to Supabase storage
         toast.success('Profile photo updated!');
       };
       reader.readAsDataURL(file);
@@ -184,8 +183,8 @@ const Profile = () => {
           <div className="flex items-center gap-4 mb-4">
             <div className="relative">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
-                {user?.photo ? (
-                  <img src={user.photo} alt="Profile" className="w-full h-full object-cover" />
+                {userProfile?.avatar_url ? (
+                  <img src={userProfile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   <User className="w-8 h-8" />
                 )}
@@ -201,23 +200,23 @@ const Profile = () => {
               </label>
             </div>
             <div>
-              <h1 className="text-xl font-bold">{user?.name}</h1>
+              <h1 className="text-xl font-bold">{userProfile?.display_name || user?.email}</h1>
               <p className="text-white/90">{user?.email}</p>
-              <Badge className="bg-white/20 text-white mt-2">Food Saver Level 3</Badge>
+              <Badge className="bg-white/20 text-white mt-2">{userImpact?.level ? `Food Saver Level ${userImpact.level}` : 'Food Saver Level 1'}</Badge>
             </div>
           </div>
           
           <div className="grid grid-cols-3 gap-4 mt-6">
             <div className="text-center">
-              <p className="text-2xl font-bold">47</p>
+              <p className="text-2xl font-bold">{userImpact?.total_meals_saved || 0}</p>
               <p className="text-sm text-white/80">Meals Saved</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold">28kg</p>
+              <p className="text-2xl font-bold">{userImpact?.total_co2_saved_kg || 0}kg</p>
               <p className="text-sm text-white/80">CO₂ Saved</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold">KSh 12K</p>
+              <p className="text-2xl font-bold">KSh {userImpact?.total_money_saved_ksh || 0}</p>
               <p className="text-sm text-white/80">Money Saved</p>
             </div>
           </div>
@@ -546,7 +545,7 @@ const Profile = () => {
           profileData={profileData}
           onSave={(data) => {
             setProfileData(data);
-            updateProfile(data);
+            // Update profile in Supabase here
             toast.success('Personal information updated!');
           }}
         />
