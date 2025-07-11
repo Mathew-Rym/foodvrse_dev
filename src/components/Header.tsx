@@ -54,29 +54,28 @@ const Header = () => {
   return (
     <header className="bg-white shadow-sm border-b border-orange-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        {/* Main header row */}
+        <div className="flex items-center justify-between h-16 lg:h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 flex-shrink-0">
             <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-sm">🍽️</span>
             </div>
             <span className="text-xl font-bold text-gray-900">FoodVrse</span>
-            <span className="text-xs text-gray-500 hidden sm:block">Good food deserves a second chance</span>
+            <span className="text-xs text-gray-500 hidden lg:block">Good food deserves a second chance</span>
           </div>
 
-          {/* Location with Search */}
-          <div className="flex items-center space-x-4">
-            <div className="hidden md:block">
-              <LocationSearch onLocationSelect={handleLocationSelect} />
-            </div>
+          {/* Desktop location and actions */}
+          <div className="hidden lg:flex items-center space-x-4">
+            <LocationSearch onLocationSelect={handleLocationSelect} />
             <div className="flex items-center space-x-2 text-gray-600">
               <MapPin className={`w-4 h-4 ${latitude && longitude ? 'text-green-500' : ''}`} />
               <span className="text-sm">{currentLocation}</span>
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center space-x-3">
+          {/* Desktop Actions */}
+          <div className="hidden lg:flex items-center space-x-3">
             <Button 
               variant="ghost" 
               size="sm" 
@@ -84,7 +83,7 @@ const Header = () => {
               onClick={handleFoodWasteClick}
             >
               <Info className="w-4 h-4" />
-              <span className="hidden sm:inline">About Food Waste</span>
+              <span>About Food Waste</span>
             </Button>
             
             {isAuthenticated ? (
@@ -92,7 +91,7 @@ const Header = () => {
                 <CartSheet />
                 <Button variant="ghost" size="sm" className="flex items-center space-x-1" onClick={handleProfileClick}>
                   <User className="w-4 h-4" />
-                  <span className="hidden sm:inline">{user?.isPartner ? 'Dashboard' : 'Profile'}</span>
+                  <span>{user?.isPartner ? 'Dashboard' : 'Profile'}</span>
                 </Button>
               </>
             ) : (
@@ -103,18 +102,79 @@ const Header = () => {
                     <Badge className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-5 h-5 flex items-center justify-center p-0">
                       {totalItems}
                     </Badge>
-                    <span className="hidden sm:inline">Cart</span>
+                    <span>Cart</span>
                   </Button>
                 )}
                 <Button variant="ghost" size="sm" className="flex items-center space-x-1" onClick={handleAuthClick}>
                   <User className="w-4 h-4" />
-                  <span className="hidden sm:inline">Sign In</span>
+                  <span>Sign In</span>
                 </Button>
               </>
             )}
             <Button 
               size="sm" 
-              className="bg-gradient-to-r from-orange-500 to-red-500 text-white"
+              className="bg-gradient-to-r from-orange-500 to-red-500 text-white whitespace-nowrap"
+              onClick={handlePartnerClick}
+            >
+              Become a Partner
+            </Button>
+          </div>
+
+          {/* Mobile/Tablet Actions */}
+          <div className="flex lg:hidden items-center space-x-2">
+            {isAuthenticated ? (
+              <>
+                <CartSheet />
+                <Button variant="ghost" size="sm" className="p-2" onClick={handleProfileClick}>
+                  <User className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                {totalItems > 0 && (
+                  <Button variant="ghost" size="sm" className="p-2 relative">
+                    <ShoppingBag className="w-4 h-4" />
+                    <Badge className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-5 h-5 flex items-center justify-center p-0">
+                      {totalItems}
+                    </Badge>
+                  </Button>
+                )}
+                <Button variant="ghost" size="sm" className="p-2" onClick={handleAuthClick}>
+                  <User className="w-4 h-4" />
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile/Tablet expanded content */}
+        <div className="lg:hidden border-t border-gray-100 py-3 space-y-3">
+          {/* Location row */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2 text-gray-600 flex-1">
+              <MapPin className={`w-4 h-4 ${latitude && longitude ? 'text-green-500' : ''}`} />
+              <span className="text-sm truncate">{currentLocation}</span>
+            </div>
+            <div className="md:block">
+              <LocationSearch onLocationSelect={handleLocationSelect} />
+            </div>
+          </div>
+
+          {/* Action buttons row */}
+          <div className="flex items-center justify-between space-x-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="flex items-center space-x-1 text-orange-600 hover:text-orange-700 flex-1"
+              onClick={handleFoodWasteClick}
+            >
+              <Info className="w-4 h-4" />
+              <span className="text-xs">About Food Waste</span>
+            </Button>
+            
+            <Button 
+              size="sm" 
+              className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs whitespace-nowrap px-3"
               onClick={handlePartnerClick}
             >
               Become a Partner
