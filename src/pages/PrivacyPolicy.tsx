@@ -1,17 +1,33 @@
 import MobileLayout from "@/components/MobileLayout";
 import BackToTop from "@/components/BackToTop";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const PrivacyPolicy = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const hideNavbar = location.state?.hideNavbar;
+
+  const handleBack = () => {
+    if (hideNavbar) {
+      navigate('/auth');
+    } else {
+      navigate(-1);
+    }
+  };
 
   return (
     <MobileLayout hideNavbar={hideNavbar}>
       <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="flex items-center gap-2 mb-6">
+          <Button variant="ghost" size="sm" onClick={handleBack}>
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-900">Privacy Policy</h1>
+        </div>
+        
         <div className="prose prose-gray max-w-none">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
-          
           <p className="text-gray-600 mb-8">
             <strong>Last updated:</strong> {new Date().toLocaleDateString()}
           </p>
