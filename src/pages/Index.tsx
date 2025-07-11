@@ -20,10 +20,10 @@ const Index = () => {
   const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       <Header />
       <LocationNotification />
-      <div className={isAuthenticated ? "pb-20" : ""}> {/* Add bottom padding only if authenticated for mobile navigation */}
+      <div className={`${isAuthenticated ? "pb-20" : ""} overflow-x-hidden`}> {/* Add overflow-x-hidden to prevent horizontal scroll */}
         <div id="hero-section">
           <HeroSection />
         </div>

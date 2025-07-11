@@ -71,7 +71,7 @@ const MysteryBoxSection = () => {
   };
 
   return (
-    <section className="py-16 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+    <section className="py-12 lg:py-16 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -89,7 +89,7 @@ const MysteryBoxSection = () => {
         </div>
 
         {/* Mystery Boxes Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
           {mysteryBoxes.map((box, index) => (
             <div key={index} className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group">
               {/* Header with gradient */}

@@ -34,7 +34,7 @@ const GameSection = () => {
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-br from-purple-50 to-pink-50">
+    <section className="py-12 lg:py-16 bg-gradient-to-br from-purple-50 to-pink-50 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -145,7 +145,7 @@ const GameSection = () => {
         {/* Achievements Section */}
         <div className="mt-12">
           <h3 className="text-2xl font-bold text-center mb-8">Achievements</h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             {achievements.map((achievement) => (
               <Card 
                 key={achievement.id} 
