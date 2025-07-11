@@ -84,7 +84,7 @@ export const ListingsGrid: React.FC<ListingsGridProps> = ({
 
       // Apply search filter
       if (searchQuery) {
-        query = query.or(`item_name.ilike.%${searchQuery}%,business.business_name.ilike.%${searchQuery}%`);
+        query = query.or(`item_name.ilike.%${searchQuery}%,business_profiles.business_name.ilike.%${searchQuery}%`);
       }
 
       // Apply pickup time filter
