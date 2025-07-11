@@ -18,17 +18,20 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useBusinessItems } from "@/contexts/BusinessItemsContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import AddItemModal from "@/components/AddItemModal";
 import Analytics from "@/components/Analytics";
 import { toast } from "sonner";
 
 const BusinessDashboard = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const { items, addItem, updateItem, deleteItem } = useBusinessItems();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
+  const [listings, setListings] = useState<any[]>([]);
+  const [businessProfile, setBusinessProfile] = useState<any>(null);
 
   const stats = {
     totalSales: 45600,

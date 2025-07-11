@@ -44,48 +44,69 @@ export type Database = {
       business_profiles: {
         Row: {
           address: string
+          average_rating: number | null
           business_logo_url: string | null
           business_name: string
           created_at: string
           description: string | null
           email: string | null
           id: string
+          last_month_revenue: number | null
+          last_month_sales: number | null
           latitude: number | null
           location: string
           longitude: number | null
           phone: string | null
+          rating_count: number | null
+          total_co2_saved_kg: number | null
+          total_revenue: number | null
+          total_sales: number | null
           updated_at: string
           user_id: string
           website_url: string | null
         }
         Insert: {
           address: string
+          average_rating?: number | null
           business_logo_url?: string | null
           business_name: string
           created_at?: string
           description?: string | null
           email?: string | null
           id?: string
+          last_month_revenue?: number | null
+          last_month_sales?: number | null
           latitude?: number | null
           location: string
           longitude?: number | null
           phone?: string | null
+          rating_count?: number | null
+          total_co2_saved_kg?: number | null
+          total_revenue?: number | null
+          total_sales?: number | null
           updated_at?: string
           user_id: string
           website_url?: string | null
         }
         Update: {
           address?: string
+          average_rating?: number | null
           business_logo_url?: string | null
           business_name?: string
           created_at?: string
           description?: string | null
           email?: string | null
           id?: string
+          last_month_revenue?: number | null
+          last_month_sales?: number | null
           latitude?: number | null
           location?: string
           longitude?: number | null
           phone?: string | null
+          rating_count?: number | null
+          total_co2_saved_kg?: number | null
+          total_revenue?: number | null
+          total_sales?: number | null
           updated_at?: string
           user_id?: string
           website_url?: string | null
@@ -154,6 +175,74 @@ export type Database = {
           week_start_day?: number
         }
         Relationships: []
+      }
+      listings: {
+        Row: {
+          business_id: string
+          category: string
+          co2_saved_per_item_kg: number | null
+          created_at: string | null
+          description: string | null
+          favorited_by_user_ids: string[] | null
+          id: string
+          initial_quantity: number
+          item_name: string
+          original_price: number
+          pickup_end: string
+          pickup_start: string
+          price: number
+          quantity: number
+          status: string
+          tags: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          business_id: string
+          category?: string
+          co2_saved_per_item_kg?: number | null
+          created_at?: string | null
+          description?: string | null
+          favorited_by_user_ids?: string[] | null
+          id?: string
+          initial_quantity?: number
+          item_name: string
+          original_price: number
+          pickup_end: string
+          pickup_start: string
+          price: number
+          quantity?: number
+          status?: string
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          business_id?: string
+          category?: string
+          co2_saved_per_item_kg?: number | null
+          created_at?: string | null
+          description?: string | null
+          favorited_by_user_ids?: string[] | null
+          id?: string
+          initial_quantity?: number
+          item_name?: string
+          original_price?: number
+          pickup_end?: string
+          pickup_start?: string
+          price?: number
+          quantity?: number
+          status?: string
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mystery_bag_categories: {
         Row: {
@@ -498,6 +587,10 @@ export type Database = {
           bag_id: string
           pickup_category: string
         }[]
+      }
+      process_purchase: {
+        Args: { p_listing_id: string; p_user_id: string; p_quantity?: number }
+        Returns: Json
       }
     }
     Enums: {

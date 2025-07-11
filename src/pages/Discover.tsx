@@ -8,6 +8,7 @@ import { FilterPopup, FilterOptions } from "@/components/FilterPopup";
 import { LocationSelector } from "@/components/LocationSelector";
 import { CategoryCarousel } from "@/components/CategoryCarousel";
 import { StoreProfilePage } from "@/components/StoreProfilePage";
+import ListingsGrid from "@/components/ListingsGrid";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -260,22 +261,47 @@ const Discover = () => {
         ) : (
           /* List View */
           <div className="space-y-6 p-4">
+            {/* Pick Up Now - Dynamic time-based listings */}
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold text-gray-900">Pick Up Now</h2>
+              <ListingsGrid 
+                pickupTimeFilter="now"
+                showSoldOut={false}
+                limit={4}
+              />
+            </div>
+
+            {/* Pick Up Tomorrow */}
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold text-gray-900">Pick Up Tomorrow</h2>
+              <ListingsGrid 
+                pickupTimeFilter="tomorrow"
+                showSoldOut={false}
+                limit={4}
+              />
+            </div>
+
             {/* Dynamic Categories */}
             <div className="space-y-6">
               <h2 className="text-lg font-semibold text-gray-900">Browse by Category</h2>
               
               {categories.map((category) => (
-                <CategoryCarousel
-                  key={category.id}
-                  category={{
-                    name: category.name,
-                    icon: category.icon,
-                    color: category.color
-                  }}
-                  items={categoryData[category.name] || []}
-                  onSeeAll={handleSeeAllCategory}
-                  onItemClick={handleItemClick}
-                />
+                <div key={category.id} className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-md font-medium text-gray-800">{category.name}</h3>
+                    <button 
+                      onClick={() => handleSeeAllCategory(category.name)}
+                      className="text-sm text-orange-500 hover:text-orange-600"
+                    >
+                      See all
+                    </button>
+                  </div>
+                  <ListingsGrid 
+                    categoryFilter={category.name}
+                    showSoldOut={false}
+                    limit={3}
+                  />
+                </div>
               ))}
             </div>
 
