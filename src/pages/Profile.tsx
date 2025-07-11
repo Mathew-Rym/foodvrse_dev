@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import PersonalInfoDialog from "@/components/PersonalInfoDialog";
+import LocationsDialog from "@/components/LocationsDialog";
 import MobileLayout from "@/components/MobileLayout";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,9 +22,21 @@ const Profile = () => {
   const [showAddPayment, setShowAddPayment] = useState(false);
   const [editingPayment, setEditingPayment] = useState<any>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [showPersonalInfo, setShowPersonalInfo] = useState(false);
+  const [showLocations, setShowLocations] = useState(false);
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
-    email: user?.email || ''
+    email: user?.email || '',
+    phone: '',
+    country: '',
+    birthday: '',
+    gender: '',
+    dietaryPreferences: ''
+  });
+
+  const [locations, setLocations] = useState({
+    home: '',
+    work: ''
   });
 
   const [newPaymentData, setNewPaymentData] = useState({

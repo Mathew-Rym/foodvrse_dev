@@ -1,22 +1,36 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
-const WelcomeMessage = () => {
+interface WelcomeMessageProps {
+  isFirstTime?: boolean;
+}
+
+const WelcomeMessage = ({ isFirstTime = false }: WelcomeMessageProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // Show the welcome message on load
-    setIsVisible(true);
-    
-    // Auto-hide after 7 seconds
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-    }, 7000);
-
-    return () => clearTimeout(timer);
-  }, []);
+    if (isFirstTime && !isAuthenticated) {
+      // Show welcome message for first-time users (10 seconds)
+      setIsVisible(true);
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+      }, 10000);
+      return () => clearTimeout(timer);
+    } else if (isAuthenticated && user) {
+      // Show welcome back message for returning users (7 seconds)
+      setIsVisible(true);
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+      }, 7000);
+      return () => clearTimeout(timer);
+    }
+  }, [isFirstTime, isAuthenticated, user]);
 
   if (!isVisible) return null;
+
+  const isWelcomeBack = isAuthenticated && user;
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -30,22 +44,35 @@ const WelcomeMessage = () => {
           </button>
           
           <div className="mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Welcome to FoodVrse!
-            </h2>
-            <p className="text-gray-600 leading-relaxed mb-4">
-              Discover delicious surplus, save money, and turn it into legends.
-            </p>
-            <p className="text-orange-500 font-medium">
-              ✨ Tap to explore. Swipe to save. Your next zero-waste meal awaits!
-            </p>
+            {isWelcomeBack ? (
+              <>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  Welcome back, {user.name}!
+                </h2>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  Discover today's mystery bag and be a food waste champion.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  Welcome to FoodVrse!
+                </h2>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  Discover surplus food (Mystery bags) from local restaurants and stores. Help reduce food waste while enjoying delicious meals at up to 70% off.
+                </p>
+                <p className="text-orange-500 font-medium">
+                  ✨ Tap to explore. Swipe to save. Your next zero-waste meal awaits!
+                </p>
+              </>
+            )}
           </div>
           
           <button
             onClick={() => setIsVisible(false)}
             className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-lg font-medium hover:opacity-90 transition-opacity"
           >
-            Let's Get Started!
+            {isWelcomeBack ? "Explore Today's Offers" : "Let's Get Started!"}
           </button>
         </div>
       </div>

@@ -33,7 +33,7 @@ const HeroSection = () => {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500"> Save Money</span>
               </h1>
               <p className="text-lg lg:text-xl text-gray-600 leading-relaxed">
-                Discover surplus meals and near-expiry items from local restaurants and stores. 
+                Discover surplus food (Mystery bags) from local restaurants and stores. 
                 Help reduce food waste while enjoying delicious meals at up to 70% off.
               </p>
             </div>

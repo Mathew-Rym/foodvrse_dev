@@ -1,12 +1,18 @@
 
-import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Twitter, Instagram, Mail, Phone, MapPin, Linkedin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Footer = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
-  const handleLinkClick = (path: string) => {
-    navigate(path);
+  const handleLinkClick = (path: string, requiresAuth = false) => {
+    if (requiresAuth && !isAuthenticated) {
+      navigate("/auth");
+    } else {
+      navigate(path);
+    }
   };
 
   return (
@@ -28,6 +34,10 @@ const Footer = () => {
               <Facebook className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
               <Twitter className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
               <Instagram className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+              <Linkedin className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+              <svg className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+              </svg>
             </div>
           </div>
 
@@ -53,7 +63,7 @@ const Footer = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => handleLinkClick("/")}
+                  onClick={() => handleLinkClick("/mystery-boxes", true)}
                   className="hover:text-white text-left"
                 >
                   Mystery Boxes
@@ -61,7 +71,7 @@ const Footer = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => handleLinkClick("/impact")}
+                  onClick={() => handleLinkClick("/impact-tracker")}
                   className="hover:text-white text-left"
                 >
                   Impact Tracker
@@ -76,7 +86,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm text-gray-400">
               <li>
                 <button 
-                  onClick={() => handleLinkClick("/profile")}
+                  onClick={() => handleLinkClick("/help-center")}
                   className="hover:text-white text-left"
                 >
                   Help Center
@@ -84,14 +94,28 @@ const Footer = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => handleLinkClick("/food-waste")}
+                  onClick={() => handleLinkClick("/safety-guidelines")}
                   className="hover:text-white text-left"
                 >
                   Safety Guidelines
                 </button>
               </li>
-              <li><a href="#" className="hover:text-white">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
+              <li>
+                <button 
+                  onClick={() => handleLinkClick("/terms-of-service")}
+                  className="hover:text-white text-left"
+                >
+                  Terms of Service
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => handleLinkClick("/privacy-policy")}
+                  className="hover:text-white text-left"
+                >
+                  Privacy Policy
+                </button>
+              </li>
             </ul>
           </div>
 
@@ -101,11 +125,11 @@ const Footer = () => {
             <div className="space-y-3 text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4" />
-                <span>hello@foodvrse.co.ke</span>
+                <span>hello@foodvrse.com</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="w-4 h-4" />
-                <span>+254 700 123 456</span>
+                <span>0110098266</span>
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4" />

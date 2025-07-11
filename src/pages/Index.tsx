@@ -18,11 +18,11 @@ import { useOnboarding } from "@/hooks/useOnboarding";
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
-  const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
+  const { isFirstVisit, showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-      <WelcomeMessage />
+      <WelcomeMessage isFirstTime={isFirstVisit} />
       <Header />
       <LocationNotification />
       <div className={`${isAuthenticated ? "pb-20" : ""} overflow-x-hidden`}> {/* Add overflow-x-hidden to prevent horizontal scroll */}
