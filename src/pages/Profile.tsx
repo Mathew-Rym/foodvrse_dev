@@ -58,8 +58,8 @@ const Profile = () => {
 
   const menuItems = [
     { icon: Receipt, label: "My Orders", action: "orders" },
-    { icon: Settings, label: "Account Settings", action: "settings" },
-    { icon: MapPin, label: "Delivery Addresses", action: "addresses" },
+    { icon: User, label: "Personal Info", action: "personalInfo" },
+    { icon: MapPin, label: "My Locations", action: "locations" },
     { icon: Bell, label: "Notifications", action: "notifications" },
     { icon: CreditCard, label: "Payment Methods", action: "payment" },
     { icon: Heart, label: "Favorite Restaurants", action: "favorites" },
@@ -151,11 +151,11 @@ const Profile = () => {
       case 'orders':
         navigate('/orders');
         break;
-      case 'settings':
-        setIsEditingProfile(true);
+      case 'personalInfo':
+        setShowPersonalInfo(true);
         break;
-      case 'addresses':
-        toast.info('Address management coming soon!');
+      case 'locations':
+        setShowLocations(true);
         break;
       case 'notifications':
         setShowNotifications(true);
@@ -538,6 +538,29 @@ const Profile = () => {
             </Button>
           </DialogContent>
         </Dialog>
+
+        {/* Personal Info Dialog */}
+        <PersonalInfoDialog
+          open={showPersonalInfo}
+          onOpenChange={setShowPersonalInfo}
+          profileData={profileData}
+          onSave={(data) => {
+            setProfileData(data);
+            updateProfile(data);
+            toast.success('Personal information updated!');
+          }}
+        />
+
+        {/* Locations Dialog */}
+        <LocationsDialog
+          open={showLocations}
+          onOpenChange={setShowLocations}
+          locations={locations}
+          onSave={(data) => {
+            setLocations(data);
+            toast.success('Locations updated!');
+          }}
+        />
       </div>
     </MobileLayout>
   );

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -12,6 +14,7 @@ const FeedbackFAB = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [subject, setSubject] = useState('');
   const [feedback, setFeedback] = useState('');
+  const [feedbackType, setFeedbackType] = useState('General');
   const { isAuthenticated } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -25,6 +28,7 @@ const FeedbackFAB = () => {
     toast.success('Feedback sent! Thank you for helping us improve FoodVrse.');
     setSubject('');
     setFeedback('');
+    setFeedbackType('General');
     setIsOpen(false);
   };
 
@@ -66,6 +70,32 @@ const FeedbackFAB = () => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Feedback Type</Label>
+                  <RadioGroup value={feedbackType} onValueChange={setFeedbackType} className="flex flex-wrap gap-2">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="General" id="general" />
+                      <Label htmlFor="general" className="text-sm">General</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Report Bug" id="bug" />
+                      <Label htmlFor="bug" className="text-sm">Report Bug</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Feature Request" id="feature" />
+                      <Label htmlFor="feature" className="text-sm">Feature Request</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Praise" id="praise" />
+                      <Label htmlFor="praise" className="text-sm">Praise</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Criticism" id="criticism" />
+                      <Label htmlFor="criticism" className="text-sm">Criticism</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
                 <div>
                   <Input
                     placeholder="Subject (optional)"

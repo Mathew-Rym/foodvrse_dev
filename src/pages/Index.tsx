@@ -13,6 +13,7 @@ import LocationNotification from "@/components/LocationNotification";
 import OnboardingTour from "@/components/OnboardingTour";
 import CookieConsent from "@/components/CookieConsent";
 import WelcomeMessage from "@/components/WelcomeMessage";
+import BackToTop from "@/components/BackToTop";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOnboarding } from "@/hooks/useOnboarding";
 
@@ -47,6 +48,7 @@ const Index = () => {
       <AddOnPopup />
       <OrderCompletePopup />
       <CookieConsent />
+      <BackToTop />
       {showOnboarding && (
         <OnboardingTour 
           onComplete={completeOnboarding}
