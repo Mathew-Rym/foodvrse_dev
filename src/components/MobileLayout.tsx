@@ -3,13 +3,14 @@ import MobileNavigation from "./MobileNavigation";
 
 interface MobileLayoutProps {
   children: React.ReactNode;
+  hideNavbar?: boolean;
 }
 
-const MobileLayout = ({ children }: MobileLayoutProps) => {
+const MobileLayout = ({ children, hideNavbar = false }: MobileLayoutProps) => {
   return (
     <>
       {children}
-      <MobileNavigation />
+      {!hideNavbar && <MobileNavigation />}
     </>
   );
 };

@@ -1,9 +1,13 @@
 import MobileLayout from "@/components/MobileLayout";
 import BackToTop from "@/components/BackToTop";
+import { useLocation } from "react-router-dom";
 
 const TermsOfService = () => {
+  const location = useLocation();
+  const hideNavbar = location.state?.hideNavbar;
+
   return (
-    <MobileLayout>
+    <MobileLayout hideNavbar={hideNavbar}>
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="prose prose-gray max-w-none">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Terms of Service</h1>
