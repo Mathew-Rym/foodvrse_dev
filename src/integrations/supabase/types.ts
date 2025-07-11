@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       business_profiles: {
         Row: {
           address: string
@@ -95,6 +122,36 @@ export type Database = {
           is_time_based?: boolean | null
           name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      challenge_settings: {
+        Row: {
+          badge_name: string
+          challenge_type: string
+          created_at: string
+          goal_value: number
+          id: string
+          updated_at: string
+          week_start_day: number
+        }
+        Insert: {
+          badge_name: string
+          challenge_type: string
+          created_at?: string
+          goal_value: number
+          id?: string
+          updated_at?: string
+          week_start_day?: number
+        }
+        Update: {
+          badge_name?: string
+          challenge_type?: string
+          created_at?: string
+          goal_value?: number
+          id?: string
+          updated_at?: string
+          week_start_day?: number
         }
         Relationships: []
       }
@@ -199,6 +256,108 @@ export type Database = {
           },
         ]
       }
+      orders: {
+        Row: {
+          business_id: string
+          collected_at: string | null
+          created_at: string
+          id: string
+          mystery_bag_id: string
+          notes: string | null
+          original_total: number
+          payment_id: string | null
+          payment_method: string | null
+          pickup_code: string | null
+          quantity: number
+          status: string
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          collected_at?: string | null
+          created_at?: string
+          id?: string
+          mystery_bag_id: string
+          notes?: string | null
+          original_total: number
+          payment_id?: string | null
+          payment_method?: string | null
+          pickup_code?: string | null
+          quantity?: number
+          status?: string
+          total_amount: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          collected_at?: string | null
+          created_at?: string
+          id?: string
+          mystery_bag_id?: string
+          notes?: string | null
+          original_total?: number
+          payment_id?: string | null
+          payment_method?: string | null
+          pickup_code?: string | null
+          quantity?: number
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_mystery_bag_id_fkey"
+            columns: ["mystery_bag_id"]
+            isOneToOne: false
+            referencedRelation: "mystery_bags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_impact_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          total_co2_saved_tonnes: number
+          total_energy_saved_kwh: number
+          total_meals_rescued: number
+          total_money_saved_ksh: number
+          total_water_conserved_liters: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          total_co2_saved_tonnes?: number
+          total_energy_saved_kwh?: number
+          total_meals_rescued?: number
+          total_money_saved_ksh?: number
+          total_water_conserved_liters?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          total_co2_saved_tonnes?: number
+          total_energy_saved_kwh?: number
+          total_meals_rescued?: number
+          total_money_saved_ksh?: number
+          total_water_conserved_liters?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ratings: {
         Row: {
           business_id: string
@@ -250,11 +409,89 @@ export type Database = {
           },
         ]
       }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          id: string
+          user_id: string
+          week_earned: string | null
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+          week_earned?: string | null
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+          week_earned?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_challenges: {
+        Row: {
+          badge_awarded: boolean
+          challenge_type: string
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          current_count: number
+          id: string
+          updated_at: string
+          user_id: string
+          week_end_date: string
+          week_start_date: string
+        }
+        Insert: {
+          badge_awarded?: boolean
+          challenge_type: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          current_count?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+          week_end_date: string
+          week_start_date: string
+        }
+        Update: {
+          badge_awarded?: boolean
+          challenge_type?: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          current_count?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+          week_end_date?: string
+          week_start_date?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      check_and_award_weekly_badge: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       get_mystery_bags_by_pickup_time: {
         Args: Record<PropertyKey, never>
         Returns: {

@@ -1,37 +1,147 @@
 
 import { Leaf, Droplets, Zap, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface PlatformMetrics {
+  total_co2_saved_tonnes: number;
+  total_water_conserved_liters: number;
+  total_energy_saved_kwh: number;
+  total_meals_rescued: number;
+  total_money_saved_ksh: number;
+}
 
 const ImpactTracker = () => {
+  const [metrics, setMetrics] = useState<PlatformMetrics | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('platform_impact_metrics')
+          .select('*')
+          .single();
+
+        if (error) {
+          console.error('Error fetching platform metrics:', error);
+          return;
+        }
+
+        setMetrics(data);
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMetrics();
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('platform-metrics-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'platform_impact_metrics'
+        },
+        (payload) => {
+          setMetrics(payload.new as PlatformMetrics);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    } else if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+  };
+
+  const formatLiters = (liters: number): string => {
+    return formatNumber(liters) + 'L';
+  };
+
+  const formatKwh = (kwh: number): string => {
+    return formatNumber(kwh) + ' kWh';
+  };
+
+  const formatTonnes = (tonnes: number): string => {
+    return tonnes.toFixed(1) + ' tonnes';
+  };
+
+  const calculateTreesEquivalent = (tonnes: number): number => {
+    // 25 kg CO₂ per tree per year
+    return Math.round((tonnes * 1000) / 25);
+  };
+
+  const calculatePeopleWaterEquivalent = (liters: number): number => {
+    // 150 liters per person per day
+    return Math.round(liters / 150);
+  };
+
+  const calculateHomesEnergyEquivalent = (kwh: number): number => {
+    // 150 kWh per home per month
+    return Math.round(kwh / 150);
+  };
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-gradient-to-br from-green-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Your Environmental Impact
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Loading impact metrics...
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   const impacts = [
     {
       icon: Leaf,
-      value: "12.7 tonnes",
+      value: formatTonnes(metrics?.total_co2_saved_tonnes || 0),
       label: "CO₂ Emissions Saved",
-      description: "Equivalent to planting 158 trees",
+      description: `Equivalent to planting ${calculateTreesEquivalent(metrics?.total_co2_saved_tonnes || 0)} trees`,
       color: "text-green-600",
       bg: "bg-green-100"
     },
     {
       icon: Droplets,
-      value: "45,200L",
+      value: formatLiters(metrics?.total_water_conserved_liters || 0),
       label: "Water Conserved",
-      description: "Enough for 180 people for a day",
+      description: `Enough for ${calculatePeopleWaterEquivalent(metrics?.total_water_conserved_liters || 0)} people for a day`,
       color: "text-blue-600",
       bg: "bg-blue-100"
     },
     {
       icon: Zap,
-      value: "8,450 kWh",
+      value: formatKwh(metrics?.total_energy_saved_kwh || 0),
       label: "Energy Saved",
-      description: "Powers 12 homes for a month",
+      description: `Powers ${calculateHomesEnergyEquivalent(metrics?.total_energy_saved_kwh || 0)} homes for a month`,
       color: "text-yellow-600",
       bg: "bg-yellow-100"
     },
     {
       icon: Users,
-      value: "1,247",
+      value: formatNumber(metrics?.total_meals_rescued || 0),
       label: "Meals Rescued",
-      description: "Fed 1,247 people this month",
+      description: `Fed ${formatNumber(metrics?.total_meals_rescued || 0)} people this month`,
       color: "text-purple-600",
       bg: "bg-purple-100"
     }
@@ -77,26 +187,37 @@ const ImpactTracker = () => {
             <div className="mb-6">
               <div className="flex justify-between text-sm text-gray-600 mb-2">
                 <span>Progress to 2024 Goal</span>
-                <span>67% Complete</span>
+                <span>{Math.round(((metrics?.total_meals_rescued || 0) / 20000) * 100)}% Complete</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
-                <div className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-500" style={{ width: '67%' }}></div>
+                <div 
+                  className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-500" 
+                  style={{ width: `${Math.min(((metrics?.total_meals_rescued || 0) / 20000) * 100, 100)}%` }}
+                ></div>
               </div>
             </div>
 
             {/* Milestones */}
             <div className="grid grid-cols-3 gap-4 text-center text-sm">
               <div>
-                <p className="font-semibold text-green-600">✓ 10K Meals</p>
-                <p className="text-gray-500">Achieved</p>
+                <p className={`font-semibold ${(metrics?.total_meals_rescued || 0) >= 1000 ? 'text-green-600' : 'text-gray-400'}`}>
+                  {(metrics?.total_meals_rescued || 0) >= 1000 ? '✓' : '○'} 1K Meals
+                </p>
+                <p className="text-gray-500">{(metrics?.total_meals_rescued || 0) >= 1000 ? 'Achieved' : 'Goal'}</p>
               </div>
               <div>
-                <p className="font-semibold text-yellow-600">📍 15K Meals</p>
-                <p className="text-gray-500">In Progress</p>
+                <p className={`font-semibold ${(metrics?.total_meals_rescued || 0) >= 10000 ? 'text-green-600' : (metrics?.total_meals_rescued || 0) >= 1000 ? 'text-yellow-600' : 'text-gray-400'}`}>
+                  {(metrics?.total_meals_rescued || 0) >= 10000 ? '✓' : '📍'} 10K Meals
+                </p>
+                <p className="text-gray-500">
+                  {(metrics?.total_meals_rescued || 0) >= 10000 ? 'Achieved' : (metrics?.total_meals_rescued || 0) >= 1000 ? 'In Progress' : 'Goal'}
+                </p>
               </div>
               <div>
-                <p className="font-semibold text-gray-400">🎯 20K Meals</p>
-                <p className="text-gray-500">Goal</p>
+                <p className={`font-semibold ${(metrics?.total_meals_rescued || 0) >= 20000 ? 'text-green-600' : 'text-gray-400'}`}>
+                  🎯 20K Meals
+                </p>
+                <p className="text-gray-500">{(metrics?.total_meals_rescued || 0) >= 20000 ? 'Achieved' : 'Goal'}</p>
               </div>
             </div>
           </div>
