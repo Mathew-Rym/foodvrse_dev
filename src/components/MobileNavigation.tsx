@@ -49,7 +49,7 @@ const MobileNavigation = () => {
                 className={`w-6 h-6 mb-1 ${isActive ? "text-orange-500" : "text-gray-500"}`}
               />
               {tab.id === "cart" && totalItems > 0 && (
-                <Badge className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-5 h-5 flex items-center justify-center p-0">
+                <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs min-w-5 h-5 flex items-center justify-center p-0 border-2 border-white">
                   {totalItems}
                 </Badge>
               )}
