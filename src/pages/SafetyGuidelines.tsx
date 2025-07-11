@@ -178,12 +178,17 @@ const SafetyGuidelines = () => {
           <AlertTriangle className="w-8 h-8 text-red-600 mx-auto mb-4" />
           <h3 className="text-xl font-bold text-gray-900 mb-2">Have a Safety Concern?</h3>
           <p className="text-gray-600 mb-4">
-            If you have any concerns about food safety or quality, please contact us immediately.
+            If you have any concerns about food safety or quality, please contact us immediately via email.
           </p>
           <div className="space-y-2">
-            <p className="font-semibold text-gray-900">Emergency Food Safety Hotline</p>
-            <p className="text-lg font-bold text-red-600">0110098266</p>
-            <p className="text-sm text-gray-600">Available 24/7 for urgent safety concerns</p>
+            <p className="font-semibold text-gray-900">Email Support</p>
+            <button 
+              onClick={() => window.location.href = "mailto:hello@foodvrse.com"}
+              className="text-lg font-bold text-red-600 hover:underline"
+            >
+              hello@foodvrse.com
+            </button>
+            <p className="text-sm text-gray-600">We respond to safety concerns promptly</p>
           </div>
         </div>
       </div>

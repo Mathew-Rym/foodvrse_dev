@@ -172,7 +172,6 @@ const TermsOfService = () => {
             </p>
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-gray-600">Email: hello@foodvrse.com</p>
-              <p className="text-gray-600">Phone: 0110098266</p>
               <p className="text-gray-600">Address: Nairobi, Kenya</p>
             </div>
           </section>

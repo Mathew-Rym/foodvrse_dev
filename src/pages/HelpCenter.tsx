@@ -98,22 +98,10 @@ const HelpCenter = () => {
 
   const contactOptions = [
     {
-      icon: Phone,
-      title: "Call Us",
-      description: "0110098266",
-      action: "Call Now"
-    },
-    {
       icon: Mail,
       title: "Email Support",
       description: "hello@foodvrse.com",
       action: "Send Email"
-    },
-    {
-      icon: MessageCircle,
-      title: "Live Chat",
-      description: "Available 9 AM - 6 PM EAT",
-      action: "Start Chat"
     }
   ];
 
