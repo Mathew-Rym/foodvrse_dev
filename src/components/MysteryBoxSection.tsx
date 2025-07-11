@@ -77,13 +77,13 @@ const MysteryBoxSection = () => {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Sparkles className="w-4 h-4" />
-            Mystery Boxes
+            Mystery Bags
           </div>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
             Surprise Yourself, Save More
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Get premium meals at unbeatable prices with our mystery boxes. 
+            Get premium meals at unbeatable prices with our mystery bags. 
             You'll always get more value than what you pay!
           </p>
         </div>
@@ -132,7 +132,7 @@ const MysteryBoxSection = () => {
                   onClick={() => handleGetMysteryBox(box)}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Get Mystery Box
+                  Get Mystery Bag
                 </Button>
               </div>
             </div>
@@ -148,27 +148,27 @@ const MysteryBoxSection = () => {
             className="border-purple-300 text-purple-600 hover:bg-purple-50"
           >
             <Sparkles className="w-4 h-4 mr-2" />
-            View All Mystery Boxes
+            View All Mystery Bags
           </Button>
         </div>
 
         {/* How it Works */}
         <div className="bg-white rounded-2xl shadow-sm p-8 mt-12">
-          <h3 className="text-xl font-bold text-gray-900 text-center mb-8">How Mystery Boxes Work</h3>
+          <h3 className="text-xl font-bold text-gray-900 text-center mb-8">How Mystery Bags Work</h3>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">
                 1
               </div>
               <h4 className="font-semibold text-gray-900 mb-2">Choose Your Box</h4>
-              <p className="text-gray-600 text-sm">Select from available mystery boxes near you</p>
+              <p className="text-gray-600 text-sm">Select from available mystery bags near you</p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">
                 2
               </div>
               <h4 className="font-semibold text-gray-900 mb-2">Pay & Reserve</h4>
-              <p className="text-gray-600 text-sm">Secure your mystery box with instant payment</p>
+              <p className="text-gray-600 text-sm">Secure your mystery bag with instant payment</p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">

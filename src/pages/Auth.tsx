@@ -57,8 +57,15 @@ const Auth = () => {
           setShowEmailSignup(true);
         } else {
           await loginConsumer(data.email, data.password);
-          const from = location.state?.from?.pathname || '/';
-          navigate(from);
+          // Check for stored redirect path
+          const redirectPath = sessionStorage.getItem('redirectAfterAuth');
+          if (redirectPath) {
+            sessionStorage.removeItem('redirectAfterAuth');
+            navigate(redirectPath);
+          } else {
+            const from = location.state?.from?.pathname || '/';
+            navigate(from);
+          }
         }
       }
     } catch (error) {
@@ -118,8 +125,15 @@ const Auth = () => {
       );
     }
     setShowLocationRequest(false);
-    const from = location.state?.from?.pathname || '/';
-    navigate(from);
+    // Check for stored redirect path
+    const redirectPath = sessionStorage.getItem('redirectAfterAuth');
+    if (redirectPath) {
+      sessionStorage.removeItem('redirectAfterAuth');
+      navigate(redirectPath);
+    } else {
+      const from = location.state?.from?.pathname || '/';
+      navigate(from);
+    }
   };
 
   const handleClose = () => {

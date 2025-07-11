@@ -1,7 +1,7 @@
 
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import FoodListings from "@/components/FoodListings";
+
 import MysteryBoxSection from "@/components/MysteryBoxSection";
 import GameSection from "@/components/GameSection";
 import ImpactTracker from "@/components/ImpactTracker";
@@ -29,9 +29,6 @@ const Index = () => {
       <div className={`${isAuthenticated ? "pb-20" : ""} overflow-x-hidden`}> {/* Add overflow-x-hidden to prevent horizontal scroll */}
         <div id="hero-section">
           <HeroSection />
-        </div>
-        <div id="food-listings">
-          <FoodListings />
         </div>
         <div id="mystery-box-section">
           <MysteryBoxSection />

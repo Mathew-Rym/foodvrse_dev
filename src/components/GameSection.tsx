@@ -2,8 +2,22 @@
 import { Trophy, Users, Award, Star, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const GameSection = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleInviteFriends = () => {
+    if (!isAuthenticated) {
+      // Store redirect path to go to impact page after login
+      sessionStorage.setItem('redirectAfterAuth', '/impact');
+      navigate("/auth");
+      return;
+    }
+    navigate("/impact");
+  };
   const userStats = {
     rank: 3,
     mealsSaved: 127,
@@ -135,7 +149,10 @@ const GameSection = () => {
                   </div>
                 ))}
               </div>
-              <Button className="w-full mt-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600">
+              <Button 
+                className="w-full mt-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 backdrop-blur-sm bg-opacity-90 shadow-lg hover:shadow-xl transition-all duration-300"
+                onClick={handleInviteFriends}
+              >
                 Invite Friends
               </Button>
             </CardContent>
