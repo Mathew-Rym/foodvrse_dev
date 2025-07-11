@@ -2,7 +2,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Building2, Mail, Phone, MapPin, Clock, Users } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft, Building2, Mail, Phone, MapPin, Clock, Users, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { toast } from "sonner";
@@ -10,6 +13,9 @@ import { toast } from "sonner";
 const PartnerApplication = () => {
   const navigate = useNavigate();
   const { toast: toastHook } = useToast();
+  const [showHoursDialog, setShowHoursDialog] = useState(false);
+  const [showSurplusDialog, setShowSurplusDialog] = useState(false);
+  
   const [formData, setFormData] = useState({
     businessName: "",
     ownerName: "",
@@ -21,6 +27,27 @@ const PartnerApplication = () => {
     operatingHours: "",
     expectedWaste: ""
   });
+
+  // Operating hours state
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [openTime, setOpenTime] = useState("");
+  const [closeTime, setCloseTime] = useState("");
+
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const timeSlots = [
+    "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30",
+    "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
+    "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30",
+    "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"
+  ];
+
+  const surplusRanges = [
+    "5-10 kg",
+    "10-20 kg", 
+    "20-50 kg",
+    "50-100 kg",
+    "100+ kg"
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +89,30 @@ Please review this application.
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleDayToggle = (day: string) => {
+    setSelectedDays(prev => 
+      prev.includes(day) 
+        ? prev.filter(d => d !== day)
+        : [...prev, day]
+    );
+  };
+
+  const handleHoursSave = () => {
+    if (selectedDays.length === 0 || !openTime || !closeTime) {
+      toast.error("Please select days and operating hours");
+      return;
+    }
+    
+    const hoursText = `${selectedDays.join(", ")} from ${openTime} to ${closeTime}`;
+    setFormData(prev => ({ ...prev, operatingHours: hoursText }));
+    setShowHoursDialog(false);
+  };
+
+  const handleSurplusSelect = (range: string) => {
+    setFormData(prev => ({ ...prev, expectedWaste: range }));
+    setShowSurplusDialog(false);
   };
 
   return (
@@ -263,28 +314,113 @@ Please review this application.
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Operating Hours *
                 </label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full justify-start text-left"
-                  onClick={() => toast.success('Hours selection popup coming soon!')}
-                >
-                  {formData.operatingHours || "Select operating days and hours"}
-                </Button>
+                <Dialog open={showHoursDialog} onOpenChange={setShowHoursDialog}>
+                  <DialogTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full justify-between text-left"
+                    >
+                      <span className={formData.operatingHours ? "text-gray-900" : "text-gray-500"}>
+                        {formData.operatingHours || "Select operating days and hours"}
+                      </span>
+                      <ChevronDown className="w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Select Operating Hours</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Operating Days</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {days.map((day) => (
+                            <div key={day} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={day}
+                                checked={selectedDays.includes(day)}
+                                onCheckedChange={() => handleDayToggle(day)}
+                              />
+                              <label htmlFor={day} className="text-sm">{day}</label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">Opening Time</label>
+                          <Select value={openTime} onValueChange={setOpenTime}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select time" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white z-50">
+                              {timeSlots.map(time => (
+                                <SelectItem key={time} value={time}>{time}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">Closing Time</label>
+                          <Select value={closeTime} onValueChange={setCloseTime}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select time" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white z-50">
+                              {timeSlots.map(time => (
+                                <SelectItem key={time} value={time}>{time}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <Button onClick={handleHoursSave} className="w-full">
+                        Save Operating Hours
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Expected Daily Food Surplus *
                 </label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full justify-start text-left"
-                  onClick={() => toast.success('Surplus range selection coming soon!')}
-                >
-                  {formData.expectedWaste || "Select expected daily surplus range"}
-                </Button>
+                <Dialog open={showSurplusDialog} onOpenChange={setShowSurplusDialog}>
+                  <DialogTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full justify-between text-left"
+                    >
+                      <span className={formData.expectedWaste ? "text-gray-900" : "text-gray-500"}>
+                        {formData.expectedWaste || "Select expected daily surplus range"}
+                      </span>
+                      <ChevronDown className="w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Select Daily Food Surplus Range</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-2">
+                      {surplusRanges.map((range) => (
+                        <Button
+                          key={range}
+                          variant="outline"
+                          className="w-full justify-start"
+                          onClick={() => handleSurplusSelect(range)}
+                        >
+                          {range}
+                        </Button>
+                      ))}
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               <div>
