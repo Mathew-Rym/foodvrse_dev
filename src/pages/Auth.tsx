@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -15,6 +15,7 @@ interface AuthFormData {
   password: string;
   name?: string;
   businessName?: string;
+  rememberMe?: boolean;
 }
 
 const Auth = () => {
@@ -26,6 +27,7 @@ const Auth = () => {
   const [showLocationRequest, setShowLocationRequest] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,12 +37,42 @@ const Auth = () => {
       email: '',
       password: '',
       name: '',
-      businessName: ''
+      businessName: '',
+      rememberMe: false
     }
   });
 
+  // Load saved email on component mount
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('saved_email');
+    if (savedEmail) {
+      form.setValue('email', savedEmail);
+      setRememberMe(true);
+    }
+  }, [form]);
+
   const onSubmit = async (data: AuthFormData) => {
     try {
+      // Handle browser password storage
+      if (rememberMe && 'credentials' in navigator && (navigator as any).credentials?.store) {
+        try {
+          // Simple localStorage backup for password saving
+          localStorage.setItem('saved_email', data.email);
+          if (confirm('Save password to browser?')) {
+            const credential = new (window as any).PasswordCredential({
+              id: data.email,
+              password: data.password,
+            });
+            await (navigator as any).credentials.store(credential);
+          }
+        } catch (credError) {
+          console.log('Credential storage not supported, using localStorage fallback');
+          localStorage.setItem('saved_email', data.email);
+        }
+      } else if (rememberMe) {
+        localStorage.setItem('saved_email', data.email);
+      }
+
       if (isSignUp) {
         // Sign up flow
         const userData = isBusinessAuth 
@@ -50,6 +82,7 @@ const Auth = () => {
         const { error } = await signUp(data.email, data.password, userData);
         if (!error) {
           if (!isBusinessAuth) {
+            // For consumer signup, redirect directly to home after email signup flow
             setShowEmailSignup(true);
           } else {
             toast.success('Business account created! Please check your email to confirm.');
@@ -124,14 +157,8 @@ const Auth = () => {
       );
     }
     setShowLocationRequest(false);
-    const redirectPath = sessionStorage.getItem('redirectAfterAuth');
-    if (redirectPath) {
-      sessionStorage.removeItem('redirectAfterAuth');
-      navigate(redirectPath);
-    } else {
-      const from = location.state?.from?.pathname || '/';
-      navigate(from);
-    }
+    // Always redirect to home page after signup flow
+    navigate('/');
   };
 
   const handleClose = () => {
@@ -317,8 +344,23 @@ const Auth = () => {
                     </FormControl>
                     <FormMessage />
                   </FormItem>
-                )}
-              />
+                 )}
+               />
+
+               {/* Remember Me Checkbox */}
+               <div className="flex items-center space-x-2">
+                 <Checkbox
+                   id="rememberMe"
+                   checked={rememberMe}
+                   onCheckedChange={(checked) => setRememberMe(checked === true)}
+                 />
+                 <label 
+                   htmlFor="rememberMe" 
+                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                 >
+                   Remember me
+                 </label>
+               </div>
 
               <Button 
                 type="submit" 
