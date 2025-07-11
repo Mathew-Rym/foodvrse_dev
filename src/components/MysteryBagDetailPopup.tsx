@@ -148,10 +148,10 @@ export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetail
             {/* Price section */}
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-2xl font-bold text-green-600">KSh {bag.price}</span>
-                  <span className="text-gray-500 line-through ml-2">KSh {bag.originalPrice}</span>
-                </div>
+                 <div>
+                   <span className="text-2xl font-bold text-green-600">KSh {bag.price}</span>
+                   <span className="text-gray-500 line-through ml-2">KSh {bag.originalPrice}</span>
+                 </div>
               </div>
             </div>
 

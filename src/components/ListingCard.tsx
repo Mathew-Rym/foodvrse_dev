@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { MysteryBagDetailPopup } from "./MysteryBagDetailPopup";
 
 interface ListingCardProps {
   listing: {
@@ -46,12 +47,24 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [userRating, setUserRating] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showDetailPopup, setShowDetailPopup] = useState(false);
 
   useEffect(() => {
-    if (user && listing.favorited_by_user_ids) {
-      setIsFavorited(listing.favorited_by_user_ids.includes(user.id));
-    }
-  }, [user, listing.favorited_by_user_ids]);
+    const checkFavoriteStatus = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('user_favorites')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('business_id', listing.business.id)
+          .single();
+        
+        setIsFavorited(!!data);
+      }
+    };
+
+    checkFavoriteStatus();
+  }, [user, listing.business.id]);
 
   useEffect(() => {
     // Show "Reserve Quick!" popup for low stock items
@@ -105,16 +118,26 @@ export const ListingCard: React.FC<ListingCardProps> = ({
     }
 
     try {
-      const newFavoritedIds = isFavorited
-        ? listing.favorited_by_user_ids.filter(id => id !== user.id)
-        : [...listing.favorited_by_user_ids, user.id];
+      if (isFavorited) {
+        // Remove from user_favorites table
+        const { error } = await supabase
+          .from('user_favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('business_id', listing.business.id);
 
-      const { error } = await supabase
-        .from('listings')
-        .update({ favorited_by_user_ids: newFavoritedIds })
-        .eq('id', listing.id);
+        if (error) throw error;
+      } else {
+        // Add to user_favorites table
+        const { error } = await supabase
+          .from('user_favorites')
+          .insert({
+            user_id: user.id,
+            business_id: listing.business.id
+          });
 
-      if (error) throw error;
+        if (error) throw error;
+      }
 
       setIsFavorited(!isFavorited);
       onFavorite(listing.id, !isFavorited);
@@ -271,7 +294,10 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleFavoriteToggle}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleFavoriteToggle();
+            }}
             className={`p-2 rounded-full ${
               isFavorited
                 ? "bg-red-500 text-white hover:bg-red-600"
@@ -284,7 +310,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
       </div>
 
       {/* Content area */}
-      <div className="p-4">
+      <div className="p-4" onClick={() => setShowDetailPopup(true)} style={{ cursor: 'pointer' }}>
         {/* Business header with logo */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3 flex-1">
@@ -330,19 +356,22 @@ export const ListingCard: React.FC<ListingCardProps> = ({
         {/* Price and reserve button */}
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-2xl font-bold text-gray-900">£{listing.price}</div>
+            <div className="text-2xl font-bold text-gray-900">KSh {listing.price}</div>
             {listing.original_price > listing.price && (
               <div className="text-sm text-gray-500 line-through">
-                £{listing.original_price}
+                KSh {listing.original_price}
               </div>
             )}
           </div>
           <Button
-            onClick={handlePurchase}
-            disabled={isProcessing || listing.status === 'sold-out'}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDetailPopup(true);
+            }}
+            disabled={listing.status === 'sold-out'}
             className="bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 disabled:opacity-50 px-6 py-2"
           >
-            {isProcessing ? "Processing..." : "Reserve"}
+            Reserve
           </Button>
         </div>
       </div>
@@ -416,6 +445,31 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Detail Popup */}
+      {showDetailPopup && (
+        <MysteryBagDetailPopup
+          isOpen={showDetailPopup}
+          onClose={() => setShowDetailPopup(false)}
+          bag={{
+            id: parseInt(listing.id),
+            vendor: listing.business.business_name,
+            title: listing.item_name,
+            price: listing.price,
+            originalPrice: listing.original_price,
+            pickup: formatPickupTime(listing.pickup_start, listing.pickup_end),
+            items: listing.description || "Mystery selection of items",
+            location: listing.business.location,
+            address: listing.business.location,
+            itemsLeft: listing.quantity,
+            rating: listing.business.average_rating || 4.6,
+            reviewCount: 171,
+            category: "Meals",
+            description: listing.description || "Rescue a selection of goodies from your favourite food retailer! You can expect to receive a mixture of items that would otherwise go to waste.",
+            gradient: "from-orange-400 to-red-500"
+          }}
+        />
+      )}
     </div>
   );
 };
