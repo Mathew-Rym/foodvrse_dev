@@ -1,5 +1,5 @@
 
-import { Home, Search, ShoppingBag, Trophy, User, Heart } from "lucide-react";
+import { Home, Search, Trophy, User, Heart } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,7 +19,7 @@ const MobileNavigation = () => {
   const tabs = [
     { id: "home", label: "Home", icon: Home, path: "/" },
     { id: "discover", label: "Discover", icon: Search, path: "/discover" },
-    { id: "cart", label: "Cart", icon: ShoppingBag, path: "/cart" },
+    { id: "impact", label: "Impact", icon: Trophy, path: "/impact" },
     { id: "favorites", label: "Favorites", icon: Heart, path: "/favorites" },
     { id: "profile", label: "Profile", icon: User, path: "/profile" },
   ];
@@ -48,11 +48,6 @@ const MobileNavigation = () => {
               <Icon 
                 className={`w-6 h-6 mb-1 ${isActive ? "text-orange-500" : "text-gray-500"}`}
               />
-              {tab.id === "cart" && totalItems > 0 && (
-                <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs min-w-5 h-5 flex items-center justify-center p-0 border-2 border-white">
-                  {totalItems}
-                </Badge>
-              )}
               <span className={`text-xs font-medium truncate ${
                 isActive ? "text-orange-500" : "text-gray-500"
               }`}>
