@@ -94,16 +94,15 @@ const BusinessOnboardingTour = ({ onComplete, onSkip }: BusinessOnboardingTourPr
       {/* Dark overlay */}
       <div className="fixed inset-0 bg-black bg-opacity-70 z-50" />
       
-      {/* Spotlight effect for highlighted element */}
+      {/* Simple highlight border for current element */}
       {spotlightStyle && (
         <div 
-          className="fixed z-50 pointer-events-none border-4 border-orange-400 rounded-lg shadow-lg animate-pulse"
+          className="fixed z-50 pointer-events-none border-2 border-orange-400 rounded-lg"
           style={{
             top: `${spotlightStyle.top}px`,
             left: `${spotlightStyle.left}px`,
             width: `${spotlightStyle.width}px`,
             height: `${spotlightStyle.height}px`,
-            boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 20px rgba(249, 115, 22, 0.6)',
           }}
         />
       )}

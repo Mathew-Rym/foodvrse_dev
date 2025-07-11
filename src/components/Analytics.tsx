@@ -1,36 +1,131 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Analytics = () => {
-  const salesData = [
-    { day: 'Mon', sales: 2400, orders: 12 },
-    { day: 'Tue', sales: 1800, orders: 9 },
-    { day: 'Wed', sales: 3200, orders: 16 },
-    { day: 'Thu', sales: 2800, orders: 14 },
-    { day: 'Fri', sales: 4200, orders: 21 },	
-    { day: 'Sat', sales: 3800, orders: 19 },
-    { day: 'Sun', sales: 2200, orders: 11 }
-  ];
+  const { user } = useAuth();
+  const [salesData, setSalesData] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
+  const [timeData, setTimeData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const categoryData = [
-    { name: 'Pastries', value: 35, color: '#FF6B35' },
-    { name: 'Salads', value: 28, color: '#4ECDC4' },
-    { name: 'Hot Food', value: 22, color: '#45B7D1' },
-    { name: 'Beverages', value: 15, color: '#96CEB4' }
-  ];
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      if (!user) return;
 
-  const timeData = [
-    { hour: '10:00', orders: 2 },
-    { hour: '12:00', orders: 8 },
-    { hour: '14:00', orders: 12 },
-    { hour: '16:00', orders: 15 },
-    { hour: '18:00', orders: 18 },
-    { hour: '20:00', orders: 8 },
-    { hour: '22:00', orders: 3 }
-  ];
+      try {
+        // Get business profile
+        const { data: profile } = await supabase
+          .from('business_profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+
+        if (!profile) return;
+
+        // Fetch real performance data
+        const { data: performanceData } = await supabase
+          .from('listing_performance')
+          .select('*')
+          .eq('business_id', profile.id)
+          .order('date', { ascending: true });
+
+        // Fetch orders data for time analysis
+        const { data: ordersData } = await supabase
+          .from('orders')
+          .select('created_at, total_amount, mystery_bag_id')
+          .eq('business_id', profile.id)
+          .eq('status', 'collected');
+
+        // Fetch listings for category analysis
+        const { data: listingsData } = await supabase
+          .from('listings')
+          .select('category, price, quantity, initial_quantity')
+          .eq('business_id', profile.id);
+
+        // Process sales data by day
+        const dailySales = performanceData?.reduce((acc, item) => {
+          const day = new Date(item.date).toLocaleDateString('en', { weekday: 'short' });
+          const existing = acc.find(d => d.day === day);
+          if (existing) {
+            existing.sales += item.revenue || 0;
+            existing.orders += item.purchases || 0;
+          } else {
+            acc.push({
+              day,
+              sales: item.revenue || 0,
+              orders: item.purchases || 0
+            });
+          }
+          return acc;
+        }, []) || [];
+
+        setSalesData(dailySales);
+
+        // Process category data
+        const categoryStats = listingsData?.reduce((acc, item) => {
+          const existing = acc.find(c => c.name === item.category);
+          const soldItems = item.initial_quantity - item.quantity;
+          if (existing) {
+            existing.value += soldItems;
+          } else {
+            acc.push({
+              name: item.category,
+              value: soldItems,
+              color: getCategoryColor(item.category)
+            });
+          }
+          return acc;
+        }, []) || [];
+
+        // Convert to percentages
+        const totalSold = categoryStats.reduce((sum, cat) => sum + cat.value, 0);
+        const categoryPercentages = categoryStats.map(cat => ({
+          ...cat,
+          value: totalSold > 0 ? Math.round((cat.value / totalSold) * 100) : 0
+        }));
+
+        setCategoryData(categoryPercentages);
+
+        // Process time data from orders
+        const hourlyOrders = Array.from({ length: 12 }, (_, i) => {
+          const hour = i + 10; // 10 AM to 9 PM
+          const hourString = `${hour}:00`;
+          const orderCount = ordersData?.filter(order => {
+            const orderHour = new Date(order.created_at).getHours();
+            return orderHour === hour;
+          }).length || 0;
+          
+          return { hour: hourString, orders: orderCount };
+        });
+
+        setTimeData(hourlyOrders);
+
+      } catch (error) {
+        console.error('Error fetching analytics:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, [user]);
+
+  const getCategoryColor = (category: string) => {
+    const colors = {
+      'Meals': '#FF6B35',
+      'Pastries': '#4ECDC4',
+      'Beverages': '#45B7D1',
+      'Dairy': '#96CEB4',
+      'Fruits': '#FECA57',
+      'Vegetables': '#48CAE4'
+    };
+    return colors[category] || '#95A5A6';
+  };
 
   const chartConfig = {
     sales: {
@@ -43,68 +138,117 @@ const Analytics = () => {
     },
   };
 
+  if (loading) {
+    return (
+      <div className="space-y-6 p-4">
+        <div className="animate-pulse">
+          <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="space-y-4">
+            <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="h-64 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const bestDay = salesData.reduce((best, day) => 
+    day.sales > (best?.sales || 0) ? day : best, null
+  );
+  
+  const peakHour = timeData.reduce((peak, hour) => 
+    hour.orders > (peak?.orders || 0) ? hour : peak, null
+  );
+  
+  const topCategory = categoryData.reduce((top, cat) => 
+    cat.value > (top?.value || 0) ? cat : top, null
+  );
+
+  const totalSales = salesData.reduce((sum, day) => sum + day.sales, 0);
+  const totalOrders = salesData.reduce((sum, day) => sum + day.orders, 0);
+  const avgOrderValue = totalOrders > 0 ? Math.round(totalSales / totalOrders) : 0;
+
   return (
     <div className="space-y-6 p-4">
-      <h2 className="text-xl font-bold text-gray-900">Analytics Dashboard</h2>
+      <h2 className="text-xl font-bold text-gray-900">Real-Time Analytics Dashboard</h2>
       
       {/* Weekly Sales Chart */}
       <Card className="p-4">
         <h3 className="text-lg font-semibold mb-4">Weekly Sales Performance</h3>
-        <ChartContainer config={chartConfig} className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={salesData}>
-              <XAxis dataKey="day" />
-              <YAxis />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="sales" fill="var(--color-sales)" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+        {salesData.length > 0 ? (
+          <ChartContainer config={chartConfig} className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={salesData}>
+                <XAxis dataKey="day" />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="sales" fill="var(--color-sales)" />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        ) : (
+          <div className="h-[300px] flex items-center justify-center text-gray-500">
+            No sales data available yet. Start selling to see analytics!
+          </div>
+        )}
       </Card>
 
       {/* Category Distribution */}
       <Card className="p-4">
         <h3 className="text-lg font-semibold mb-4">Sales by Category</h3>
-        <div className="h-[250px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={categoryData}
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                dataKey="value"
-                label={({ name, value }) => `${name}: ${value}%`}
-              >
-                {categoryData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <ChartTooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+        {categoryData.length > 0 ? (
+          <div className="h-[250px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={categoryData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}%`}
+                >
+                  {categoryData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <ChartTooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <div className="h-[250px] flex items-center justify-center text-gray-500">
+            No category data available yet.
+          </div>
+        )}
       </Card>
 
       {/* Peak Hours */}
       <Card className="p-4">
         <h3 className="text-lg font-semibold mb-4">Peak Ordering Hours</h3>
-        <ChartContainer config={chartConfig} className="h-[250px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={timeData}>
-              <XAxis dataKey="hour" />
-              <YAxis />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Line 
-                type="monotone" 
-                dataKey="orders" 
-                stroke="var(--color-orders)" 
-                strokeWidth={3}
-                dot={{ fill: "var(--color-orders)" }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+        {timeData.some(hour => hour.orders > 0) ? (
+          <ChartContainer config={chartConfig} className="h-[250px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={timeData}>
+                <XAxis dataKey="hour" />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Line 
+                  type="monotone" 
+                  dataKey="orders" 
+                  stroke="var(--color-orders)" 
+                  strokeWidth={3}
+                  dot={{ fill: "var(--color-orders)" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        ) : (
+          <div className="h-[250px] flex items-center justify-center text-gray-500">
+            No order time data available yet.
+          </div>
+        )}
       </Card>
 
       {/* Key Insights */}
@@ -113,19 +257,25 @@ const Analytics = () => {
         <div className="space-y-3 text-sm">
           <div className="flex items-center justify-between p-2 bg-green-50 rounded">
             <span>Best performing day:</span>
-            <span className="font-semibold text-green-700">Friday (KSh 4,200)</span>
+            <span className="font-semibold text-green-700">
+              {bestDay ? `${bestDay.day} (KSh ${bestDay.sales.toLocaleString()})` : 'No data yet'}
+            </span>
           </div>
           <div className="flex items-center justify-between p-2 bg-blue-50 rounded">
             <span>Peak ordering time:</span>
-            <span className="font-semibold text-blue-700">6:00 PM (18 orders)</span>
+            <span className="font-semibold text-blue-700">
+              {peakHour ? `${peakHour.hour} (${peakHour.orders} orders)` : 'No data yet'}
+            </span>
           </div>
           <div className="flex items-center justify-between p-2 bg-orange-50 rounded">
             <span>Top category:</span>
-            <span className="font-semibold text-orange-700">Pastries (35%)</span>
+            <span className="font-semibold text-orange-700">
+              {topCategory ? `${topCategory.name} (${topCategory.value}%)` : 'No data yet'}
+            </span>
           </div>
           <div className="flex items-center justify-between p-2 bg-purple-50 rounded">
             <span>Average order value:</span>
-            <span className="font-semibold text-purple-700">KSh 195</span>
+            <span className="font-semibold text-purple-700">KSh {avgOrderValue.toLocaleString()}</span>
           </div>
         </div>
       </Card>

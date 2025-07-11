@@ -927,6 +927,14 @@ export type Database = {
         Args: { p_listing_id: string; p_user_id: string; p_quantity?: number }
         Returns: Json
       }
+      track_listing_favorite: {
+        Args: { listing_uuid: string; is_favorited: boolean }
+        Returns: undefined
+      }
+      track_listing_view: {
+        Args: { listing_uuid: string }
+        Returns: undefined
+      }
     }
     Enums: {
       user_type: "consumer" | "business"

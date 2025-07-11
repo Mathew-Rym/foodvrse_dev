@@ -5,6 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { QuantitySelector } from "./QuantitySelector";
 import { PaymentPopup } from "./PaymentPopup";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface MysteryBagDetailPopupProps {
   isOpen: boolean;
@@ -30,10 +33,12 @@ interface MysteryBagDetailPopupProps {
 }
 
 export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetailPopupProps) => {
+  const { user } = useAuth();
   const [showQuantitySelector, setShowQuantitySelector] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [showSurprisePopup, setShowSurprisePopup] = useState(false);
+  const [userRating, setUserRating] = useState(0);
 
   const handleReserveClick = () => {
     setShowQuantitySelector(true);
@@ -53,6 +58,32 @@ export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetail
         text: `Check out this mystery bag from ${bag.vendor}`,
         url: window.location.href,
       });
+    }
+  };
+
+  const handleRateClick = async (rating: number) => {
+    if (!user) {
+      toast.error("Please sign in to rate businesses");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('ratings')
+        .upsert({
+          business_id: bag.id.toString(), // Convert to string as business_id expects UUID
+          user_id: user.id,
+          rating: rating,
+          review_comment: `Rating for ${bag.vendor}`
+        });
+
+      if (error) throw error;
+
+      setUserRating(rating);
+      toast.success("Thank you for your rating!");
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      toast.error("Failed to submit rating");
     }
   };
 
@@ -199,6 +230,24 @@ export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetail
             >
               RESERVE
             </Button>
+
+            {/* Rating Section */}
+            <div className="mt-4 pt-4 border-t">
+              <p className="text-sm font-medium text-center mb-2">Rate this business:</p>
+              <div className="flex justify-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => handleRateClick(star)}
+                    className={`p-1 ${
+                      star <= userRating ? 'text-yellow-500' : 'text-gray-300 hover:text-yellow-400'
+                    }`}
+                  >
+                    <Star className="w-5 h-5 fill-current" />
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

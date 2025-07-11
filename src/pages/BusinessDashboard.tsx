@@ -226,32 +226,43 @@ const BusinessDashboard = () => {
     if (!file || !businessProfile) return;
 
     try {
-      // Create a simple placeholder URL for now - in production you'd upload to storage
-      const imageUrl = URL.createObjectURL(file);
+      // Upload to Supabase Storage
+      const fileName = `${businessProfile.id}/${imageType}_${Date.now()}.${file.name.split('.').pop()}`;
+      
+      const { data, error: uploadError } = await supabase.storage
+        .from('business-images')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('business-images')
+        .getPublicUrl(fileName);
       
       const updateField = imageType === 'logo' ? 'business_logo_url' : 'business_thumbnail_url';
       
       const { error } = await supabase
         .from('business_profiles')
-        .update({ [updateField]: imageUrl })
+        .update({ [updateField]: publicUrl })
         .eq('id', businessProfile.id);
 
       if (error) throw error;
 
-      setBusinessProfile(prev => ({ ...prev, [updateField]: imageUrl }));
+      setBusinessProfile(prev => ({ ...prev, [updateField]: publicUrl }));
       toast.success(`Business ${imageType} uploaded successfully!`);
       
       // Update all existing listings with the new business thumbnail
       if (imageType === 'thumbnail') {
         await supabase
           .from('listings')
-          .update({ business_thumbnail_url: imageUrl })
+          .update({ business_thumbnail_url: publicUrl })
           .eq('business_id', businessProfile.id);
           
         // Update local listings state
         setListings(prev => prev.map(listing => ({
           ...listing,
-          business_thumbnail_url: imageUrl
+          business_thumbnail_url: publicUrl
         })));
       }
     } catch (error) {
@@ -265,6 +276,17 @@ const BusinessDashboard = () => {
 
     try {
       const updateField = imageType === 'logo' ? 'business_logo_url' : 'business_thumbnail_url';
+      const currentUrl = businessProfile[updateField];
+      
+      // Remove from storage if exists
+      if (currentUrl) {
+        const fileName = currentUrl.split('/').pop();
+        if (fileName) {
+          await supabase.storage
+            .from('business-images')
+            .remove([`${businessProfile.id}/${fileName}`]);
+        }
+      }
       
       const { error } = await supabase
         .from('business_profiles')
