@@ -868,7 +868,7 @@ export type Database = {
         }[]
       }
       get_user_type: {
-        Args: { user_uuid: string }
+        Args: { user_uuid?: string }
         Returns: Database["public"]["Enums"]["user_type"]
       }
       process_purchase: {
