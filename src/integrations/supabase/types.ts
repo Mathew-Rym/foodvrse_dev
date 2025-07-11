@@ -47,6 +47,7 @@ export type Database = {
           average_rating: number | null
           business_logo_url: string | null
           business_name: string
+          business_thumbnail_url: string | null
           carbon_credits_earned: number | null
           co2_missed_kg: number | null
           created_at: string
@@ -73,6 +74,7 @@ export type Database = {
           average_rating?: number | null
           business_logo_url?: string | null
           business_name: string
+          business_thumbnail_url?: string | null
           carbon_credits_earned?: number | null
           co2_missed_kg?: number | null
           created_at?: string
@@ -99,6 +101,7 @@ export type Database = {
           average_rating?: number | null
           business_logo_url?: string | null
           business_name?: string
+          business_thumbnail_url?: string | null
           carbon_credits_earned?: number | null
           co2_missed_kg?: number | null
           created_at?: string
@@ -266,6 +269,7 @@ export type Database = {
       listings: {
         Row: {
           business_id: string
+          business_thumbnail_url: string | null
           category: string
           co2_saved_per_item_kg: number | null
           created_at: string | null
@@ -274,6 +278,8 @@ export type Database = {
           id: string
           initial_quantity: number
           item_name: string
+          latitude: number | null
+          longitude: number | null
           original_price: number
           pickup_end: string
           pickup_start: string
@@ -281,10 +287,12 @@ export type Database = {
           quantity: number
           status: string
           tags: string[] | null
+          thumbnail_url: string | null
           updated_at: string | null
         }
         Insert: {
           business_id: string
+          business_thumbnail_url?: string | null
           category?: string
           co2_saved_per_item_kg?: number | null
           created_at?: string | null
@@ -293,6 +301,8 @@ export type Database = {
           id?: string
           initial_quantity?: number
           item_name: string
+          latitude?: number | null
+          longitude?: number | null
           original_price: number
           pickup_end: string
           pickup_start: string
@@ -300,10 +310,12 @@ export type Database = {
           quantity?: number
           status?: string
           tags?: string[] | null
+          thumbnail_url?: string | null
           updated_at?: string | null
         }
         Update: {
           business_id?: string
+          business_thumbnail_url?: string | null
           category?: string
           co2_saved_per_item_kg?: number | null
           created_at?: string | null
@@ -312,6 +324,8 @@ export type Database = {
           id?: string
           initial_quantity?: number
           item_name?: string
+          latitude?: number | null
+          longitude?: number | null
           original_price?: number
           pickup_end?: string
           pickup_start?: string
@@ -319,6 +333,7 @@ export type Database = {
           quantity?: number
           status?: string
           tags?: string[] | null
+          thumbnail_url?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -856,9 +871,46 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_distance: {
+        Args: { lat1: number; lon1: number; lat2: number; lon2: number }
+        Returns: number
+      }
       check_and_award_weekly_badge: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      get_listings_with_distance: {
+        Args: {
+          user_lat?: number
+          user_lon?: number
+          max_distance?: number
+          category_filter?: string
+          search_query?: string
+        }
+        Returns: {
+          id: string
+          item_name: string
+          description: string
+          quantity: number
+          price: number
+          original_price: number
+          pickup_start: string
+          pickup_end: string
+          status: string
+          category: string
+          thumbnail_url: string
+          business_thumbnail_url: string
+          favorited_by_user_ids: string[]
+          business_id: string
+          business_name: string
+          business_logo_url: string
+          location: string
+          average_rating: number
+          rating_count: number
+          business_lat: number
+          business_lon: number
+          distance_km: number
+        }[]
       }
       get_mystery_bags_by_pickup_time: {
         Args: Record<PropertyKey, never>

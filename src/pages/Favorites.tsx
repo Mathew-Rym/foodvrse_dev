@@ -2,34 +2,74 @@ import { Heart, MapPin, Star, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MobileLayout from "@/components/MobileLayout";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import ListingCard from "@/components/ListingCard";
 
 const Favorites = () => {
-  const [favorites, setFavorites] = useState([
-    {
-      id: 1,
-      name: "Java House Westlands",
-      type: "Restaurant",
-      distance: "0.5 km",
-      rating: 4.5,
-      savings: "Up to 70%",
-      pickup: "5:00 PM - 8:00 PM",
-      image: "🍕"
-    },
-    {
-      id: 3,
-      name: "Healthy U Junction",
-      type: "Health Food",
-      distance: "0.8 km",
-      rating: 4.7,
-      savings: "Up to 80%",
-      pickup: "4:00 PM - 7:00 PM",
-      image: "🥗"
-    }
-  ]);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [favoriteListings, setFavoriteListings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const removeFavorite = (id: number) => {
-    setFavorites(prev => prev.filter(fav => fav.id !== id));
+  useEffect(() => {
+    if (user) {
+      fetchFavoriteListings();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const fetchFavoriteListings = async () => {
+    if (!user) return;
+
+    try {
+      // Get all listings that the user has favorited
+      const { data, error } = await supabase
+        .from('listings')
+        .select(`
+          *,
+          business:business_profiles(
+            id,
+            business_name,
+            business_logo_url,
+            location,
+            average_rating,
+            rating_count
+          )
+        `)
+        .contains('favorited_by_user_ids', [user.id])
+        .neq('status', 'sold-out')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setFavoriteListings(data || []);
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+      toast.error('Failed to load favorites');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFavorite = (listingId: string, isFavorited: boolean) => {
+    // Update local state immediately for better UX
+    if (!isFavorited) {
+      setFavoriteListings(prev => prev.filter(listing => listing.id !== listingId));
+    }
+  };
+
+  const handlePurchase = (listingId: string, quantity: number) => {
+    // Update local state immediately for better UX
+    setFavoriteListings(prev => prev.map(listing => 
+      listing.id === listingId 
+        ? { ...listing, quantity: listing.quantity - quantity }
+        : listing
+    ));
   };
 
   return (
@@ -41,65 +81,38 @@ const Favorites = () => {
           <p className="text-gray-600 mt-1">Your saved restaurants and stores</p>
         </div>
 
-        {favorites.length === 0 ? (
+        {loading ? (
+          <div className="p-4">
+            <div className="grid grid-cols-1 gap-6">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="bg-gray-100 rounded-2xl h-80 animate-pulse" />
+              ))}
+            </div>
+          </div>
+        ) : favoriteListings.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-4">
             <Heart className="w-16 h-16 text-gray-300 mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No favorites yet</h3>
             <p className="text-gray-600 text-center mb-6">
               Start adding your favorite restaurants and stores to see them here
             </p>
-            <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+            <Button 
+              onClick={() => navigate('/discover')}
+              className="bg-gradient-to-r from-orange-500 to-red-500 text-white"
+            >
               Discover Places
             </Button>
           </div>
         ) : (
           <div className="p-4">
-            <div className="space-y-3">
-              {favorites.map((place) => (
-                <div key={place.id} className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
-                      {place.image}
-                    </div>
-                    
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-semibold text-gray-900">{place.name}</h3>
-                          <p className="text-sm text-gray-600">{place.type}</p>
-                        </div>
-                        <button
-                          onClick={() => removeFavorite(place.id)}
-                          className="p-1 text-red-500"
-                        >
-                          <Heart className="w-5 h-5 fill-current" />
-                        </button>
-                      </div>
-                      
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          <span>{place.distance}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                          <span>{place.rating}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          <span>{place.pickup}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between mt-3">
-                        <Badge className="bg-green-100 text-green-600">{place.savings}</Badge>
-                        <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
-                          View Deals
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 gap-6">
+              {favoriteListings.map((listing) => (
+                <ListingCard
+                  key={listing.id}
+                  listing={listing}
+                  onPurchase={handlePurchase}
+                  onFavorite={handleFavorite}
+                />
               ))}
             </div>
           </div>

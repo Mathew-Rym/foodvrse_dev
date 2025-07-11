@@ -10,6 +10,8 @@ interface ListingsGridProps {
   pickupTimeFilter?: 'now' | 'tomorrow' | 'any';
   showSoldOut?: boolean;
   limit?: number;
+  distanceFilter?: number;
+  userLocation?: { lat: number; lng: number };
 }
 
 export const ListingsGrid: React.FC<ListingsGridProps> = ({
@@ -17,7 +19,9 @@ export const ListingsGrid: React.FC<ListingsGridProps> = ({
   searchQuery = '',
   pickupTimeFilter = 'any',
   showSoldOut = false,
-  limit
+  limit,
+  distanceFilter,
+  userLocation
 }) => {
   const { user } = useAuth();
   const [listings, setListings] = useState<any[]>([]);
@@ -58,69 +62,130 @@ export const ListingsGrid: React.FC<ListingsGridProps> = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [categoryFilter, searchQuery, pickupTimeFilter, showSoldOut]);
+  }, [categoryFilter, searchQuery, pickupTimeFilter, showSoldOut, distanceFilter, userLocation]);
 
   const fetchListings = async () => {
     try {
-      let query = supabase
-        .from('listings')
-        .select(`
-          *,
-          business:business_profiles(
-            id,
-            business_name,
-            business_logo_url,
-            location,
-            average_rating,
-            rating_count
-          )
-        `)
-        .order('created_at', { ascending: false });
+      // Use the new distance-based function if location and distance filter are provided
+      if (userLocation && distanceFilter) {
+        const { data, error } = await supabase.rpc('get_listings_with_distance', {
+          user_lat: userLocation.lat,
+          user_lon: userLocation.lng,
+          max_distance: distanceFilter,
+          category_filter: categoryFilter === 'all' ? null : categoryFilter,
+          search_query: searchQuery || null
+        });
 
-      // Apply category filter
-      if (categoryFilter && categoryFilter !== 'all') {
-        query = query.eq('category', categoryFilter);
+        if (error) throw error;
+
+        let filteredData = data || [];
+
+        // Apply pickup time filter
+        if (pickupTimeFilter !== 'any') {
+          filteredData = filteredData.filter((listing: any) => {
+            const pickupStart = new Date(listing.pickup_start);
+            if (pickupTimeFilter === 'now') {
+              const now = new Date();
+              const threeHoursLater = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+              return pickupStart <= threeHoursLater && new Date(listing.pickup_end) >= now;
+            } else if (pickupTimeFilter === 'tomorrow') {
+              const tomorrow = new Date();
+              tomorrow.setDate(tomorrow.getDate() + 1);
+              tomorrow.setHours(0, 0, 0, 0);
+              const endOfTomorrow = new Date(tomorrow);
+              endOfTomorrow.setHours(23, 59, 59, 999);
+              return pickupStart >= tomorrow && pickupStart <= endOfTomorrow;
+            }
+            return true;
+          });
+        }
+
+        // Filter sold out items
+        if (!showSoldOut) {
+          filteredData = filteredData.filter((listing: any) => listing.status !== 'sold-out');
+        }
+
+        // Apply limit
+        if (limit) {
+          filteredData = filteredData.slice(0, limit);
+        }
+
+        // Transform data to match expected format
+        const transformedData = filteredData.map((item: any) => ({
+          ...item,
+          business: {
+            id: item.business_id,
+            business_name: item.business_name,
+            business_logo_url: item.business_logo_url,
+            location: item.location,
+            average_rating: item.average_rating,
+            rating_count: item.rating_count
+          }
+        }));
+
+        setListings(transformedData);
+      } else {
+        // Fallback to original query for listings without distance filtering
+        let query = supabase
+          .from('listings')
+          .select(`
+            *,
+            business:business_profiles(
+              id,
+              business_name,
+              business_logo_url,
+              location,
+              average_rating,
+              rating_count
+            )
+          `)
+          .order('created_at', { ascending: false });
+
+        // Apply category filter
+        if (categoryFilter && categoryFilter !== 'all') {
+          query = query.eq('category', categoryFilter);
+        }
+
+        // Apply search filter
+        if (searchQuery) {
+          query = query.or(`item_name.ilike.%${searchQuery}%,business_profiles.business_name.ilike.%${searchQuery}%`);
+        }
+
+        // Apply pickup time filter
+        if (pickupTimeFilter === 'now') {
+          const now = new Date();
+          const threeHoursLater = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+          query = query
+            .lte('pickup_start', threeHoursLater.toISOString())
+            .gte('pickup_end', now.toISOString());
+        } else if (pickupTimeFilter === 'tomorrow') {
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          tomorrow.setHours(0, 0, 0, 0);
+          const endOfTomorrow = new Date(tomorrow);
+          endOfTomorrow.setHours(23, 59, 59, 999);
+          
+          query = query
+            .gte('pickup_start', tomorrow.toISOString())
+            .lte('pickup_start', endOfTomorrow.toISOString());
+        }
+
+        // Filter sold out items
+        if (!showSoldOut) {
+          query = query.neq('status', 'sold-out');
+        }
+
+        // Apply limit
+        if (limit) {
+          query = query.limit(limit);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        setListings(data || []);
       }
-
-      // Apply search filter
-      if (searchQuery) {
-        query = query.or(`item_name.ilike.%${searchQuery}%,business_profiles.business_name.ilike.%${searchQuery}%`);
-      }
-
-      // Apply pickup time filter
-      if (pickupTimeFilter === 'now') {
-        const now = new Date();
-        const threeHoursLater = new Date(now.getTime() + 3 * 60 * 60 * 1000);
-        query = query
-          .lte('pickup_start', threeHoursLater.toISOString())
-          .gte('pickup_end', now.toISOString());
-      } else if (pickupTimeFilter === 'tomorrow') {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(0, 0, 0, 0);
-        const endOfTomorrow = new Date(tomorrow);
-        endOfTomorrow.setHours(23, 59, 59, 999);
-        
-        query = query
-          .gte('pickup_start', tomorrow.toISOString())
-          .lte('pickup_start', endOfTomorrow.toISOString());
-      }
-
-      // Filter sold out items
-      if (!showSoldOut) {
-        query = query.neq('status', 'sold-out');
-      }
-
-      // Apply limit
-      if (limit) {
-        query = query.limit(limit);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      setListings(data || []);
     } catch (error) {
       console.error('Error fetching listings:', error);
       toast.error('Failed to load listings');

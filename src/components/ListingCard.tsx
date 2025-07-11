@@ -19,6 +19,9 @@ interface ListingCardProps {
     pickup_end: string;
     status: 'active' | 'low-stock' | 'sold-out';
     favorited_by_user_ids: string[];
+    thumbnail_url?: string;
+    business_thumbnail_url?: string;
+    distance_km?: number;
     business: {
       id: string;
       business_name: string;
@@ -88,7 +91,10 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   };
 
   const calculateDistance = () => {
-    // Mock distance calculation - in production, use geolocation
+    if (listing.distance_km) {
+      return `${listing.distance_km.toFixed(1)} km`;
+    }
+    // Fallback for listings without distance data
     return `${(Math.random() * 5 + 0.5).toFixed(1)} km`;
   };
 
@@ -236,80 +242,94 @@ export const ListingCard: React.FC<ListingCardProps> = ({
 
   return (
     <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden relative">
-      {/* Status badges and favorite button */}
-      <div className="absolute top-3 left-3 z-10">
-        <Badge 
-          className={`text-white font-medium ${
-            listing.quantity > 2 ? 'bg-green-500' : 'bg-orange-500'
-          }`}
-        >
-          {listing.quantity} left
-        </Badge>
-      </div>
-
-      <div className="absolute top-3 right-3 z-10">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleFavoriteToggle}
-          className={`p-2 rounded-full ${
-            isFavorited
-              ? "bg-red-500 text-white hover:bg-red-600"
-              : "bg-white/90 text-gray-700 hover:bg-white"
-          }`}
-        >
-          <Heart className={`w-4 h-4 ${isFavorited ? "fill-current" : ""}`} />
-        </Button>
-      </div>
-
-      {/* Business header with logo */}
-      <div className="p-4 pb-2">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-            {listing.business.business_logo_url ? (
-              <img 
-                src={listing.business.business_logo_url} 
-                alt={listing.business.business_name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-lg">🏪</span>
-            )}
+      {/* Item thumbnail image */}
+      <div className="relative h-48 bg-gray-100">
+        {listing.thumbnail_url || listing.business_thumbnail_url ? (
+          <img 
+            src={listing.thumbnail_url || listing.business_thumbnail_url} 
+            alt={listing.item_name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-400">
+            <span className="text-4xl">🍽️</span>
           </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-gray-900">{listing.business.business_name}</h3>
-            <p className="text-sm text-gray-600">{listing.business.location}</p>
+        )}
+        
+        {/* Status badge and favorite button overlay */}
+        <div className="absolute top-3 left-3">
+          <Badge 
+            className={`text-white font-medium ${
+              listing.quantity > 2 ? 'bg-green-500' : 'bg-orange-500'
+            }`}
+          >
+            {listing.quantity} left
+          </Badge>
+        </div>
+
+        <div className="absolute top-3 right-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleFavoriteToggle}
+            className={`p-2 rounded-full ${
+              isFavorited
+                ? "bg-red-500 text-white hover:bg-red-600"
+                : "bg-white/90 text-gray-700 hover:bg-white"
+            }`}
+          >
+            <Heart className={`w-4 h-4 ${isFavorited ? "fill-current" : ""}`} />
+          </Button>
+        </div>
+      </div>
+
+      {/* Content area */}
+      <div className="p-4">
+        {/* Business header with logo */}
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-3 flex-1">
+            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+              {listing.business.business_logo_url ? (
+                <img 
+                  src={listing.business.business_logo_url} 
+                  alt={listing.business.business_name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-lg">🏪</span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-gray-900 truncate">{listing.business.business_name}</h3>
+              <p className="text-sm text-gray-600 truncate">{listing.business.location}</p>
+            </div>
           </div>
         </div>
 
         {/* Item details */}
-        <div className="space-y-2">
-          <h4 className="font-medium text-gray-900">{listing.item_name}</h4>
+        <div className="mb-3">
+          <h4 className="font-medium text-gray-900 mb-1">{listing.item_name}</h4>
           <p className="text-sm text-gray-600">{formatPickupTime(listing.pickup_start, listing.pickup_end)}</p>
         </div>
 
         {/* Metrics row */}
-        <div className="flex items-center gap-4 mt-3 text-sm text-gray-600">
+        <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
           <button
             onClick={() => setShowRatingModal(true)}
             className="flex items-center gap-1 hover:text-orange-500 transition-colors"
           >
             <Star className="w-4 h-4 text-yellow-500 fill-current" />
-            <span>{listing.business.average_rating || 0}</span>
+            <span>{(listing.business.average_rating || 0).toFixed(1)}</span>
           </button>
           <div className="flex items-center gap-1">
             <MapPin className="w-4 h-4" />
             <span>{calculateDistance()}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Clock className="w-4 h-4" />
-            <span>18 km</span>
-          </div>
         </div>
 
-        {/* Price */}
-        <div className="flex items-center justify-between mt-4">
-          <div className="text-right">
+        {/* Price and reserve button */}
+        <div className="flex items-center justify-between">
+          <div>
             <div className="text-2xl font-bold text-gray-900">£{listing.price}</div>
             {listing.original_price > listing.price && (
               <div className="text-sm text-gray-500 line-through">
@@ -320,7 +340,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           <Button
             onClick={handlePurchase}
             disabled={isProcessing || listing.status === 'sold-out'}
-            className="bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 disabled:opacity-50"
+            className="bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 disabled:opacity-50 px-6 py-2"
           >
             {isProcessing ? "Processing..." : "Reserve"}
           </Button>

@@ -138,7 +138,9 @@ const BusinessDashboard = () => {
           tags: newItem.tags || [],
           pickup_start: newItem.pickupStart,
           pickup_end: newItem.pickupEnd,
-          co2_saved_per_item_kg: 0.8
+          co2_saved_per_item_kg: 0.8,
+          thumbnail_url: newItem.thumbnailUrl,
+          business_thumbnail_url: newItem.businessThumbnailUrl
         }])
         .select()
         .single();

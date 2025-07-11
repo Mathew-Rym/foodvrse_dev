@@ -2,9 +2,11 @@
 import { useState } from "react";
 import ListingsGrid from "@/components/ListingsGrid";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "@/hooks/useLocation";
 
 const FoodListings = () => {
   const [filter, setFilter] = useState("all");
+  const { location } = useLocation();
 
   const categories = [
     { id: "all", label: "All Items" },
@@ -46,6 +48,8 @@ const FoodListings = () => {
           categoryFilter={filter}
           pickupTimeFilter="any"
           showSoldOut={false}
+          userLocation={location}
+          distanceFilter={location ? 25 : undefined}
         />
       </div>
     </section>

@@ -27,6 +27,8 @@ interface ItemFormData {
   pickupEnd: string;
   category: string;
   tags: string[];
+  thumbnailUrl: string;
+  businessThumbnailUrl: string;
 }
 
 const AddItemModal = ({ isOpen, onClose, onAddItem }: AddItemModalProps) => {
@@ -43,7 +45,9 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }: AddItemModalProps) => {
       pickupStart: '',
       pickupEnd: '',
       category: '',
-      tags: []
+      tags: [],
+      thumbnailUrl: '',
+      businessThumbnailUrl: ''
     }
   });
 
@@ -102,7 +106,9 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }: AddItemModalProps) => {
       category: data.category,
       tags: selectedTags,
       pickupStart: pickupStart.toISOString(),
-      pickupEnd: pickupEnd.toISOString()
+      pickupEnd: pickupEnd.toISOString(),
+      thumbnailUrl: data.thumbnailUrl || null,
+      businessThumbnailUrl: data.businessThumbnailUrl || null
     };
 
     onAddItem(newItem);
@@ -341,6 +347,49 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }: AddItemModalProps) => {
                 </FormItem>
               )}
             />
+
+            {/* Image URLs Section */}
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="thumbnailUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Item Thumbnail URL (Optional)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="https://example.com/food-image.jpg" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <p className="text-xs text-gray-500">
+                      Add a photo URL of your food item for better visibility
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="businessThumbnailUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Business Thumbnail URL (Optional)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="https://example.com/business-image.jpg" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <p className="text-xs text-gray-500">
+                      Add a photo URL showcasing your business/kitchen
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Tags Section */}
             <div className="space-y-3">
