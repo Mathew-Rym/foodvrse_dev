@@ -11,7 +11,7 @@ const Footer = () => {
     if (requiresAuth && !isAuthenticated) {
       navigate("/auth");
     } else {
-      navigate(path);
+      navigate(path, { state: { hideNavbar: true } });
     }
   };
 

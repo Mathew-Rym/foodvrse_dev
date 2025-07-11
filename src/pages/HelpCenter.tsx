@@ -1,13 +1,21 @@
-import { Search, Phone, Mail, MessageCircle, HelpCircle, Clock, MapPin, CreditCard } from "lucide-react";
+import { Search, Phone, Mail, MessageCircle, HelpCircle, Clock, MapPin, CreditCard, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import MobileLayout from "@/components/MobileLayout";
 import BackToTop from "@/components/BackToTop";
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const HelpCenter = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const hideNavbar = location.state?.hideNavbar;
+
+  const handleBack = () => {
+    navigate(-1);
+  };
 
   const faqCategories = [
     {
@@ -119,11 +127,16 @@ const HelpCenter = () => {
   })).filter(category => category.questions.length > 0);
 
   return (
-    <MobileLayout>
+    <MobileLayout hideNavbar={hideNavbar}>
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Help Center</h1>
+          <div className="flex items-center gap-2 mb-4 justify-center">
+            <Button variant="ghost" size="sm" onClick={handleBack}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <h1 className="text-3xl font-bold text-gray-900">Help Center</h1>
+          </div>
           <p className="text-lg text-gray-600">
             Find answers to common questions or get in touch with our support team
           </p>

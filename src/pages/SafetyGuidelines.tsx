@@ -1,8 +1,17 @@
-import { Shield, CheckCircle, AlertTriangle, Users, Clock, Thermometer } from "lucide-react";
+import { Shield, CheckCircle, AlertTriangle, Users, Clock, Thermometer, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import MobileLayout from "@/components/MobileLayout";
 import BackToTop from "@/components/BackToTop";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const SafetyGuidelines = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const hideNavbar = location.state?.hideNavbar;
+
+  const handleBack = () => {
+    navigate(-1);
+  };
   const safetyMeasures = [
     {
       icon: Shield,
@@ -67,12 +76,17 @@ const SafetyGuidelines = () => {
   ];
 
   return (
-    <MobileLayout>
+    <MobileLayout hideNavbar={hideNavbar}>
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-8 h-8 text-white" />
+          <div className="flex items-center gap-2 mb-4 justify-center">
+            <Button variant="ghost" size="sm" onClick={handleBack}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+              <Shield className="w-8 h-8 text-white" />
+            </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Safety Guidelines</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
