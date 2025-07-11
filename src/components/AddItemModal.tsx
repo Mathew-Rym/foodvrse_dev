@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Bot, Lightbulb } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AddItemModalProps {
   isOpen: boolean;
@@ -32,6 +34,7 @@ interface ItemFormData {
 }
 
 const AddItemModal = ({ isOpen, onClose, onAddItem }: AddItemModalProps) => {
+  const { user } = useAuth();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   
@@ -91,7 +94,12 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }: AddItemModalProps) => {
     setShowSuggestions(false);
   };
 
-  const onSubmit = (data: ItemFormData) => {
+  const onSubmit = async (data: ItemFormData) => {
+    if (!user) {
+      toast.error('Please sign in to add items');
+      return;
+    }
+
     // Format pickup times as ISO strings
     const now = new Date();
     const pickupStart = new Date(now.toDateString() + ' ' + data.pickupStart);
@@ -110,6 +118,22 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }: AddItemModalProps) => {
       thumbnailUrl: data.thumbnailUrl || null,
       businessThumbnailUrl: data.businessThumbnailUrl || null
     };
+
+    // Get business location to add to the item
+    try {
+      const { data: businessProfile } = await supabase
+        .from('business_profiles')
+        .select('latitude, longitude')
+        .eq('user_id', user.id)
+        .single();
+
+      if (businessProfile?.latitude && businessProfile?.longitude) {
+        (newItem as any).latitude = businessProfile.latitude;
+        (newItem as any).longitude = businessProfile.longitude;
+      }
+    } catch (error) {
+      console.error('Error getting business location:', error);
+    }
 
     onAddItem(newItem);
     toast.success('Item added successfully!');

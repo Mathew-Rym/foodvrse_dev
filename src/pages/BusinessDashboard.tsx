@@ -20,7 +20,8 @@ import {
   CreditCard,
   AlertTriangle,
   Heart,
-  Bot
+  Bot,
+  MapPin
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,6 +29,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AddItemModal from "@/components/AddItemModal";
 import Analytics from "@/components/Analytics";
 import BusinessOnboardingTour from "@/components/BusinessOnboardingTour";
+import GoogleMapsLocationPicker from "@/components/GoogleMapsLocationPicker";
 import { toast } from "sonner";
 
 const BusinessDashboard = () => {
@@ -49,6 +51,7 @@ const BusinessDashboard = () => {
     monthlyGrowth: 0,
     co2Missed: 0
   });
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -317,6 +320,35 @@ const BusinessDashboard = () => {
     }
   };
 
+  const handleLocationUpdate = (location: { lat: number; lng: number; address: string }) => {
+    setBusinessProfile(prev => prev ? {
+      ...prev,
+      latitude: location.lat,
+      longitude: location.lng,
+      address: location.address,
+      location: location.address
+    } : null);
+    
+    // Update existing listings with new location
+    if (businessProfile) {
+      supabase
+        .from('listings')
+        .update({
+          latitude: location.lat,
+          longitude: location.lng
+        })
+        .eq('business_id', businessProfile.id)
+        .then(() => {
+          // Update local listings state
+          setListings(prev => prev.map(listing => ({
+            ...listing,
+            latitude: location.lat,
+            longitude: location.lng
+          })));
+        });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -528,6 +560,52 @@ const BusinessDashboard = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Business Location */}
+          <div className="bg-white rounded-lg p-4 shadow-sm mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-blue-600" />
+                <h3 className="font-semibold">Business Location</h3>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowLocationPicker(!showLocationPicker)}
+              >
+                {businessProfile?.latitude ? 'Update Location' : 'Set Location'}
+              </Button>
+            </div>
+            
+            {businessProfile?.latitude ? (
+              <div className="text-sm text-gray-600">
+                <p><strong>Address:</strong> {businessProfile.address || 'Address not set'}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Coordinates: {businessProfile.latitude.toFixed(6)}, {businessProfile.longitude?.toFixed(6)}
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">
+                No location set. Customers won't be able to find your store easily.
+              </p>
+            )}
+            
+            {showLocationPicker && (
+              <div className="mt-4">
+                <GoogleMapsLocationPicker
+                  businessId={businessProfile?.id || ''}
+                  currentLocation={
+                    businessProfile?.latitude ? {
+                      lat: businessProfile.latitude,
+                      lng: businessProfile.longitude || 0,
+                      address: businessProfile.address || ''
+                    } : undefined
+                  }
+                  onLocationUpdate={handleLocationUpdate}
+                />
+              </div>
+            )}
           </div>
 
           {/* Quick Actions */}
