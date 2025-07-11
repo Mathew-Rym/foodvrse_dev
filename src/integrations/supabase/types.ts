@@ -65,6 +65,7 @@ export type Database = {
           total_sales: number | null
           updated_at: string
           user_id: string
+          user_type: Database["public"]["Enums"]["user_type"]
           website_url: string | null
         }
         Insert: {
@@ -90,6 +91,7 @@ export type Database = {
           total_sales?: number | null
           updated_at?: string
           user_id: string
+          user_type?: Database["public"]["Enums"]["user_type"]
           website_url?: string | null
         }
         Update: {
@@ -115,6 +117,7 @@ export type Database = {
           total_sales?: number | null
           updated_at?: string
           user_id?: string
+          user_type?: Database["public"]["Enums"]["user_type"]
           website_url?: string | null
         }
         Relationships: []
@@ -804,6 +807,7 @@ export type Database = {
           push_notifications: boolean | null
           updated_at: string
           user_id: string
+          user_type: Database["public"]["Enums"]["user_type"]
         }
         Insert: {
           address?: string | null
@@ -820,6 +824,7 @@ export type Database = {
           push_notifications?: boolean | null
           updated_at?: string
           user_id: string
+          user_type?: Database["public"]["Enums"]["user_type"]
         }
         Update: {
           address?: string | null
@@ -836,12 +841,19 @@ export type Database = {
           push_notifications?: boolean | null
           updated_at?: string
           user_id?: string
+          user_type?: Database["public"]["Enums"]["user_type"]
         }
         Relationships: []
       }
     }
     Views: {
-      [_ in never]: never
+      current_user_type: {
+        Row: {
+          user_id: string | null
+          user_type: Database["public"]["Enums"]["user_type"] | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_and_award_weekly_badge: {
@@ -855,13 +867,17 @@ export type Database = {
           pickup_category: string
         }[]
       }
+      get_user_type: {
+        Args: { user_uuid: string }
+        Returns: Database["public"]["Enums"]["user_type"]
+      }
       process_purchase: {
         Args: { p_listing_id: string; p_user_id: string; p_quantity?: number }
         Returns: Json
       }
     }
     Enums: {
-      [_ in never]: never
+      user_type: "consumer" | "business"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -988,6 +1004,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_type: ["consumer", "business"],
+    },
   },
 } as const
