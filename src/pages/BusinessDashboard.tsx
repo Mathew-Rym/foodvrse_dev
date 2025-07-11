@@ -221,6 +221,80 @@ const BusinessDashboard = () => {
     return 0;
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, imageType: 'logo' | 'thumbnail') => {
+    const file = event.target.files?.[0];
+    if (!file || !businessProfile) return;
+
+    try {
+      // Create a simple placeholder URL for now - in production you'd upload to storage
+      const imageUrl = URL.createObjectURL(file);
+      
+      const updateField = imageType === 'logo' ? 'business_logo_url' : 'business_thumbnail_url';
+      
+      const { error } = await supabase
+        .from('business_profiles')
+        .update({ [updateField]: imageUrl })
+        .eq('id', businessProfile.id);
+
+      if (error) throw error;
+
+      setBusinessProfile(prev => ({ ...prev, [updateField]: imageUrl }));
+      toast.success(`Business ${imageType} uploaded successfully!`);
+      
+      // Update all existing listings with the new business thumbnail
+      if (imageType === 'thumbnail') {
+        await supabase
+          .from('listings')
+          .update({ business_thumbnail_url: imageUrl })
+          .eq('business_id', businessProfile.id);
+          
+        // Update local listings state
+        setListings(prev => prev.map(listing => ({
+          ...listing,
+          business_thumbnail_url: imageUrl
+        })));
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error(`Failed to upload ${imageType}`);
+    }
+  };
+
+  const handleRemoveImage = async (imageType: 'logo' | 'thumbnail') => {
+    if (!businessProfile) return;
+
+    try {
+      const updateField = imageType === 'logo' ? 'business_logo_url' : 'business_thumbnail_url';
+      
+      const { error } = await supabase
+        .from('business_profiles')
+        .update({ [updateField]: null })
+        .eq('id', businessProfile.id);
+
+      if (error) throw error;
+
+      setBusinessProfile(prev => ({ ...prev, [updateField]: null }));
+      toast.success(`Business ${imageType} removed successfully!`);
+      
+      // Update all existing listings to remove the business thumbnail
+      if (imageType === 'thumbnail') {
+        await supabase
+          .from('listings')
+          .update({ business_thumbnail_url: null })
+          .eq('business_id', businessProfile.id);
+          
+        // Update local listings state
+        setListings(prev => prev.map(listing => ({
+          ...listing,
+          business_thumbnail_url: null
+        })));
+      }
+    } catch (error) {
+      console.error('Error removing image:', error);
+      toast.error(`Failed to remove ${imageType}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -337,6 +411,102 @@ const BusinessDashboard = () => {
               </Button>
             </div>
           )}
+
+          {/* Business Profile Images */}
+          <div className="bg-white rounded-lg p-4 shadow-sm mb-6">
+            <h3 className="font-semibold mb-3">Business Images</h3>
+            <p className="text-sm text-gray-600 mb-4">Add your business logo and thumbnail that will appear on all your listings</p>
+            
+            <div className="grid grid-cols-2 gap-4">
+              {/* Business Logo */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Business Logo</label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center bg-gray-50">
+                  {businessProfile?.business_logo_url ? (
+                    <div className="space-y-2">
+                      <img 
+                        src={businessProfile.business_logo_url} 
+                        alt="Business Logo" 
+                        className="w-16 h-16 object-cover rounded-lg mx-auto"
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleRemoveImage('logo')}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        Remove Logo
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="w-16 h-16 bg-gray-200 rounded-lg mx-auto flex items-center justify-center">
+                        <Package className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(e, 'logo')}
+                        className="hidden"
+                        id="logo-upload"
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => document.getElementById('logo-upload')?.click()}
+                      >
+                        Upload Logo
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Business Thumbnail */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Business Thumbnail</label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center bg-gray-50">
+                  {businessProfile?.business_thumbnail_url ? (
+                    <div className="space-y-2">
+                      <img 
+                        src={businessProfile.business_thumbnail_url} 
+                        alt="Business Thumbnail" 
+                        className="w-16 h-16 object-cover rounded-lg mx-auto"
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleRemoveImage('thumbnail')}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        Remove Thumbnail
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="w-16 h-16 bg-gray-200 rounded-lg mx-auto flex items-center justify-center">
+                        <Package className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(e, 'thumbnail')}
+                        className="hidden"
+                        id="thumbnail-upload"
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => document.getElementById('thumbnail-upload')?.click()}
+                      >
+                        Upload Thumbnail
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Quick Actions */}
           <div className="bg-white rounded-lg p-4 shadow-sm mb-6">
