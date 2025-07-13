@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { BusinessItemsProvider } from "@/contexts/BusinessItemsContext";
 import FeedbackFAB from "@/components/FeedbackFAB";
+import "@/lib/i18n";
 import Index from "./pages/Index";
 import Discover from "./pages/Discover";
 import Cart from "./pages/Cart";
