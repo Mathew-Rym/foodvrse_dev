@@ -24,65 +24,59 @@ const MeetTheTeam = () => {
     },
   ,
     {
-      name: "Amina Hassan",
-      role: "Head of Partnerships",
-      bio: "Former business development manager at leading hospitality group. Expert in building relationships with restaurants and food businesses.",
+      name: "Rachel Wangu",
+      role: "Sustainability Officer",
+      bio: "Environmental scientist and food systems expert. Bachelors in Sustainable environmental science from Kenyatta University.",
       avatar: "/placeholder.svg",
-      initials: "AH",
+      initials: "RW"
       location: "Nairobi, Kenya",
       linkedin: "#",
       twitter: "#",
-      email: "amina@foodvrse.com"
+      email: "rachel@foodvrse.com"
     },
     {
-      name: "Peter Mwangi",
+      name: "Sam Mwangi",
       role: "Lead Developer",
       bio: "Senior software engineer with expertise in React and mobile development. Previously worked at top fintech companies in Kenya.",
       avatar: "/placeholder.svg",
-      initials: "PM",
-      location: "Nakuru, Kenya",
-      linkedin: "#",
-      twitter: "#",
-      email: "peter@foodvrse.com"
-    },
-    {
-      name: "Grace Wanjiru",
-      role: "Operations Manager",
-      bio: "Operations specialist with background in logistics and supply chain. Ensures smooth operations between businesses and customers.",
-      avatar: "/placeholder.svg",
-      initials: "GW",
+      initials: "SM",
       location: "Nairobi, Kenya",
       linkedin: "#",
       twitter: "#",
-      email: "grace@foodvrse.com"
+      email: "sam@foodvrse.com"
     },
     {
-      name: "Michael Kiprotich",
+      name: "Hebrew Simeon",
+      role: "Operations Manager",
+      bio: "Operations specialist with background in Phd in BioChemisty and experience in logistics and supply chain. Ensures smooth operations between businesses and customers.",
+      avatar: "/placeholder.svg",
+      initials: "HS",
+      location: "Nairobi, Kenya",
+      linkedin: "#",
+      twitter: "#",
+      email: "hebrew@foodvrse.com"
+    },
+    {
+      name: "Grace Wangechi",
       role: "Marketing Lead",
       bio: "Digital marketing expert with focus on sustainable brands. Helps spread awareness about food waste reduction and community impact.",
       avatar: "/placeholder.svg",
       initials: "MK",
-      location: "Eldoret, Kenya",
+      location: "Nairobi, Kenya",
       linkedin: "#",
       twitter: "#",
-      email: "michael@foodvrse.com"
+      email: "grace@foodvrse.com"
     }
   ];
 
   const advisors = [
+   
     {
-      name: "Dr. Rachel Nyong'o",
-      role: "Sustainability Advisor",
-      bio: "Environmental scientist and food systems expert. PhD in Sustainable Agriculture from University of Nairobi.",
-      avatar: "/placeholder.svg",
-      initials: "RN"
-    },
-    {
-      name: "David Kinyanjui",
+      name: "Charity  Wanjiru",
       role: "Business Advisor",
-      bio: "Serial entrepreneur and investor. Founded three successful startups in Kenya's tech ecosystem.",
+      bio: "Serial entrepreneur and investor. Founded successful startups in Kenya's tech ecosystem.",
       avatar: "/placeholder.svg",
-      initials: "DK"
+      initials: "CW"
     }
   ];
 
