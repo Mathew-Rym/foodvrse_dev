@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import VideoSection from "./VideoSection";
+import { useTranslation } from 'react-i18next';
 
 interface PlatformMetrics {
   total_co2_saved_tonnes: number;
@@ -18,6 +19,7 @@ const HeroSection = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [metrics, setMetrics] = useState<PlatformMetrics | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -99,12 +101,12 @@ const HeroSection = () => {
           <div className="space-y-6 lg:space-y-8">
             <div className="space-y-4">
               <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                Save Food,
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500"> Save Money</span>
+                {t('hero.save_food')},
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500"> {t('hero.save_money')}</span>
               </h1>
               <p className="text-lg lg:text-xl text-gray-600 leading-relaxed">
-                Discover surplus food (Mystery bags) from local restaurants and stores. 
-                Help reduce food waste while enjoying delicious meals at up to 70% off.
+                {t('hero.discover_surplus_food')} (Mystery bags) from local restaurants and stores. 
+                {t('hero.help_reduce_food_waste')} while enjoying delicious meals at up to 70% off.
               </p>
             </div>
 
@@ -117,7 +119,7 @@ const HeroSection = () => {
                 <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {formatNumber(metrics?.total_meals_rescued || 1247)}+
                 </p>
-                <p className="text-xs sm:text-sm text-gray-600">Meals Saved</p>
+                <p className="text-xs sm:text-sm text-gray-600">{t('hero.meals_saved')}</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-2 mx-auto">
@@ -126,7 +128,7 @@ const HeroSection = () => {
                 <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {formatTonnes(metrics?.total_co2_saved_tonnes || 2.5)}
                 </p>
-                <p className="text-xs sm:text-sm text-gray-600">CO₂ Saved</p>
+                <p className="text-xs sm:text-sm text-gray-600">{t('hero.co2_saved')}</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-full mb-2 mx-auto">
@@ -135,7 +137,7 @@ const HeroSection = () => {
                 <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {formatMoney(metrics?.total_money_saved_ksh || 580000)}
                 </p>
-                <p className="text-xs sm:text-sm text-gray-600">Money Saved</p>
+                <p className="text-xs sm:text-sm text-gray-600">{t('hero.money_saved')}</p>
               </div>
             </div>
 
@@ -146,7 +148,7 @@ const HeroSection = () => {
                 className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm sm:text-base px-6 sm:px-8 py-3"
                 onClick={handleStartSaving}
               >
-                Start Saving Food
+                {t('hero.start_saving_food')}
               </Button>
               <Button 
                 variant="outline" 
@@ -154,7 +156,7 @@ const HeroSection = () => {
                 className="text-sm sm:text-base px-6 sm:px-8 py-3"
                 onClick={handleForBusinesses}
               >
-                For Businesses
+                {t('hero.for_businesses')}
               </Button>
             </div>
           </div>

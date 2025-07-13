@@ -4,12 +4,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from 'react-i18next';
 
 const MobileNavigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { totalItems } = useCart();
   const { isBusinessUser } = useAuth();
+  const { t } = useTranslation();
 
   // Don't show navigation for business users
   if (isBusinessUser) {
@@ -17,11 +19,11 @@ const MobileNavigation = () => {
   }
 
   const tabs = [
-    { id: "home", label: "Home", icon: Home, path: "/" },
-    { id: "discover", label: "Discover", icon: Search, path: "/discover" },
-    { id: "impact", label: "Impact", icon: Trophy, path: "/impact" },
-    { id: "favorites", label: "Favorites", icon: Heart, path: "/favorites" },
-    { id: "profile", label: "Profile", icon: User, path: "/profile" },
+    { id: "home", label: t('nav.home'), icon: Home, path: "/" },
+    { id: "discover", label: t('nav.discover'), icon: Search, path: "/discover" },
+    { id: "impact", label: t('nav.impact'), icon: Trophy, path: "/impact" },
+    { id: "favorites", label: t('nav.favorites'), icon: Heart, path: "/favorites" },
+    { id: "profile", label: t('nav.profile'), icon: User, path: "/profile" },
   ];
 
   const handleTabClick = (path: string) => {

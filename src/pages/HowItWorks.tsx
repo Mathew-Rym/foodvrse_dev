@@ -3,33 +3,35 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import MobileLayout from "@/components/MobileLayout";
 import BackToTop from "@/components/BackToTop";
+import { useTranslation } from 'react-i18next';
 
 const HowItWorks = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const steps = [
     {
       icon: Smartphone,
-      title: "Download & Sign Up",
-      description: "Get the FoodVrse app and create your account to start saving food and money.",
+      title: t('howItWorks.downloadSignUp'),
+      description: t('howItWorks.downloadSignUpDesc'),
       color: "bg-blue-100 text-blue-600"
     },
     {
       icon: Search,
-      title: "Browse Mystery Bags",
-      description: "Discover surplus food from local restaurants and stores at up to 70% off.",
+      title: t('howItWorks.browseMysteryBags'),
+      description: t('howItWorks.browseMysteryBagsDesc'),
       color: "bg-green-100 text-green-600"
     },
     {
       icon: ShoppingBag,
-      title: "Order & Collect",
-      description: "Choose your mystery bag, pay through the app, and collect during pickup hours.",
+      title: t('howItWorks.orderCollect'),
+      description: t('howItWorks.orderCollectDesc'),
       color: "bg-orange-100 text-orange-600"
     },
     {
       icon: Heart,
-      title: "Enjoy & Impact",
-      description: "Enjoy delicious meals while reducing food waste and tracking your positive impact.",
+      title: t('howItWorks.enjoyImpact'),
+      description: t('howItWorks.enjoyImpactDesc'),
       color: "bg-red-100 text-red-600"
     }
   ];
@@ -38,9 +40,9 @@ const HowItWorks = () => {
     <MobileLayout>
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">How FoodVrse Works</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('howItWorks.title')}</h1>
           <p className="text-lg text-gray-600">
-            Save money, reduce waste, and enjoy great food in 4 simple steps
+            {t('howItWorks.subtitle')}
           </p>
         </div>
 

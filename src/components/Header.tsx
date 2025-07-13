@@ -8,7 +8,9 @@ import { useCart } from "@/contexts/CartContext";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import CartSheet from "./CartSheet";
 import LocationSearch from "./LocationSearch";
+import LanguageSwitcher from "./LanguageSwitcher";
 import { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ const Header = () => {
   const { totalItems } = useCart();
   const { latitude, longitude } = useGeolocation();
   const [currentLocation, setCurrentLocation] = useState("Nairobi, Kenya");
+  const { t } = useTranslation();
 
   // Update location display when geolocation is available
   useEffect(() => {
@@ -76,6 +79,7 @@ const Header = () => {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center space-x-3">
+            <LanguageSwitcher />
             <Button 
               variant="ghost" 
               size="sm" 
@@ -83,7 +87,7 @@ const Header = () => {
               onClick={handleFoodWasteClick}
             >
               <Info className="w-4 h-4" />
-              <span>About Food Waste</span>
+              <span>{t('header.aboutFoodWaste')}</span>
             </Button>
             
             {isAuthenticated ? (
@@ -91,7 +95,7 @@ const Header = () => {
                 <CartSheet />
                 <Button variant="ghost" size="sm" className="flex items-center space-x-1" onClick={handleProfileClick}>
                   <User className="w-4 h-4" />
-                  <span>{isBusinessUser ? 'Dashboard' : 'Profile'}</span>
+                  <span>{isBusinessUser ? t('header.dashboard') : t('header.profile')}</span>
                 </Button>
               </>
             ) : (
@@ -102,12 +106,12 @@ const Header = () => {
                     <Badge className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-5 h-5 flex items-center justify-center p-0">
                       {totalItems}
                     </Badge>
-                    <span>Cart</span>
+                    <span>{t('header.cart')}</span>
                   </Button>
                 )}
                 <Button variant="ghost" size="sm" className="flex items-center space-x-1" onClick={handleAuthClick}>
                   <User className="w-4 h-4" />
-                  <span>Sign In</span>
+                  <span>{t('header.signIn')}</span>
                 </Button>
               </>
             )}
@@ -116,12 +120,13 @@ const Header = () => {
               className="bg-gradient-to-r from-orange-500 to-red-500 text-white whitespace-nowrap"
               onClick={handlePartnerClick}
             >
-              Become a Partner
+              {t('header.becomePartner')}
             </Button>
           </div>
 
           {/* Mobile/Tablet Actions */}
           <div className="flex lg:hidden items-center space-x-2">
+            <LanguageSwitcher className="scale-90" />
             {isAuthenticated ? (
               <>
                 <CartSheet />
@@ -169,7 +174,7 @@ const Header = () => {
               onClick={handleFoodWasteClick}
             >
               <Info className="w-4 h-4" />
-              <span className="text-xs">About Food Waste</span>
+              <span className="text-xs">{t('header.aboutFoodWaste')}</span>
             </Button>
             
             <Button 
@@ -177,7 +182,7 @@ const Header = () => {
               className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs whitespace-nowrap px-3"
               onClick={handlePartnerClick}
             >
-              Become a Partner
+              {t('header.becomePartner')}
             </Button>
           </div>
         </div>
