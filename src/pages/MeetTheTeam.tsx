@@ -9,27 +9,17 @@ const MeetTheTeam = () => {
 
   const teamMembers = [
     {
-      name: "Sarah Kimani",
-      role: "Co-Founder & CEO",
-      bio: "Former sustainability consultant with 8 years of experience in food systems. Passionate about creating technology solutions for environmental challenges.",
+      name: "Rym Njuguna",
+      role: "Founder CTO & CEO",
+      bio: "Former Mechtronics Eng. consultant with 8 years of experience in business and sustainable food systems. Combines technical expertise with deep understanding of food industry operations & Passionate about creating technology solutions for environmental challenges.",
       avatar: "/placeholder.svg",
-      initials: "SK",
+      initials: "RN",
       location: "Nairobi, Kenya",
       linkedin: "#",
       twitter: "#",
-      email: "sarah@foodvrse.com"
+      email: "rym@foodvrse.com"
     },
-    {
-      name: "James Ochieng",
-      role: "Co-Founder & CTO",
-      bio: "Full-stack developer and former restaurant manager. Combines technical expertise with deep understanding of food industry operations.",
-      avatar: "/placeholder.svg",
-      initials: "JO",
-      location: "Mombasa, Kenya",
-      linkedin: "#",
-      twitter: "#",
-      email: "james@foodvrse.com"
-    },
+  ,
     {
       name: "Amina Hassan",
       role: "Head of Partnerships",
