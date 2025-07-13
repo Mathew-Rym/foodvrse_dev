@@ -2,6 +2,9 @@
 import { Facebook, Twitter, Instagram, Mail, MapPin, Linkedin, Youtube } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import LanguageToggle from "./LanguageToggle";
+import ThemeToggle from "./ThemeToggle";
+import AppInstallPrompt from "./AppInstallPrompt";
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -134,6 +137,14 @@ const Footer = () => {
                 </button>
               </li>
               <li>
+                <button 
+                  onClick={() => handleLinkClick("/partners")}
+                  className="hover:text-white text-left"
+                >
+                  Our Partners
+                </button>
+              </li>
+              <li>
                 <span className="text-gray-500">Affiliates (Coming Soon)</span>
               </li>
             </ul>
@@ -218,8 +229,25 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-          <p>&copy; 2024 FoodVrse. All rights reserved. | Reducing food waste, one meal at a time.</p>
+        {/* App Install Prompt */}
+        <div className="mt-8">
+          <AppInstallPrompt />
+        </div>
+
+        {/* Bottom Section with toggles and copyright */}
+        <div className="border-t border-gray-800 mt-8 pt-8">
+          <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0">
+            {/* Language and Theme Toggles */}
+            <div className="flex items-center space-x-4">
+              <LanguageToggle />
+              <ThemeToggle />
+            </div>
+            
+            {/* Copyright */}
+            <div className="text-center text-sm text-gray-400">
+              <p>&copy; 2024 FoodVrse. All rights reserved. | Reducing food waste, one meal at a time.</p>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

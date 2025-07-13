@@ -36,18 +36,23 @@ import OurImpact from "./pages/OurImpact";
 import MeetTheTeam from "./pages/MeetTheTeam";
 import Careers from "./pages/Careers";
 import Press from "./pages/Press";
+import Partners from "./pages/Partners";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <BusinessItemsProvider>
-        <CartProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <BusinessItemsProvider>
+            <CartProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
@@ -76,6 +81,7 @@ const App = () => (
                 <Route path="/meet-the-team" element={<MeetTheTeam />} />
                 <Route path="/careers" element={<Careers />} />
                 <Route path="/press" element={<Press />} />
+                <Route path="/partners" element={<Partners />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
@@ -85,7 +91,9 @@ const App = () => (
         </CartProvider>
       </BusinessItemsProvider>
     </AuthProvider>
-  </QueryClientProvider>
+  </LanguageProvider>
+</ThemeProvider>
+</QueryClientProvider>
 );
 
 export default App;
