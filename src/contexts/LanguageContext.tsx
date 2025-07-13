@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Language {
   code: string;
@@ -12,7 +13,7 @@ interface LanguageContextType {
   languages: Language[];
 }
 
-// Top 7 global languages
+// Top 15 global languages by number of speakers
 const LANGUAGES: Language[] = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'zh', name: '中文', flag: '🇨🇳' },
@@ -21,6 +22,14 @@ const LANGUAGES: Language[] = [
   { code: 'ar', name: 'العربية', flag: '🇸🇦' },
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+  { code: 'pt', name: 'Português', flag: '🇧🇷' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: 'ko', name: '한국어', flag: '🇰🇷' },
+  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+  { code: 'sw', name: 'Kiswahili', flag: '🇹🇿' },
+  { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
 ];
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -34,16 +43,27 @@ export const useLanguage = () => {
 };
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { i18n } = useTranslation();
   const [currentLanguage, setCurrentLanguage] = useState<Language>(() => {
-    const savedLanguage = localStorage.getItem('language');
-    return savedLanguage 
-      ? JSON.parse(savedLanguage) 
-      : LANGUAGES[0]; // Default to English
+    // Get language from i18n current language or default to English
+    return LANGUAGES.find(lang => lang.code === i18n.language) || LANGUAGES[0];
   });
+
+  useEffect(() => {
+    // Update current language when i18n language changes
+    const handleLanguageChange = () => {
+      const newLanguage = LANGUAGES.find(lang => lang.code === i18n.language) || LANGUAGES[0];
+      setCurrentLanguage(newLanguage);
+    };
+
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => i18n.off('languageChanged', handleLanguageChange);
+  }, [i18n]);
 
   const setLanguage = (language: Language) => {
     setCurrentLanguage(language);
-    localStorage.setItem('language', JSON.stringify(language));
+    // Change i18n language, which will trigger the effect above
+    i18n.changeLanguage(language.code);
   };
 
   return (

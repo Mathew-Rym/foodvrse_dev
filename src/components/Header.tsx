@@ -8,7 +8,6 @@ import { useCart } from "@/contexts/CartContext";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import CartSheet from "./CartSheet";
 import LocationSearch from "./LocationSearch";
-import LanguageSwitcher from "./LanguageSwitcher";
 import { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 
@@ -79,7 +78,6 @@ const Header = () => {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center space-x-3">
-            <LanguageSwitcher />
             <Button 
               variant="ghost" 
               size="sm" 
@@ -126,7 +124,6 @@ const Header = () => {
 
           {/* Mobile/Tablet Actions */}
           <div className="flex lg:hidden items-center space-x-2">
-            <LanguageSwitcher className="scale-90" />
             {isAuthenticated ? (
               <>
                 <CartSheet />
