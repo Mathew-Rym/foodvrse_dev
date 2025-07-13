@@ -164,7 +164,7 @@ const OurStory = () => {
               chapter to our story. Together, we're creating a more sustainable and equitable food system.
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
-              <Button onClick={() => navigate("/discover")}>Start Saving Food</Button>
+              <Button onClick={() => navigate("/auth")}>Start Saving Food</Button>
               <Button variant="outline" onClick={() => navigate("/partner-application")}>
                 Become a Partner
               </Button>

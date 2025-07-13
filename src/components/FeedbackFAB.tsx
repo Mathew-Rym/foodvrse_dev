@@ -44,7 +44,7 @@ const FeedbackFAB = () => {
       <Button
         id="feedback-fab"
         onClick={() => setIsOpen(true)}
-        className={`fixed right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 animate-[pulse_3s_cubic-bezier(0.4,0,0.6,1)_infinite] ${
+        className={`fixed right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 animate-[ambiance-blink_2s_ease-in-out_infinite] ${
           isAuthenticated ? 'bottom-24' : 'bottom-6'
         }`}
         style={{
