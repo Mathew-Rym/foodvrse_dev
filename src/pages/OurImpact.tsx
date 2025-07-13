@@ -270,7 +270,7 @@ const OurImpact = () => {
             a more sustainable and equitable food system.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <Button onClick={() => navigate("/discover")}>
+            <Button onClick={() => navigate("/auth")}>
               Start Saving Food Today
             </Button>
             <Button variant="outline" onClick={() => navigate("/partner-application")}>

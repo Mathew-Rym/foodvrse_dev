@@ -1,11 +1,14 @@
 import { ArrowLeft, MapPin, Clock, Users, Briefcase, Heart, Coffee } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import CVPopup from "@/components/CVPopup";
 
 const Careers = () => {
   const navigate = useNavigate();
+  const [isCVPopupOpen, setIsCVPopupOpen] = useState(false);
 
   const openPositions = [
     {
@@ -304,13 +307,15 @@ const Careers = () => {
             We're always interested in connecting with talented individuals who are passionate about 
             sustainability and making a positive impact. Send us your CV and tell us how you'd like to contribute.
           </p>
-          <Button asChild>
-            <a href="mailto:careers@foodvrse.com">
-              Send Your CV
-            </a>
+          <Button onClick={() => setIsCVPopupOpen(true)}>
+            Send Your CV
           </Button>
         </section>
       </div>
+      <CVPopup 
+        isOpen={isCVPopupOpen} 
+        onClose={() => setIsCVPopupOpen(false)} 
+      />
     </div>
   );
 };

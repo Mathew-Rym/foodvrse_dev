@@ -1,11 +1,14 @@
 import { ArrowLeft, Linkedin, Twitter, Mail, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import CVPopup from "@/components/CVPopup";
 
 const MeetTheTeam = () => {
   const navigate = useNavigate();
+  const [isCVPopupOpen, setIsCVPopupOpen] = useState(false);
 
   const teamMembers = [
     {
@@ -230,16 +233,18 @@ const MeetTheTeam = () => {
             <Button onClick={() => navigate("/careers")}>
               View Open Positions
             </Button>
-            <Button variant="outline" asChild>
-              <a href="mailto:careers@foodvrse.com">
-                Send Your CV
-              </a>
+            <Button variant="outline" onClick={() => setIsCVPopupOpen(true)}>
+              Send Your CV
             </Button>
           </div>
-        </section>
+                  </section>
+        </div>
+        <CVPopup 
+          isOpen={isCVPopupOpen} 
+          onClose={() => setIsCVPopupOpen(false)} 
+        />
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default MeetTheTeam;

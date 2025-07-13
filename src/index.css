@@ -114,4 +114,9 @@ All colors MUST be HSL.
   .safe-area-pt {
     padding-top: env(safe-area-inset-top);
   }
+
+  @keyframes ambiance-blink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+  }
 }
