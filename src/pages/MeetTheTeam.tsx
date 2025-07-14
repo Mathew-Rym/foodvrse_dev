@@ -24,15 +24,15 @@ const MeetTheTeam = () => {
     },
   ,
     {
-      name: "Amina Hassan",
+      name: "Rachel Wangu",
       role: "Head of Partnerships",
-      bio: "Former business development manager at leading hospitality group. Expert in building relationships with restaurants and food businesses.",
+      bio: "Environmental scientist and food systems expert. Expert in building relationships with restaurants and food businesses.",
       avatar: "/placeholder.svg",
-      initials: "AH",
+      initials: "RW",
       location: "Nairobi, Kenya",
       linkedin: "#",
       twitter: "#",
-      email: "amina@foodvrse.com"
+      email: "rachel@foodvrse.com"
     },
     {
       name: "Peter Mwangi",
@@ -46,15 +46,15 @@ const MeetTheTeam = () => {
       email: "peter@foodvrse.com"
     },
     {
-      name: "Grace Wanjiru",
+      name: "Hebrew Simeon",
       role: "Operations Manager",
       bio: "Operations specialist with background in logistics and supply chain. Ensures smooth operations between businesses and customers.",
       avatar: "/placeholder.svg",
-      initials: "GW",
+      initials: "HS",
       location: "Nairobi, Kenya",
       linkedin: "#",
       twitter: "#",
-      email: "grace@foodvrse.com"
+      email: "hebrew@foodvrse.com"
     },
     {
       name: "Michael Kiprotich",
