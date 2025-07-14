@@ -42,7 +42,7 @@ const OurStory = () => {
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
                 <p className="text-muted-foreground mb-4">
-                  In 2023, our founders Sarah and James witnessed firsthand the massive amount of perfectly good food 
+                  In 2024, our founders Rym witnessed firsthand the massive amount of perfectly good food 
                   being discarded by restaurants and bakeries at the end of each day. At the same time, they saw 
                   students and families in their community struggling with rising food costs.
                 </p>
@@ -135,14 +135,14 @@ const OurStory = () => {
               <div className="flex gap-4">
                 <div className="w-3 h-3 rounded-full bg-primary mt-2 flex-shrink-0"></div>
                 <div>
-                  <h3 className="font-semibold">Early 2024 - First Partners</h3>
+                  <h3 className="font-semibold">Early 2025 - First Partners</h3>
                   <p className="text-muted-foreground">Onboarded our first 10 restaurant partners and saved 1,000 meals</p>
                 </div>
               </div>
               <div className="flex gap-4">
                 <div className="w-3 h-3 rounded-full bg-primary mt-2 flex-shrink-0"></div>
                 <div>
-                  <h3 className="font-semibold">Mid 2024 - Community Growth</h3>
+                  <h3 className="font-semibold">Mid 2025 - Community Growth</h3>
                   <p className="text-muted-foreground">Reached 1,000 active users and expanded to 5 cities</p>
                 </div>
               </div>
