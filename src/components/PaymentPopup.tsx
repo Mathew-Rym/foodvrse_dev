@@ -31,6 +31,51 @@ export const PaymentPopup = ({ isOpen, onClose, bag, quantity }: PaymentPopupPro
 
   const totalAmount = bag.price * quantity;
 
+  const validatePhoneNumber = (phone: string): boolean => {
+    // Kenyan phone number validation (254xxxxxxxxx or 07xxxxxxxx format)
+    const phoneRegex = /^(?:254|\+254|0)?([17]\d{8})$/;
+    return phoneRegex.test(phone.replace(/\s+/g, ''));
+  };
+
+  const validateCardNumber = (number: string): boolean => {
+    // Basic Luhn algorithm for card validation
+    const cleanNumber = number.replace(/\s+/g, '');
+    if (!/^\d{13,19}$/.test(cleanNumber)) return false;
+    
+    let sum = 0;
+    let isEven = false;
+    for (let i = cleanNumber.length - 1; i >= 0; i--) {
+      let digit = parseInt(cleanNumber[i]);
+      if (isEven) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+      sum += digit;
+      isEven = !isEven;
+    }
+    return sum % 10 === 0;
+  };
+
+  const validateExpiryDate = (expiry: string): boolean => {
+    const match = expiry.match(/^(\d{2})\/(\d{2})$/);
+    if (!match) return false;
+    
+    const month = parseInt(match[1]);
+    const year = parseInt(match[2]) + 2000;
+    const now = new Date();
+    const expiryDate = new Date(year, month - 1);
+    
+    return month >= 1 && month <= 12 && expiryDate > now;
+  };
+
+  const validateCVV = (cvv: string): boolean => {
+    return /^\d{3,4}$/.test(cvv);
+  };
+
+  const sanitizeInput = (input: string): string => {
+    return input.replace(/[<>\"'&]/g, '').trim();
+  };
+
   const handlePayment = async () => {
     if (!paymentMethod) {
       toast({
@@ -42,10 +87,21 @@ export const PaymentPopup = ({ isOpen, onClose, bag, quantity }: PaymentPopupPro
     }
 
     if (paymentMethod === 'mpesa' || paymentMethod === 'airtel') {
-      if (!phoneNumber) {
+      const cleanPhone = sanitizeInput(phoneNumber);
+      
+      if (!cleanPhone) {
         toast({
           title: "Phone Number Required",
           description: "Please enter your phone number",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!validatePhoneNumber(cleanPhone)) {
+        toast({
+          title: "Invalid Phone Number",
+          description: "Please enter a valid Kenyan phone number (e.g., 0712345678)",
           variant: "destructive"
         });
         return;
@@ -66,10 +122,51 @@ export const PaymentPopup = ({ isOpen, onClose, bag, quantity }: PaymentPopupPro
         onClose();
       }, 3000);
     } else if (paymentMethod === 'card') {
-      if (!cardDetails.number || !cardDetails.expiry || !cardDetails.cvv || !cardDetails.name) {
+      const cleanCardNumber = sanitizeInput(cardDetails.number);
+      const cleanExpiry = sanitizeInput(cardDetails.expiry);
+      const cleanCVV = sanitizeInput(cardDetails.cvv);
+      const cleanName = sanitizeInput(cardDetails.name);
+
+      if (!cleanCardNumber || !cleanExpiry || !cleanCVV || !cleanName) {
         toast({
           title: "Card Details Required",
           description: "Please fill in all card details",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!validateCardNumber(cleanCardNumber)) {
+        toast({
+          title: "Invalid Card Number",
+          description: "Please enter a valid card number",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!validateExpiryDate(cleanExpiry)) {
+        toast({
+          title: "Invalid Expiry Date",
+          description: "Please enter a valid expiry date (MM/YY) in the future",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!validateCVV(cleanCVV)) {
+        toast({
+          title: "Invalid CVV",
+          description: "Please enter a valid 3 or 4 digit CVV",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (cleanName.length < 2) {
+        toast({
+          title: "Invalid Cardholder Name",
+          description: "Please enter the full name on the card",
           variant: "destructive"
         });
         return;

@@ -862,13 +862,7 @@ export type Database = {
       }
     }
     Views: {
-      current_user_type: {
-        Row: {
-          user_id: string | null
-          user_type: Database["public"]["Enums"]["user_type"] | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       calculate_distance: {
@@ -878,6 +872,10 @@ export type Database = {
       check_and_award_weekly_badge: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      get_current_user_type: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["user_type"]
       }
       get_listings_with_distance: {
         Args: {
