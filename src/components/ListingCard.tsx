@@ -284,7 +284,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
         <div className="absolute top-3 left-3">
           <Badge 
             className={`text-white font-medium ${
-              listing.quantity > 2 ? 'bg-green-500' : 'bg-orange-500'
+                              listing.quantity > 2 ? 'bg-green-500' : 'bg-brand-yellow'
             }`}
           >
             {listing.quantity} left
@@ -343,7 +343,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
         <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
           <button
             onClick={() => setShowRatingModal(true)}
-            className="flex items-center gap-1 hover:text-orange-500 transition-colors"
+                          className="flex items-center gap-1 hover:text-brand-green transition-colors"
           >
             <Star className="w-4 h-4 text-yellow-500 fill-current" />
             <span>{(listing.business.average_rating || 0).toFixed(1)}</span>
@@ -381,7 +381,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
       {showReserveQuick && listing.status === 'low-stock' && (
         <div className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center z-20">
                       <div className="bg-card rounded-lg p-4 mx-4 text-center animate-pulse">
-            <AlertCircle className="w-8 h-8 text-orange-500 mx-auto mb-2" />
+            <AlertCircle className="w-8 h-8 text-brand-green mx-auto mb-2" />
             <h3 className="font-semibold text-gray-900 mb-1">Reserve Quick!</h3>
             <p className="text-sm text-gray-600 mb-3">Only {listing.quantity} left!</p>
             <div className="flex gap-2">

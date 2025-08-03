@@ -70,7 +70,7 @@ const WelcomeMessage = ({ isFirstTime = false }: WelcomeMessageProps) => {
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   Discover surplus food (Mystery bags) from local restaurants and stores. Help reduce food waste while enjoying delicious meals at up to 70% off.
                 </p>
-                <p className="text-orange-500 font-medium">
+                <p className="text-brand-green font-medium">
                   ✨ Tap to explore. Swipe to save. Your next zero-waste meal awaits!
                 </p>
               </>

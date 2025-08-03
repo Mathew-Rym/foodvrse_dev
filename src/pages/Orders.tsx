@@ -113,7 +113,7 @@ const Orders = () => {
                   variant="ghost" 
                   size="sm"
                   onClick={() => setShowPastOrders(!showPastOrders)}
-                  className="text-orange-600"
+                  className="text-brand-green"
                 >
                   {showPastOrders ? 'Hide' : 'View All Past Orders'}
                 </Button>

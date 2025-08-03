@@ -135,18 +135,18 @@ const Impact = () => {
             <div className="bg-card rounded-lg shadow-sm overflow-hidden">
               {friends.map((friend, index) => (
                 <div key={index} className={`flex items-center gap-3 p-4 ${
-                  friend.name === "You" ? "bg-orange-50 dark:bg-orange-900" : ""
+                  friend.name === "You" ? "bg-brand-light-green" : ""
                 } ${index !== friends.length - 1 ? "border-b border-border" : ""}`}>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                     friend.rank === 1 ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200" :
                     friend.rank === 2 ? "bg-muted text-muted-foreground" :
-                    friend.rank === 3 ? "bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-200" :
+                    friend.rank === 3 ? "bg-brand-light-green text-brand-green" :
                     "bg-muted text-muted-foreground"
                   }`}>
                     #{friend.rank}
                   </div>
                   <div className="flex-1">
-                    <p className={`font-medium ${friend.name === "You" ? "text-orange-600" : "text-gray-900"}`}>
+                    <p className={`font-medium ${friend.name === "You" ? "text-brand-green" : "text-gray-900"}`}>
                       {friend.name}
                     </p>
                     <p className="text-sm text-gray-600">{friend.meals} meals saved</p>

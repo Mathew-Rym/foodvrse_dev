@@ -145,16 +145,16 @@ const Partners: React.FC = () => {
                 
                 {/* Partner Info */}
                 <div className="text-center">
-                  <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-orange-600 transition-colors">
+                  <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-brand-green transition-colors">
                     {partner.name}
                   </h3>
-                  <span className="inline-block bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs px-2 py-1 rounded-full mb-3">
+                                      <span className="inline-block bg-brand-light-green text-brand-green text-xs px-2 py-1 rounded-full mb-3">
                     {partner.category}
                   </span>
                   <p className="text-muted-foreground text-sm mb-4">
                     {partner.description}
                   </p>
-                  <div className="flex items-center justify-center text-orange-600 group-hover:text-orange-700">
+                                      <div className="flex items-center justify-center text-brand-green group-hover:text-brand-green/80">
                     <span className="text-sm font-medium mr-1">Visit Store</span>
                     <ExternalLink className="w-4 h-4" />
                   </div>

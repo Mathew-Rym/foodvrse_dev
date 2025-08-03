@@ -360,11 +360,11 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
     <>
       {/* Dark overlay with spotlight cutout */}
       <div className="fixed inset-0 bg-black bg-opacity-80 z-50">
-        {spotlightStyle && (
+      {spotlightStyle && (
           <>
             {/* Simple highlight border - always visible */}
             <div
-              className="absolute border-4 border-orange-400 rounded-lg bg-orange-400 bg-opacity-10"
+              className="absolute border-4 border-brand-green rounded-lg bg-brand-green bg-opacity-10"
               style={{
                 top: `${spotlightStyle.top}px`,
                 left: `${spotlightStyle.left}px`,
@@ -390,12 +390,12 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
             />
             {/* Main spotlight cutout */}
             <div
-              className="absolute bg-transparent border-4 border-orange-400 rounded-lg"
-              style={{
-                top: `${spotlightStyle.top}px`,
-                left: `${spotlightStyle.left}px`,
-                width: `${spotlightStyle.width}px`,
-                height: `${spotlightStyle.height}px`,
+              className="absolute bg-transparent border-4 border-brand-green rounded-lg"
+          style={{
+            top: `${spotlightStyle.top}px`,
+            left: `${spotlightStyle.left}px`,
+            width: `${spotlightStyle.width}px`,
+            height: `${spotlightStyle.height}px`,
                 borderRadius: spotlightStyle.borderRadius,
                 boxShadow: `0 0 0 9999px rgba(0,0,0,0.85)`,
                 zIndex: 51,
@@ -436,11 +436,11 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
           {/* Header */}
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-2">
-              <div className="text-orange-500">
+              <div className="text-brand-green">
                 {currentStepData.icon}
               </div>
               <div className="text-sm text-muted-foreground font-medium">
-                Step {currentStep + 1} of {steps.length}
+              Step {currentStep + 1} of {steps.length}
               </div>
             </div>
             <Button 
@@ -456,11 +456,11 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
           {/* Content */}
           <div className="mb-6">
                     <h2 id="tour-title" className="text-xl font-bold text-foreground mb-3">
-          {currentStepData.title}
-        </h2>
+              {currentStepData.title}
+            </h2>
         <p id="tour-content" className="text-muted-foreground leading-relaxed text-sm">
-          {currentStepData.content}
-        </p>
+              {currentStepData.content}
+            </p>
           </div>
 
           {/* Progress bar */}

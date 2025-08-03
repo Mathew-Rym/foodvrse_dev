@@ -49,15 +49,15 @@ const LocationNotification = () => {
   if (!showNotification) return null;
 
   return (
-    <div className="bg-orange-50 border-l-4 border-orange-400 p-4 mx-4 my-2 rounded-r-lg">
+          <div className="bg-brand-light-green border-l-4 border-brand-green p-4 mx-4 my-2 rounded-r-lg">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <MapPin className="w-5 h-5 text-orange-500" />
+          <MapPin className="w-5 h-5 text-brand-green" />
           <div>
-            <p className="text-sm font-medium text-orange-800">
+            <p className="text-sm font-medium text-brand-green">
               Enable location for better deals
             </p>
-            <p className="text-xs text-orange-600 mt-1">
+            <p className="text-xs text-brand-green/70 mt-1">
               Turn on location access to find the best food deals near you
             </p>
           </div>
@@ -66,7 +66,7 @@ const LocationNotification = () => {
           <Button 
             size="sm" 
             onClick={handleEnableLocation}
-            className="bg-orange-500 hover:bg-orange-600 text-white"
+            className="bg-brand-green hover:bg-brand-green/90 text-white"
           >
             Enable
           </Button>
@@ -74,7 +74,7 @@ const LocationNotification = () => {
             size="sm" 
             variant="ghost" 
             onClick={handleDismiss}
-            className="text-orange-600 hover:text-orange-800"
+            className="text-brand-green hover:text-brand-green/80"
           >
             <X className="w-4 h-4" />
           </Button>

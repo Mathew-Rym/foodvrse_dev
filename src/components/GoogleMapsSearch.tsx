@@ -107,7 +107,7 @@ const GoogleMapsSearch = ({ onLocationSelect }: GoogleMapsSearchProps) => {
               onClick={() => handleLocationSelect(location)}
               className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center space-x-3 border-b border-gray-100 last:border-b-0 transition-colors"
             >
-              <MapPin className="w-4 h-4 text-orange-500 flex-shrink-0" />
+              <MapPin className="w-4 h-4 text-brand-green flex-shrink-0" />
               <div className="flex-1">
                 <span className="text-sm text-gray-700 block">{getDisplayName(location)}</span>
                 <span className="text-xs text-gray-500">{location.country}</span>

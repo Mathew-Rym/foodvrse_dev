@@ -76,7 +76,7 @@ const HowItWorks = () => {
               <div className="text-sm text-gray-600">= Food Waste Reduced</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-orange-600">70% Off</div>
+              <div className="text-2xl font-bold text-brand-yellow">70% Off</div>
               <div className="text-sm text-gray-600">= Money Saved</div>
             </div>
           </div>
@@ -85,14 +85,14 @@ const HowItWorks = () => {
         {/* Coming Soon Section */}
         <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-6 mb-8">
           <div className="flex items-center space-x-2 mb-4">
-            <Video className="w-6 h-6 text-orange-600" />
+            <Video className="w-6 h-6 text-brand-green" />
             <h2 className="text-2xl font-bold text-gray-900">Coming Soon: VrsePoints</h2>
           </div>
           <p className="text-gray-600 mb-4">
             Share your food waste reduction journey through content creation and earn VrsePoints! 
             Create videos, share your impact, and get rewarded for spreading awareness.
           </p>
-          <div className="bg-white rounded-lg p-4 border border-orange-200">
+          <div className="bg-white rounded-lg p-4 border border-brand-green">
             <h3 className="font-semibold text-gray-900 mb-2">Earn VrsePoints by:</h3>
             <ul className="space-y-1 text-sm text-gray-600">
               <li>• Creating video content about your FoodVrse experience</li>

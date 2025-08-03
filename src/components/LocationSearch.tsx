@@ -93,7 +93,7 @@ const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
               onClick={() => handleLocationSelect(location)}
               className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center space-x-2 border-b border-gray-100 last:border-b-0 transition-colors"
             >
-              <MapPin className="w-4 h-4 text-orange-500 flex-shrink-0" />
+              <MapPin className="w-4 h-4 text-brand-green flex-shrink-0" />
               <span className="text-sm text-gray-700">{location.address}</span>
             </button>
           ))}

@@ -353,7 +353,7 @@ const BusinessDashboard = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green mx-auto mb-4"></div>
           <p>Loading your business dashboard...</p>
         </div>
       </div>
@@ -447,18 +447,18 @@ const BusinessDashboard = () => {
 
           {/* CO2 Missed Alert */}
           {businessStats.co2Missed > 0 && (
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
+            <div className="bg-brand-light-green border border-brand-green rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="w-5 h-5 text-orange-600" />
-                <span className="font-medium text-orange-800">CO₂ Impact Missed</span>
+                <AlertTriangle className="w-5 h-5 text-brand-green" />
+                <span className="font-medium text-brand-green">CO₂ Impact Missed</span>
               </div>
-              <p className="text-sm text-orange-700 mb-3">
+              <p className="text-sm text-brand-green/80 mb-3">
                 {businessStats.co2Missed.toFixed(1)}kg of CO₂ could have been saved from unsold items. 
                 Recommend FoodVrse to more customers to maximize your environmental impact!
               </p>
               <Button 
                 size="sm" 
-                className="bg-orange-500 hover:bg-orange-600 text-white"
+                className="bg-brand-green hover:bg-brand-green/90 text-white"
                 onClick={() => toast.info('Referral program coming soon!')}
               >
                 Share with Friends
@@ -698,7 +698,7 @@ const BusinessDashboard = () => {
                       <div className="flex items-center gap-4">
                         <span>
                           <span className="line-through">KSh {item.original_price}</span>
-                          <span className="ml-2 font-medium text-orange-600">KSh {item.price}</span>
+                          <span className="ml-2 font-medium text-brand-green">KSh {item.price}</span>
                         </span>
                         <span>Qty: {item.quantity}/{item.initial_quantity}</span>
                         <span className="text-green-600">

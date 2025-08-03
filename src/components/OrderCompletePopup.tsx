@@ -42,8 +42,8 @@ const OrderCompletePopup = () => {
             </div>
           </div>
 
-          <div className="bg-orange-50 p-4 rounded-lg">
-            <p className="text-sm text-orange-700">
+                  <div className="bg-brand-light-green p-4 rounded-lg">
+          <p className="text-sm text-brand-green">
               <strong>Important:</strong> Please arrive during the designated pickup time. 
               Late pickups may result in order cancellation.
             </p>

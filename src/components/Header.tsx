@@ -80,7 +80,7 @@ const Header = () => {
             <Button 
               variant="ghost" 
               size="sm" 
-              className="flex items-center space-x-1 text-orange-600 hover:text-orange-700"
+              className="flex items-center space-x-1 text-brand-yellow hover:text-brand-yellow/80"
               onClick={handleFoodWasteClick}
             >
               <Info className="w-4 h-4" />
@@ -166,7 +166,7 @@ const Header = () => {
             <Button 
               variant="ghost" 
               size="sm" 
-              className="flex items-center space-x-1 text-orange-600 hover:text-orange-700 flex-1"
+                              className="flex items-center space-x-1 text-brand-yellow hover:text-brand-yellow/80 flex-1"
               onClick={handleFoodWasteClick}
             >
               <Info className="w-4 h-4" />

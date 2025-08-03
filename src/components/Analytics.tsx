@@ -267,9 +267,9 @@ const Analytics = () => {
               {peakHour ? `${peakHour.hour} (${peakHour.orders} orders)` : 'No data yet'}
             </span>
           </div>
-          <div className="flex items-center justify-between p-2 bg-orange-50 rounded">
+          <div className="flex items-center justify-between p-2 bg-brand-light-green rounded">
             <span>Top category:</span>
-            <span className="font-semibold text-orange-700">
+            <span className="font-semibold text-brand-green">
               {topCategory ? `${topCategory.name} (${topCategory.value}%)` : 'No data yet'}
             </span>
           </div>

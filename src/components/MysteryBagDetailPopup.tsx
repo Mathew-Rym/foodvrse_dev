@@ -123,7 +123,7 @@ export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetail
             {/* Items left indicator */}
             <button 
               onClick={handleItemsLeftClick}
-              className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium"
+              className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-brand-yellow text-brand-green px-3 py-1 rounded-full text-sm font-medium"
             >
               {bag.itemsLeft} left
             </button>
@@ -152,7 +152,7 @@ export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetail
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 fill-orange-400 text-orange-400" />
+                  <Star className="w-4 h-4 fill-brand-yellow text-brand-yellow" />
                   <span className="font-medium">{bag.rating}</span>
                   <span className="text-gray-500 text-sm">({bag.reviewCount})</span>
                 </div>
@@ -209,7 +209,7 @@ export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetail
               <h3 className="font-semibold text-gray-900">WHAT OTHER PEOPLE ARE SAYING</h3>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-2">
-                  <Star className="w-5 h-5 fill-orange-400 text-orange-400" />
+                  <Star className="w-5 h-5 fill-brand-yellow text-brand-yellow" />
                   <span className="text-xl font-bold">{bag.rating} / 5.0</span>
                 </div>
                 <div className="space-y-1">
