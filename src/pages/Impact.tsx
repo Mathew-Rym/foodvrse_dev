@@ -60,11 +60,11 @@ const Impact = () => {
 
   return (
     <MobileLayout>
-      <div className="min-h-screen bg-gray-50 pb-20">
+      <div className="min-h-screen bg-background pb-20">
         {/* Header */}
-        <div className="bg-gradient-to-br from-green-50 to-blue-50 px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">Your Impact</h1>
-          <p className="text-gray-600 mt-1">See how you're helping save the planet</p>
+        <div className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 px-4 py-6">
+          <h1 className="text-2xl font-bold text-foreground">Your Impact</h1>
+          <p className="text-muted-foreground mt-1">See how you're helping save the planet</p>
         </div>
 
         {/* Stats Grid */}
@@ -73,12 +73,12 @@ const Impact = () => {
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
-                <div key={index} className="bg-white rounded-lg p-4 shadow-sm">
+                <div key={index} className="bg-card rounded-lg p-4 shadow-sm">
                   <div className="flex items-center gap-3">
                     <Icon className={`w-6 h-6 ${stat.color}`} />
                     <div>
-                      <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                      <p className="text-sm text-gray-600">{stat.label}</p>
+                      <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                      <p className="text-sm text-muted-foreground">{stat.label}</p>
                     </div>
                   </div>
                 </div>
@@ -90,14 +90,14 @@ const Impact = () => {
           <div className="grid grid-cols-2 gap-3 mb-6">
             <Button 
               onClick={handleShareImpact}
-              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+              className="bg-brand-green text-white hover:bg-brand-green/90"
             >
               <Share2 className="w-4 h-4 mr-2" />
               Share Impact
             </Button>
             <Button 
               onClick={handleInviteFriends}
-              className="bg-gradient-to-r from-green-500 to-teal-500 text-white"
+              className="bg-brand-yellow text-brand-green hover:bg-brand-yellow/90"
             >
               <UserPlus className="w-4 h-4 mr-2" />
               Invite Friends
@@ -109,9 +109,9 @@ const Impact = () => {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Achievements</h2>
             <div className="space-y-3">
               {achievements.map((achievement, index) => (
-                <div key={index} className="bg-white rounded-lg p-4 shadow-sm flex items-center gap-3">
+                <div key={index} className="bg-card rounded-lg p-4 shadow-sm flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    achievement.earned ? "bg-yellow-100" : "bg-gray-100"
+                                          achievement.earned ? "bg-yellow-100 dark:bg-yellow-900" : "bg-muted"
                   }`}>
                     <Trophy className={`w-5 h-5 ${achievement.earned ? "text-yellow-600" : "text-gray-400"}`} />
                   </div>
@@ -132,16 +132,16 @@ const Impact = () => {
           {/* Leaderboard */}
           <div>
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Friends Leaderboard</h2>
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-card rounded-lg shadow-sm overflow-hidden">
               {friends.map((friend, index) => (
                 <div key={index} className={`flex items-center gap-3 p-4 ${
-                  friend.name === "You" ? "bg-orange-50" : ""
-                } ${index !== friends.length - 1 ? "border-b border-gray-100" : ""}`}>
+                  friend.name === "You" ? "bg-orange-50 dark:bg-orange-900" : ""
+                } ${index !== friends.length - 1 ? "border-b border-border" : ""}`}>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                    friend.rank === 1 ? "bg-yellow-100 text-yellow-700" :
-                    friend.rank === 2 ? "bg-gray-100 text-gray-700" :
-                    friend.rank === 3 ? "bg-orange-100 text-orange-700" :
-                    "bg-gray-50 text-gray-600"
+                    friend.rank === 1 ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200" :
+                    friend.rank === 2 ? "bg-muted text-muted-foreground" :
+                    friend.rank === 3 ? "bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-200" :
+                    "bg-muted text-muted-foreground"
                   }`}>
                     #{friend.rank}
                   </div>

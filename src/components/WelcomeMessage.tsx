@@ -43,11 +43,11 @@ const WelcomeMessage = ({ isFirstTime = false }: WelcomeMessageProps) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl p-6 max-w-sm mx-auto shadow-2xl animate-scale-in">
+              <div className="bg-card rounded-2xl p-6 max-w-sm mx-auto shadow-2xl animate-scale-in">
         <div className="text-center">
           <button
             onClick={() => setIsVisible(false)}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
           >
             <X className="w-5 h-5" />
           </button>
@@ -55,19 +55,19 @@ const WelcomeMessage = ({ isFirstTime = false }: WelcomeMessageProps) => {
           <div className="mb-4">
             {isWelcomeBack ? (
               <>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="text-2xl font-bold text-foreground mb-2">
                   Welcome back, {userProfile?.display_name || user?.email}!
                 </h2>
-                <p className="text-gray-600 leading-relaxed mb-4">
+                <p className="text-muted-foreground leading-relaxed mb-4">
                   Discover today's mystery bag and be a food waste champion.
                 </p>
               </>
             ) : (
               <>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="text-2xl font-bold text-foreground mb-2">
                   Welcome to FoodVrse!
                 </h2>
-                <p className="text-gray-600 leading-relaxed mb-4">
+                <p className="text-muted-foreground leading-relaxed mb-4">
                   Discover surplus food (Mystery bags) from local restaurants and stores. Help reduce food waste while enjoying delicious meals at up to 70% off.
                 </p>
                 <p className="text-orange-500 font-medium">

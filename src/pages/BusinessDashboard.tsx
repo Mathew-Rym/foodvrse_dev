@@ -351,7 +351,7 @@ const BusinessDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
           <p>Loading your business dashboard...</p>
@@ -361,9 +361,9 @@ const BusinessDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div id="business-header" className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-4">
+              <div id="business-header" className="bg-brand-green text-white p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Button 
@@ -396,32 +396,32 @@ const BusinessDashboard = () => {
         {/* Stats Overview */}
         <div className="p-4">
           <div id="stats-overview" className="grid grid-cols-2 gap-3 mb-6">
-            <div className="bg-white rounded-lg p-4 shadow-sm">
+            <div className="bg-card rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-gray-600">Total Sales</span>
+                <span className="text-sm text-muted-foreground">Total Sales</span>
               </div>
-              <p className="text-xl font-bold text-gray-900">KSh {businessStats.totalSales.toLocaleString()}</p>
+              <p className="text-xl font-bold text-foreground">KSh {businessStats.totalSales.toLocaleString()}</p>
               <p className={`text-xs ${businessStats.monthlyGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {businessStats.monthlyGrowth >= 0 ? '+' : ''}{businessStats.monthlyGrowth.toFixed(1)}% this month
               </p>
             </div>
 
-            <div className="bg-white rounded-lg p-4 shadow-sm">
+            <div className="bg-card rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
                 <Package className="w-4 h-4 text-blue-600" />
-                <span className="text-sm text-gray-600">Items Sold</span>
+                <span className="text-sm text-muted-foreground">Items Sold</span>
               </div>
-              <p className="text-xl font-bold text-gray-900">{businessStats.itemsSold}</p>
+              <p className="text-xl font-bold text-foreground">{businessStats.itemsSold}</p>
               <p className="text-xs text-blue-600">This month</p>
             </div>
 
-            <div id="co2-stats" className="bg-white rounded-lg p-4 shadow-sm">
+            <div id="co2-stats" className="bg-card rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
                 <Leaf className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-gray-600">CO₂ Saved</span>
+                <span className="text-sm text-muted-foreground">CO₂ Saved</span>
               </div>
-              <p className="text-xl font-bold text-gray-900">{businessStats.co2Saved.toFixed(1)}kg</p>
+              <p className="text-xl font-bold text-foreground">{businessStats.co2Saved.toFixed(1)}kg</p>
               <div className="flex items-center gap-2 mt-1">
                 <p className="text-xs text-green-600">Environmental impact</p>
                 <Button
@@ -435,13 +435,13 @@ const BusinessDashboard = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-4 shadow-sm">
+            <div className="bg-card rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
                 <Star className="w-4 h-4 text-yellow-600" />
-                <span className="text-sm text-gray-600">Rating</span>
+                <span className="text-sm text-muted-foreground">Rating</span>
               </div>
-              <p className="text-xl font-bold text-gray-900">{businessStats.avgRating.toFixed(1)}</p>
-              <p className="text-xs text-gray-600">Based on reviews</p>
+              <p className="text-xl font-bold text-foreground">{businessStats.avgRating.toFixed(1)}</p>
+              <p className="text-xs text-muted-foreground">Based on reviews</p>
             </div>
           </div>
 
@@ -467,15 +467,15 @@ const BusinessDashboard = () => {
           )}
 
           {/* Business Profile Images */}
-          <div className="bg-white rounded-lg p-4 shadow-sm mb-6">
-            <h3 className="font-semibold mb-3">Business Images</h3>
-            <p className="text-sm text-gray-600 mb-4">Add your business logo and thumbnail that will appear on all your listings</p>
+          <div className="bg-card rounded-lg p-4 shadow-sm mb-6">
+            <h3 className="font-semibold mb-3 text-foreground">Business Images</h3>
+            <p className="text-sm text-muted-foreground mb-4">Add your business logo and thumbnail that will appear on all your listings</p>
             
             <div className="grid grid-cols-2 gap-4">
               {/* Business Logo */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Business Logo</label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center bg-gray-50">
+                <label className="text-sm font-medium text-foreground">Business Logo</label>
+                <div className="border-2 border-dashed border-border rounded-lg p-4 text-center bg-muted">
                   {businessProfile?.business_logo_url ? (
                     <div className="space-y-2">
                       <img 

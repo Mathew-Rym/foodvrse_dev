@@ -30,7 +30,7 @@ const CookieConsent = () => {
 
   return (
     <div className={`fixed left-0 right-0 z-40 p-4 ${isAuthenticated ? 'bottom-20' : 'bottom-0'}`}>
-      <Card className="bg-white shadow-lg border border-orange-200">
+              <Card className="bg-card shadow-lg border border-orange-200">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <Cookie className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />

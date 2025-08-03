@@ -99,9 +99,9 @@ const CVPopup = ({ isOpen, onClose }: CVPopupProps) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-lg bg-white shadow-2xl max-h-[90vh] overflow-y-auto">
+              <Card className="w-full max-w-lg bg-card shadow-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="text-xl font-bold text-gray-900">
+          <CardTitle className="text-xl font-bold text-foreground">
             Send Your CV
           </CardTitle>
           <Button variant="ghost" size="sm" onClick={onClose} disabled={isSubmitting}>

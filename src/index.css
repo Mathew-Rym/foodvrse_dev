@@ -18,24 +18,24 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 158 25% 35%; /* #3D6C56 - Primary Green */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 120 25% 90%; /* #E2F1E0 - Light Green */
+    --secondary-foreground: 158 25% 35%;
 
-    --muted: 210 40% 96.1%;
+    --muted: 120 25% 90%; /* #E2F1E0 - Light Green */
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 120 25% 90%; /* #E2F1E0 - Light Green */
+    --accent-foreground: 158 25% 35%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 120 25% 90%; /* #E2F1E0 - Light Green */
+    --input: 120 25% 90%; /* #E2F1E0 - Light Green */
+    --ring: 158 25% 35%; /* #3D6C56 - Primary Green */
 
     --radius: 0.5rem;
 
@@ -105,6 +105,53 @@ All colors MUST be HSL.
   }
 }
 
+@layer utilities {
+  /* Custom FoodVrse brand colors */
+  .bg-brand-green {
+    background-color: #3D6C56;
+  }
+  
+  .text-brand-green {
+    color: #3D6C56;
+  }
+  
+  .bg-brand-light-green {
+    background-color: #E2F1E0;
+  }
+  
+  .text-brand-light-green {
+    color: #E2F1E0;
+  }
+  
+  .bg-brand-yellow {
+    background-color: #FCDA5B;
+  }
+  
+  .text-brand-yellow {
+    color: #FCDA5B;
+  }
+  
+  .border-brand-green {
+    border-color: #3D6C56;
+  }
+  
+  .border-brand-light-green {
+    border-color: #E2F1E0;
+  }
+  
+  .border-brand-yellow {
+    border-color: #FCDA5B;
+  }
+  
+  .hover\:bg-brand-green:hover {
+    background-color: #2D5A46;
+  }
+  
+  .hover\:bg-brand-yellow:hover {
+    background-color: #F4D03F;
+  }
+}
+
 /* Safe area utilities for mobile devices */
 @layer utilities {
   .safe-area-pb {
@@ -115,8 +162,27 @@ All colors MUST be HSL.
     padding-top: env(safe-area-inset-top);
   }
 
-  @keyframes ambiance-blink {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.05); }
+  @keyframes ambiance-pulse {
+    0%, 100% { 
+      opacity: 1; 
+      transform: scale(1);
+      box-shadow: 0 0 15px rgba(251, 191, 36, 0.4), 0 0 30px rgba(251, 191, 36, 0.2);
+    }
+    50% { 
+      opacity: 0.9; 
+      transform: scale(1.01);
+      box-shadow: 0 0 25px rgba(251, 191, 36, 0.6), 0 0 50px rgba(251, 191, 36, 0.3);
+    }
+  }
+
+  @keyframes gentle-glow {
+    0%, 100% { 
+      opacity: 1; 
+      box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+    }
+    50% { 
+      opacity: 0.95; 
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+    }
   }
 }

@@ -47,12 +47,12 @@ export const CategoryCarousel = ({ category, items, onSeeAll, onItemClick }: Cat
         {items.slice(0, 5).map((item) => (
           <div
             key={item.id}
-            className="flex-shrink-0 w-64 bg-white rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
+            className="flex-shrink-0 w-64 bg-card rounded-lg shadow-sm border border-border cursor-pointer hover:shadow-md transition-shadow"
             onClick={() => onItemClick(item.id)}
           >
             <div className="p-3">
               <div className="flex items-start gap-3">
-                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   {item.image}
                 </div>
                 

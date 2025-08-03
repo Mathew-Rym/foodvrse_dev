@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import LanguageToggle from "./LanguageToggle";
 import ThemeToggle from "./ThemeToggle";
 import AppInstallPrompt from "./AppInstallPrompt";
+import Logo from "./Logo";
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -19,15 +20,13 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-brand-green text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid md:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">🍽️</span>
-              </div>
+              <Logo size="md" className="flex-shrink-0" />
               <span className="text-xl font-bold">FoodVrse</span>
             </div>
             <p className="text-gray-400 text-sm">

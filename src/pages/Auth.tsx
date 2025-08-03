@@ -28,6 +28,7 @@ const Auth = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,6 +53,7 @@ const Auth = () => {
   }, [form]);
 
   const onSubmit = async (data: AuthFormData) => {
+    setIsLoading(true);
     try {
       // Handle browser password storage
       if (rememberMe && 'credentials' in navigator && (navigator as any).credentials?.store) {
@@ -88,6 +90,11 @@ const Auth = () => {
             toast.success('Business account created! Please check your email to confirm.');
             navigate('/business-dashboard');
           }
+        } else {
+          // Handle rate limiting error specifically
+          if (error.message && error.message.includes('43 seconds')) {
+            toast.error('Too many attempts. Please wait a moment before trying again, or try signing in instead.');
+          }
         }
       } else {
         // Sign in flow
@@ -102,11 +109,24 @@ const Auth = () => {
             const from = location.state?.from?.pathname || '/';
             navigate(from);
           }
+        } else {
+          // Handle rate limiting error specifically
+          if (error.message && error.message.includes('43 seconds')) {
+            toast.error('Too many sign-in attempts. Please wait a moment before trying again.');
+          }
         }
       }
     } catch (error) {
       console.error('Authentication error:', error);
-      toast.error('Authentication failed. Please try again.');
+      // Check if it's a rate limiting error
+      if (error && typeof error === 'object' && 'message' in error && 
+          typeof error.message === 'string' && error.message.includes('43 seconds')) {
+        toast.error('Rate limit reached. Please wait a moment before trying again.');
+      } else {
+        toast.error('Authentication failed. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -140,6 +160,21 @@ const Auth = () => {
       console.log('User subscribed to emails');
     }
     setShowEmailSignup(false);
+    
+    // Check if location request was recently shown
+    const lastShown = localStorage.getItem('auth_location_request_last_shown');
+    if (lastShown) {
+      const now = Date.now();
+      const timeSinceLastShown = now - parseInt(lastShown);
+      const cooldownPeriod = 7 * 24 * 60 * 60 * 1000; // 7 days
+      
+      if (timeSinceLastShown < cooldownPeriod) {
+        // Skip location request and go directly to home
+        navigate('/');
+        return;
+      }
+    }
+    
     setShowLocationRequest(true);
   };
 
@@ -148,7 +183,15 @@ const Auth = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           console.log('Location accessed:', position.coords);
-          toast.success('Location access granted!');
+          // Only show success toast if enough time has passed since last shown
+          const lastShown = localStorage.getItem('auth_location_toast_last_shown');
+          const now = Date.now();
+          const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours
+          
+          if (!lastShown || (now - parseInt(lastShown)) > cooldownPeriod) {
+            toast.success('Location access granted!');
+            localStorage.setItem('auth_location_toast_last_shown', now.toString());
+          }
         },
         (error) => {
           console.log('Location access denied:', error);
@@ -157,6 +200,8 @@ const Auth = () => {
       );
     }
     setShowLocationRequest(false);
+    // Remember when user interacted with location request
+    localStorage.setItem('auth_location_request_last_shown', Date.now().toString());
     // Always redirect to home page after signup flow
     navigate('/');
   };
@@ -206,7 +251,7 @@ const Auth = () => {
         {/* Account Type Selection */}
         <div className="space-y-3 mb-4">
           <div className="text-center">
-            <p className="text-sm text-gray-600 mb-3">Choose your account type:</p>
+            <p className="text-sm text-muted-foreground mb-3">Choose your account type:</p>
           </div>
           
           {/* Consumer Option */}
@@ -215,14 +260,14 @@ const Auth = () => {
             className={`w-full p-4 h-auto flex items-start gap-3 ${
               !isBusinessAuth 
                 ? 'bg-green-500 hover:bg-green-600 text-white border-green-500' 
-                : 'border-green-200 bg-green-50 hover:bg-green-100'
+                : 'border-green-200 bg-green-50 hover:bg-green-100 dark:border-green-800 dark:bg-green-950 dark:hover:bg-green-900'
             }`}
             onClick={() => handleAuthTypeSwitch(false)}
           >
-            <ShoppingBag className={`w-5 h-5 mt-0.5 ${!isBusinessAuth ? 'text-white' : 'text-green-600'}`} />
+            <ShoppingBag className={`w-5 h-5 mt-0.5 ${!isBusinessAuth ? 'text-white' : 'text-green-600 dark:text-green-400'}`} />
             <div className="text-left">
-              <div className={`font-medium ${!isBusinessAuth ? 'text-white' : 'text-green-800'}`}>Save Money</div>
-              <div className={`text-xs ${!isBusinessAuth ? 'text-green-100' : 'text-green-600'}`}>Click here to buy discounted food</div>
+              <div className={`font-medium ${!isBusinessAuth ? 'text-white' : 'text-green-800 dark:text-green-200'}`}>Save Money</div>
+              <div className={`text-xs ${!isBusinessAuth ? 'text-green-100' : 'text-green-600 dark:text-green-400'}`}>Click here to buy discounted food</div>
             </div>
           </Button>
 
@@ -232,14 +277,14 @@ const Auth = () => {
             className={`w-full p-4 h-auto flex items-start gap-3 ${
               isBusinessAuth 
                 ? 'bg-orange-500 hover:bg-orange-600 text-white border-orange-500' 
-                : 'border-orange-200 bg-orange-50 hover:bg-orange-100'
+                : 'border-orange-200 bg-orange-50 hover:bg-orange-100 dark:border-orange-800 dark:bg-orange-950 dark:hover:bg-orange-900'
             }`}
             onClick={() => handleAuthTypeSwitch(true)}
           >
-            <Building className={`w-5 h-5 mt-0.5 ${isBusinessAuth ? 'text-white' : 'text-orange-600'}`} />
+            <Building className={`w-5 h-5 mt-0.5 ${isBusinessAuth ? 'text-white' : 'text-orange-600 dark:text-orange-400'}`} />
             <div className="text-left">
-              <div className={`font-medium ${isBusinessAuth ? 'text-white' : 'text-orange-800'}`}>Business/Sell</div>
-              <div className={`text-xs ${isBusinessAuth ? 'text-orange-100' : 'text-orange-600'}`}>Click here to list your food items</div>
+              <div className={`font-medium ${isBusinessAuth ? 'text-white' : 'text-orange-800 dark:text-orange-200'}`}>Business/Sell</div>
+              <div className={`text-xs ${isBusinessAuth ? 'text-orange-100' : 'text-orange-600 dark:text-orange-400'}`}>Click here to list your food items</div>
             </div>
           </Button>
         </div>
@@ -364,16 +409,23 @@ const Auth = () => {
 
               <Button 
                 type="submit" 
+                disabled={isLoading}
                 className={`w-full text-white ${
                   isBusinessAuth 
-                    ? 'bg-gradient-to-r from-orange-500 to-red-500' 
-                    : 'bg-gradient-to-r from-green-500 to-green-600'
+                    ? 'bg-brand-yellow text-brand-green' 
+                    : 'bg-brand-green text-white'
                 }`}
               >
-                {isBusinessAuth 
-                  ? (isSignUp ? 'Create Business Account' : 'Sign In as Business')
-                  : (isSignUp ? 'Create Consumer Account' : 'Sign In as Consumer')
-                }
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                  </div>
+                ) : (
+                  isBusinessAuth 
+                    ? (isSignUp ? 'Create Business Account' : 'Sign In as Business')
+                    : (isSignUp ? 'Create Consumer Account' : 'Sign In as Consumer')
+                )}
               </Button>
             </form>
           </Form>
@@ -382,37 +434,37 @@ const Auth = () => {
         <div className="text-center">
           {isBusinessAuth ? (
             <div className="space-y-2">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {isSignUp ? 'Already have a business account?' : "Don't have a business account?"}
               </p>
               <button
                 type="button"
                 onClick={() => setIsSignUp(!isSignUp)}
-                className="font-medium text-orange-600 hover:text-orange-700"
+                className="font-medium text-brand-yellow hover:text-brand-yellow/80"
               >
                 {isSignUp ? 'Sign In' : 'Sign Up'}
               </button>
             </div>
           ) : (
             <div className="space-y-2">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
                 <button
                   type="button"
                   onClick={() => setIsSignUp(!isSignUp)}
-                  className="font-medium text-green-600 hover:text-green-700"
+                  className="font-medium text-brand-green hover:text-brand-green/80"
                 >
                   {isSignUp ? 'Sign In' : 'Sign Up'}
                 </button>
               </p>
               {/* Terms and Privacy Policy Links for Signup */}
               {isSignUp && (
-                <div className="text-xs text-gray-500 mt-2">
+                <div className="text-xs text-muted-foreground mt-2">
                   By creating your account, you agree to the{' '}
                   <button
                     type="button"
                     onClick={() => navigate('/terms-of-service', { state: { hideNavbar: true } })}
-                    className="text-green-600 hover:text-green-700 underline"
+                    className="text-brand-green hover:text-brand-green/80 underline"
                   >
                     Terms of Service
                   </button>{' '}
@@ -420,7 +472,7 @@ const Auth = () => {
                   <button
                     type="button"
                     onClick={() => navigate('/privacy-policy', { state: { hideNavbar: true } })}
-                    className="text-green-600 hover:text-green-700 underline"
+                    className="text-brand-green hover:text-brand-green/80 underline"
                   >
                     Privacy Policy
                   </button>
@@ -443,7 +495,7 @@ const Auth = () => {
           <div className="space-y-4">
             <Button 
               onClick={() => handleEmailSignupContinue(true)}
-              className="w-full bg-green-600 hover:bg-green-700"
+              className="w-full bg-brand-green hover:bg-brand-green/90"
             >
               Yes, keep me updated!
             </Button>

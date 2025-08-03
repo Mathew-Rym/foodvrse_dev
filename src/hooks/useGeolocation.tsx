@@ -17,6 +17,17 @@ export const useGeolocation = () => {
     loading: true,
   });
 
+  const shouldShowLocationToast = () => {
+    const lastShown = localStorage.getItem('location_toast_last_shown');
+    if (!lastShown) return true;
+    
+    const now = Date.now();
+    const timeSinceLastShown = now - parseInt(lastShown);
+    const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    
+    return timeSinceLastShown > cooldownPeriod;
+  };
+
   const requestLocation = () => {
     if (!navigator.geolocation) {
       setLocation(prev => ({
@@ -35,7 +46,12 @@ export const useGeolocation = () => {
           error: null,
           loading: false,
         });
-        toast.success('Location enabled! Now showing deals near you.');
+        
+        // Only show toast if enough time has passed since last shown
+        if (shouldShowLocationToast()) {
+          toast.success('Location enabled! Now showing deals near you.');
+          localStorage.setItem('location_toast_last_shown', Date.now().toString());
+        }
       },
       (error) => {
         let errorMessage = 'Unable to retrieve your location.';

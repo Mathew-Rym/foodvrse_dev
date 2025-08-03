@@ -22,7 +22,7 @@ const Index = () => {
   const { isFirstVisit, showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
+    <div className="min-h-screen bg-brand-light-green text-foreground overflow-x-hidden">
       <WelcomeMessage isFirstTime={isFirstVisit} />
       <Header />
       <LocationNotification />
@@ -33,8 +33,12 @@ const Index = () => {
         <div id="mystery-box-section">
           <MysteryBoxSection />
         </div>
-        <GameSection />
-        <ImpactTracker />
+        <div id="game-section">
+          <GameSection />
+        </div>
+        <div id="partner-section">
+          <ImpactTracker />
+        </div>
         <Footer />
       </div>
       {isAuthenticated && (

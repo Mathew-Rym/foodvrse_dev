@@ -17,12 +17,12 @@ const FoodListings = () => {
   ];
 
   return (
-    <section className="py-12 bg-gray-50">
+    <section className="py-12 bg-brand-light-green">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Available Near You</h2>
-          <p className="text-lg text-gray-600">Fresh deals updated every hour</p>
+          <h2 className="text-3xl font-bold text-brand-green mb-4">Available Near You</h2>
+          <p className="text-lg text-brand-green/80">Fresh deals updated every hour</p>
         </div>
 
         {/* Category Filter */}

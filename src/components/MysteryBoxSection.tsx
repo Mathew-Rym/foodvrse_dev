@@ -98,10 +98,10 @@ const MysteryBoxSection = () => {
             <Sparkles className="w-4 h-4" />
             Mystery Bags
           </div>
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-brand-green mb-4">
             Surprise Yourself, Save More
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-brand-green/80 max-w-2xl mx-auto">
             Get premium meals at unbeatable prices with our mystery bags. 
             You'll always get more value than what you pay!
           </p>
@@ -110,7 +110,7 @@ const MysteryBoxSection = () => {
         {/* Mystery Boxes Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
           {mysteryBoxes.map((box, index) => (
-            <div key={index} className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group">
+            <div key={index} className="bg-card rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group">
               {/* Header with gradient */}
               <div className={`bg-gradient-to-r ${box.gradient} p-6 text-white relative`}>
                 <div className="absolute top-4 right-4">
@@ -127,13 +127,13 @@ const MysteryBoxSection = () => {
               {/* Content */}
               <div className="p-6 space-y-4">
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <Clock className="w-4 h-4" />
                     <span className="text-sm">{box.pickup}</span>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">What's Inside:</p>
-                    <p className="text-gray-700 font-medium">{box.items}</p>
+                    <p className="text-sm text-muted-foreground mb-1">What's Inside:</p>
+                    <p className="text-foreground font-medium">{box.items}</p>
                   </div>
                 </div>
 
@@ -147,7 +147,7 @@ const MysteryBoxSection = () => {
                 </div>
 
                 <Button 
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 group-hover:scale-105 transition-transform"
+                  className="w-full bg-brand-yellow text-brand-green font-semibold hover:bg-brand-yellow/90 group-hover:scale-105 transition-transform"
                   onClick={() => handleGetMysteryBox(box)}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
@@ -164,7 +164,7 @@ const MysteryBoxSection = () => {
             size="lg"
             variant="outline"
             onClick={handleViewAllMysteryBoxes}
-            className="border-purple-300 text-purple-600 hover:bg-purple-50"
+            className="border-brand-green text-brand-green hover:bg-brand-light-green"
           >
             <Sparkles className="w-4 h-4 mr-2" />
             View All Mystery Bags
@@ -172,29 +172,29 @@ const MysteryBoxSection = () => {
         </div>
 
         {/* How it Works */}
-        <div className="bg-white rounded-2xl shadow-sm p-8 mt-12">
-          <h3 className="text-xl font-bold text-gray-900 text-center mb-8">How Mystery Bags Work</h3>
+        <div className="bg-card rounded-2xl shadow-sm p-8 mt-12">
+          <h3 className="text-xl font-bold text-foreground text-center mb-8">How Mystery Bags Work</h3>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">
                 1
               </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Choose Your Location</h4>
-              <p className="text-gray-600 text-sm">Select from available stores with mystery bags near you</p>
+              <h4 className="font-semibold text-foreground mb-2">Choose Your Location</h4>
+              <p className="text-muted-foreground text-sm">Select from available stores with mystery bags near you</p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">
                 2
               </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Pay & Reserve</h4>
-              <p className="text-gray-600 text-sm">Secure your mystery bag with instant payment</p>
+              <h4 className="font-semibold text-foreground mb-2">Pay & Reserve</h4>
+              <p className="text-muted-foreground text-sm">Secure your mystery bag with instant payment</p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">
                 3
               </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Pickup & Enjoy</h4>
-              <p className="text-gray-600 text-sm">Collect your surprise meal during pickup window</p>
+              <h4 className="font-semibold text-foreground mb-2">Pickup & Enjoy</h4>
+              <p className="text-muted-foreground text-sm">Collect your surprise meal during pickup window</p>
             </div>
           </div>
         </div>

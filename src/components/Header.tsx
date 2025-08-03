@@ -10,6 +10,7 @@ import CartSheet from "./CartSheet";
 import LocationSearch from "./LocationSearch";
 import { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
+import Logo from "./Logo";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -54,23 +55,21 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-orange-100">
+    <header className="bg-brand-green shadow-sm border-b border-brand-green">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main header row */}
         <div className="flex items-center justify-between h-16 lg:h-16">
           {/* Logo */}
           <div className="flex items-center space-x-2 flex-shrink-0">
-            <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">🍽️</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">FoodVrse</span>
-            <span className="text-xs text-gray-500 hidden lg:block">Good food deserves a second chance</span>
+            <Logo size="md" className="flex-shrink-0" />
+            <span className="text-xl font-bold text-white">FoodVrse</span>
+            <span className="text-xs text-white/90 hidden lg:block">Good food deserves a second chance</span>
           </div>
 
           {/* Desktop location and actions */}
           <div className="hidden lg:flex items-center space-x-4">
             <LocationSearch onLocationSelect={handleLocationSelect} />
-            <div className="flex items-center space-x-2 text-gray-600">
+            <div className="flex items-center space-x-2 text-white/90">
               <MapPin className={`w-4 h-4 ${latitude && longitude ? 'text-green-500' : ''}`} />
               <span className="text-sm">{currentLocation}</span>
             </div>

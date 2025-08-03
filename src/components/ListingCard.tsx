@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { MysteryBagDetailPopup } from "./MysteryBagDetailPopup";
+import Logo from "./Logo";
 
 interface ListingCardProps {
   listing: {
@@ -211,9 +212,9 @@ export const ListingCard: React.FC<ListingCardProps> = ({
 
   if (showSoldOut && listing.status === 'sold-out') {
     return (
-      <div className="bg-gray-100 rounded-2xl shadow-sm p-4 opacity-75 relative">
+                  <div className="bg-muted rounded-2xl shadow-sm p-4 opacity-75 relative">
         <div className="absolute inset-0 bg-black/20 rounded-2xl flex items-center justify-center">
-          <div className="bg-white rounded-lg p-4 text-center max-w-xs">
+                      <div className="bg-card rounded-lg p-4 text-center max-w-xs">
             <h3 className="font-semibold text-gray-900 mb-2">Sold Out!</h3>
             <p className="text-sm text-gray-600 mb-3">
               Want to explore and try it next time? Favorite it to get notified first!
@@ -264,9 +265,9 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden relative">
+            <div className="bg-card rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden relative">
       {/* Item thumbnail image */}
-      <div className="relative h-48 bg-gray-100">
+              <div className="relative h-48 bg-muted">
         {listing.thumbnail_url || listing.business_thumbnail_url ? (
           <img 
             src={listing.thumbnail_url || listing.business_thumbnail_url} 
@@ -275,7 +276,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
-            <span className="text-4xl">🍽️</span>
+            <Logo size="lg" />
           </div>
         )}
         
@@ -314,7 +315,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
         {/* Business header with logo */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3 flex-1">
-            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+            <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
               {listing.business.business_logo_url ? (
                 <img 
                   src={listing.business.business_logo_url} 
@@ -379,7 +380,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
       {/* Reserve Quick popup */}
       {showReserveQuick && listing.status === 'low-stock' && (
         <div className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center z-20">
-          <div className="bg-white rounded-lg p-4 mx-4 text-center animate-pulse">
+                      <div className="bg-card rounded-lg p-4 mx-4 text-center animate-pulse">
             <AlertCircle className="w-8 h-8 text-orange-500 mx-auto mb-2" />
             <h3 className="font-semibold text-gray-900 mb-1">Reserve Quick!</h3>
             <p className="text-sm text-gray-600 mb-3">Only {listing.quantity} left!</p>

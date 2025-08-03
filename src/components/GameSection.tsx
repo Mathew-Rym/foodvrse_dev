@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import Logo from "./Logo";
 
 interface UserChallenge {
   current_count: number;
@@ -177,7 +178,7 @@ const GameSection = () => {
   const leaderboard = [
     { rank: 1, name: "Sarah K.", mealsSaved: 234, avatar: "🌟" },
     { rank: 2, name: "Mike R.", mealsSaved: 189, avatar: "🏆" },
-    { rank: 3, name: "You", mealsSaved: 127, avatar: "🍽️" },
+    { rank: 3, name: "You", mealsSaved: 127, avatar: "logo" },
     { rank: 4, name: "Emma L.", mealsSaved: 98, avatar: "🌱" },
     { rank: 5, name: "David M.", mealsSaved: 76, avatar: "♻️" }
   ];
@@ -197,39 +198,39 @@ const GameSection = () => {
   ];
 
   return (
-    <section className="py-12 lg:py-16 bg-gradient-to-br from-purple-50 to-pink-50 overflow-x-hidden">
+    <section className="py-12 lg:py-16 bg-brand-light-green overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-brand-green mb-4">
             Food Saving Challenge
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-brand-green/80 max-w-2xl mx-auto">
             Compete with friends, earn achievements, and climb the leaderboard while making a difference!
           </p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* User Stats Card */}
-          <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="text-center pb-4">
-              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mx-auto flex items-center justify-center mb-4">
+              <div className="w-20 h-20 bg-brand-green rounded-full mx-auto flex items-center justify-center mb-4">
                 <Trophy className="w-10 h-10 text-white" />
               </div>
               <CardTitle className="text-2xl">Your Rank</CardTitle>
-              <p className="text-3xl font-bold text-purple-600">#{userStats.rank}</p>
+              <p className="text-3xl font-bold text-brand-green">#{userStats.rank}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Meals Saved</span>
+                <span className="text-muted-foreground">Meals Saved</span>
                 <span className="font-bold text-lg">{userStats.mealsSaved}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">CO₂ Saved</span>
+                <span className="text-muted-foreground">CO₂ Saved</span>
                 <span className="font-bold text-lg">{userStats.co2Saved} kg</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Current Streak</span>
+                <span className="text-muted-foreground">Current Streak</span>
                 <span className="font-bold text-lg flex items-center">
                   {userStats.streak} <span className="ml-1">🔥</span>
                 </span>
@@ -238,10 +239,10 @@ const GameSection = () => {
           </Card>
 
           {/* Leaderboard */}
-          <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="w-5 h-5 text-purple-600" />
+                <TrendingUp className="w-5 h-5 text-brand-green" />
                 <span>Leaderboard</span>
               </CardTitle>
             </CardHeader>
@@ -251,18 +252,22 @@ const GameSection = () => {
                   <div 
                     key={user.rank} 
                     className={`flex items-center justify-between p-3 rounded-lg ${
-                      user.name === 'You' ? 'bg-purple-100 border-2 border-purple-300' : 'bg-gray-50'
+                      user.name === 'You' ? 'bg-brand-light-green border-2 border-brand-green' : 'bg-muted'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
-                      <span className="text-2xl">{user.avatar}</span>
+                      {user.avatar === "logo" ? (
+                        <Logo size="sm" />
+                      ) : (
+                        <span className="text-2xl">{user.avatar}</span>
+                      )}
                       <div>
                         <p className="font-semibold">{user.name}</p>
-                        <p className="text-sm text-gray-600">{user.mealsSaved} meals</p>
+                        <p className="text-sm text-muted-foreground">{user.mealsSaved} meals</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-lg font-bold text-purple-600">#{user.rank}</span>
+                      <span className="text-lg font-bold text-brand-green">#{user.rank}</span>
                     </div>
                   </div>
                 ))}
@@ -271,19 +276,19 @@ const GameSection = () => {
           </Card>
 
           {/* Friends Activity */}
-          <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Users className="w-5 h-5 text-purple-600" />
+                <Users className="w-5 h-5 text-brand-green" />
                 <span>Friends</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {friends.map((friend, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex items-start space-x-3 p-3 bg-muted rounded-lg">
                     <div className="relative">
-                      <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
+                      <div className="w-10 h-10 bg-brand-green rounded-full flex items-center justify-center">
                         <span className="text-white font-bold">{friend.name.charAt(0)}</span>
                       </div>
                       {friend.isOnline && (
@@ -292,14 +297,14 @@ const GameSection = () => {
                     </div>
                     <div className="flex-1">
                       <p className="font-semibold text-sm">{friend.name}</p>
-                      <p className="text-xs text-gray-600">{friend.status}</p>
-                      <p className="text-xs text-purple-600 font-medium">{friend.mealsSaved} meals saved</p>
+                      <p className="text-xs text-muted-foreground">{friend.status}</p>
+                      <p className="text-xs text-brand-green font-medium">{friend.mealsSaved} meals saved</p>
                     </div>
                   </div>
                 ))}
               </div>
               <Button 
-                className="w-full mt-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 backdrop-blur-sm bg-opacity-90 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="w-full mt-4 bg-brand-yellow text-brand-green font-semibold hover:bg-brand-yellow/90 shadow-lg hover:shadow-xl transition-all duration-300"
                 onClick={handleInviteFriends}
               >
                 Invite Friends
@@ -318,7 +323,7 @@ const GameSection = () => {
                 className={`text-center p-4 transition-all hover:scale-105 ${
                   achievement.completed 
                     ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-yellow-300' 
-                    : 'bg-gray-100 border-gray-200'
+                    : 'bg-muted border-border'
                 }`}
               >
                 <div className="text-4xl mb-2">{achievement.icon}</div>

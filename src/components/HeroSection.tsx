@@ -94,20 +94,20 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 py-8 lg:py-20 overflow-x-hidden">
+    <section className="bg-brand-light-green py-8 lg:py-20 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Content */}
           <div className="space-y-6 lg:space-y-8">
             <div className="space-y-4">
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-brand-green leading-tight">
                 {t('hero.save_food')},
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500"> {t('hero.save_money')}</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-yellow to-orange-500"> {t('hero.save_money')}</span>
               </h1>
-              <p className="text-lg lg:text-xl text-gray-600 leading-relaxed">
-                {t('hero.discover_surplus_food')} (Mystery bags) from local restaurants and stores. 
-                {t('hero.help_reduce_food_waste')} while enjoying delicious meals at up to 70% off.
-              </p>
+                              <p className="text-lg lg:text-xl text-brand-green/80 leading-relaxed">
+                  {t('hero.discover_surplus_food')} (Mystery bags) from local restaurants and stores. 
+                  {t('hero.help_reduce_food_waste')} while enjoying delicious meals at up to 70% off.
+                </p>
             </div>
 
             {/* Stats */}
@@ -116,28 +116,28 @@ const HeroSection = () => {
                 <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-2 mx-auto">
                   <Leaf className="w-6 h-6 text-green-600" />
                 </div>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900">
+                <p className="text-lg sm:text-2xl font-bold text-brand-green">
                   {formatNumber(metrics?.total_meals_rescued || 1247)}+
                 </p>
-                <p className="text-xs sm:text-sm text-gray-600">{t('hero.meals_saved')}</p>
+                <p className="text-xs sm:text-sm text-brand-green/70">{t('hero.meals_saved')}</p>
               </div>
               <div className="text-center">
-                <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-2 mx-auto">
-                  <Clock className="w-6 h-6 text-blue-600" />
+                <div className="flex items-center justify-center w-12 h-12 bg-brand-green/20 rounded-full mb-2 mx-auto">
+                  <Clock className="w-6 h-6 text-brand-green" />
                 </div>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900">
+                <p className="text-lg sm:text-2xl font-bold text-brand-green">
                   {formatTonnes(metrics?.total_co2_saved_tonnes || 2.5)}
                 </p>
-                <p className="text-xs sm:text-sm text-gray-600">{t('hero.co2_saved')}</p>
+                <p className="text-xs sm:text-sm text-brand-green/70">{t('hero.co2_saved')}</p>
               </div>
               <div className="text-center">
-                <div className="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-full mb-2 mx-auto">
-                  <DollarSign className="w-6 h-6 text-yellow-600" />
+                <div className="flex items-center justify-center w-12 h-12 bg-brand-yellow/20 rounded-full mb-2 mx-auto">
+                  <DollarSign className="w-6 h-6 text-brand-yellow" />
                 </div>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900">
+                <p className="text-lg sm:text-2xl font-bold text-brand-green">
                   {formatMoney(metrics?.total_money_saved_ksh || 580000)}
                 </p>
-                <p className="text-xs sm:text-sm text-gray-600">{t('hero.money_saved')}</p>
+                <p className="text-xs sm:text-sm text-brand-green/70">{t('hero.money_saved')}</p>
               </div>
             </div>
 
@@ -145,7 +145,7 @@ const HeroSection = () => {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm sm:text-base px-6 sm:px-8 py-3"
+                className="bg-brand-yellow text-brand-green font-semibold text-sm sm:text-base px-6 sm:px-8 py-3 hover:bg-brand-yellow/90"
                 onClick={handleStartSaving}
               >
                 {t('hero.start_saving_food')}
@@ -153,7 +153,7 @@ const HeroSection = () => {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="text-sm sm:text-base px-6 sm:px-8 py-3"
+                className="border-brand-green text-brand-green hover:bg-brand-green hover:text-white text-sm sm:text-base px-6 sm:px-8 py-3"
                 onClick={handleForBusinesses}
               >
                 {t('hero.for_businesses')}

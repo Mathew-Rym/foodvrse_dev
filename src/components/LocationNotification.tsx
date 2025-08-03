@@ -8,9 +8,28 @@ const LocationNotification = () => {
   const [showNotification, setShowNotification] = useState(false);
   const { latitude, longitude, error, loading, requestLocation } = useGeolocation();
 
+  const shouldShowNotification = () => {
+    // Don't show if location is already enabled
+    if (latitude && longitude) return false;
+    
+    // Check if user recently dismissed the notification
+    const lastDismissed = localStorage.getItem('location_notification_last_dismissed');
+    if (lastDismissed) {
+      const now = Date.now();
+      const timeSinceLastDismissed = now - parseInt(lastDismissed);
+      const cooldownPeriod = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+      
+      if (timeSinceLastDismissed < cooldownPeriod) {
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
   useEffect(() => {
-    // Show notification if location is not available and not loading
-    if (!loading && !latitude && !longitude) {
+    // Show notification if location is not available, not loading, and cooldown period has passed
+    if (!loading && !latitude && !longitude && shouldShowNotification()) {
       setShowNotification(true);
     } else if (latitude && longitude) {
       setShowNotification(false);
@@ -23,6 +42,8 @@ const LocationNotification = () => {
 
   const handleDismiss = () => {
     setShowNotification(false);
+    // Remember when user dismissed the notification
+    localStorage.setItem('location_notification_last_dismissed', Date.now().toString());
   };
 
   if (!showNotification) return null;

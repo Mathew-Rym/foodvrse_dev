@@ -100,10 +100,10 @@ const ImpactTracker = () => {
       <section className="py-16 bg-gradient-to-br from-green-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-brand-green mb-4">
               Your Environmental Impact
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-brand-green/80 max-w-2xl mx-auto">
               Loading impact metrics...
             </p>
           </div>
@@ -164,28 +164,28 @@ const ImpactTracker = () => {
         {/* Impact Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {impacts.map((impact, index) => (
-            <div key={index} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 text-center">
+            <div key={index} className="bg-card rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 text-center">
               <div className={`inline-flex items-center justify-center w-16 h-16 ${impact.bg} rounded-full mb-4`}>
                 <impact.icon className={`w-8 h-8 ${impact.color}`} />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">{impact.value}</h3>
-              <p className="font-semibold text-gray-700 mb-2">{impact.label}</p>
-              <p className="text-sm text-gray-500">{impact.description}</p>
+              <h3 className="text-2xl font-bold text-foreground mb-1">{impact.value}</h3>
+              <p className="font-semibold text-foreground mb-2">{impact.label}</p>
+              <p className="text-sm text-muted-foreground">{impact.description}</p>
             </div>
           ))}
         </div>
 
         {/* Achievement Progress */}
-        <div className="bg-white rounded-2xl shadow-sm p-8">
+        <div className="bg-card rounded-2xl shadow-sm p-8">
           <div className="text-center mb-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Community Achievement</h3>
-            <p className="text-gray-600">Together, we're making a difference</p>
+            <h3 className="text-xl font-bold text-foreground mb-2">Community Achievement</h3>
+            <p className="text-muted-foreground">Together, we're making a difference</p>
           </div>
 
           <div className="max-w-2xl mx-auto">
             {/* Progress Bar */}
             <div className="mb-6">
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
+              <div className="flex justify-between text-sm text-muted-foreground mb-2">
                 <span>Progress to 2024 Goal</span>
                 <span>{Math.round(((metrics?.total_meals_rescued || 0) / 20000) * 100)}% Complete</span>
               </div>
@@ -203,13 +203,13 @@ const ImpactTracker = () => {
                 <p className={`font-semibold ${(metrics?.total_meals_rescued || 0) >= 1000 ? 'text-green-600' : 'text-gray-400'}`}>
                   {(metrics?.total_meals_rescued || 0) >= 1000 ? '✓' : '○'} 1K Meals
                 </p>
-                <p className="text-gray-500">{(metrics?.total_meals_rescued || 0) >= 1000 ? 'Achieved' : 'Goal'}</p>
+                <p className="text-muted-foreground">{(metrics?.total_meals_rescued || 0) >= 1000 ? 'Achieved' : 'Goal'}</p>
               </div>
               <div>
                 <p className={`font-semibold ${(metrics?.total_meals_rescued || 0) >= 10000 ? 'text-green-600' : (metrics?.total_meals_rescued || 0) >= 1000 ? 'text-yellow-600' : 'text-gray-400'}`}>
                   {(metrics?.total_meals_rescued || 0) >= 10000 ? '✓' : '📍'} 10K Meals
                 </p>
-                <p className="text-gray-500">
+                <p className="text-muted-foreground">
                   {(metrics?.total_meals_rescued || 0) >= 10000 ? 'Achieved' : (metrics?.total_meals_rescued || 0) >= 1000 ? 'In Progress' : 'Goal'}
                 </p>
               </div>
@@ -217,7 +217,7 @@ const ImpactTracker = () => {
                 <p className={`font-semibold ${(metrics?.total_meals_rescued || 0) >= 20000 ? 'text-green-600' : 'text-gray-400'}`}>
                   🎯 20K Meals
                 </p>
-                <p className="text-gray-500">{(metrics?.total_meals_rescued || 0) >= 20000 ? 'Achieved' : 'Goal'}</p>
+                <p className="text-muted-foreground">{(metrics?.total_meals_rescued || 0) >= 20000 ? 'Achieved' : 'Goal'}</p>
               </div>
             </div>
           </div>

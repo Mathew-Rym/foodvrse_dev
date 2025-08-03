@@ -74,26 +74,26 @@ const Favorites = () => {
 
   return (
     <MobileLayout>
-      <div className="min-h-screen bg-gray-50 pb-20">
+      <div className="min-h-screen bg-background pb-20">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">My Favorites</h1>
-          <p className="text-gray-600 mt-1">Your saved restaurants and stores</p>
+        <div className="bg-card border-b border-border px-4 py-6">
+          <h1 className="text-2xl font-bold text-foreground">My Favorites</h1>
+          <p className="text-muted-foreground mt-1">Your saved restaurants and stores</p>
         </div>
 
         {loading ? (
           <div className="p-4">
             <div className="grid grid-cols-1 gap-6">
               {Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="bg-gray-100 rounded-2xl h-80 animate-pulse" />
+                <div key={index} className="bg-muted rounded-2xl h-80 animate-pulse" />
               ))}
             </div>
           </div>
         ) : favoriteListings.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-4">
             <Heart className="w-16 h-16 text-gray-300 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No favorites yet</h3>
-            <p className="text-gray-600 text-center mb-6">
+            <h3 className="text-xl font-semibold text-foreground mb-2">No favorites yet</h3>
+            <p className="text-muted-foreground text-center mb-6">
               Start adding your favorite restaurants and stores to see them here
             </p>
             <Button 

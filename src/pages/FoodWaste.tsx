@@ -61,9 +61,9 @@ const FoodWaste = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-card shadow-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
             <Button
@@ -82,10 +82,10 @@ const FoodWaste = () => {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             Understanding Food Waste
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Food waste is one of the world's most pressing issues. Learn about its impact and how you can make a difference.
           </p>
         </div>
@@ -95,23 +95,23 @@ const FoodWaste = () => {
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <div key={index} className="bg-white rounded-lg p-6 shadow-sm text-center">
+              <div key={index} className="bg-card rounded-lg p-6 shadow-sm text-center">
                 <Icon className={`w-8 h-8 mx-auto mb-3 ${stat.color}`} />
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{stat.title}</h3>
-                <p className="text-sm text-gray-600">{stat.description}</p>
+                <h3 className="text-2xl font-bold text-foreground mb-2">{stat.title}</h3>
+                <p className="text-sm text-muted-foreground">{stat.description}</p>
               </div>
             );
           })}
         </div>
 
         {/* What is Food Waste */}
-        <div className="bg-white rounded-lg p-8 shadow-sm mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">What is Food Waste?</h2>
-          <p className="text-gray-600 mb-4">
+        <div className="bg-card rounded-lg p-8 shadow-sm mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-4">What is Food Waste?</h2>
+          <p className="text-muted-foreground mb-4">
             Food waste refers to the decrease in the quantity or quality of food along the food supply chain. 
             It occurs at every stage - from production and processing to retail and consumption.
           </p>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             In developed countries, most food waste happens at the consumer level, while in developing countries, 
             it often occurs during production, handling, and storage due to inadequate infrastructure.
           </p>
@@ -119,24 +119,24 @@ const FoodWaste = () => {
 
         {/* Impacts */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">The Triple Impact</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6 text-center">The Triple Impact</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {impacts.map((impact, index) => (
               <div key={index} className={`border-2 rounded-lg p-6 ${impact.color}`}>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">{impact.title}</h3>
-                <p className="text-gray-700">{impact.description}</p>
+                <h3 className="text-lg font-semibold text-foreground mb-3">{impact.title}</h3>
+                <p className="text-foreground">{impact.description}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Kenya Context */}
-        <div className="bg-white rounded-lg p-8 shadow-sm mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Food Waste in Kenya</h2>
+        <div className="bg-card rounded-lg p-8 shadow-sm mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-4">Food Waste in Kenya</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">The Challenge</h3>
-              <ul className="space-y-2 text-gray-600">
+              <h3 className="text-lg font-semibold text-foreground mb-3">The Challenge</h3>
+              <ul className="space-y-2 text-muted-foreground">
                 <li>• 40% of food produced is lost or wasted</li>
                 <li>• Post-harvest losses average 20-30%</li>
                 <li>• Limited cold storage infrastructure</li>
@@ -144,8 +144,8 @@ const FoodWaste = () => {
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">The Opportunity</h3>
-              <ul className="space-y-2 text-gray-600">
+              <h3 className="text-lg font-semibold text-foreground mb-3">The Opportunity</h3>
+              <ul className="space-y-2 text-muted-foreground">
                 <li>• Growing tech solutions like FoodVrse</li>
                 <li>• Increased awareness among consumers</li>
                 <li>• Government initiatives on food security</li>
@@ -156,33 +156,33 @@ const FoodWaste = () => {
         </div>
 
         {/* Solutions */}
-        <div className="bg-white rounded-lg p-8 shadow-sm mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">How You Can Help</h2>
+        <div className="bg-card rounded-lg p-8 shadow-sm mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-6">How You Can Help</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {solutions.map((solution, index) => (
               <div key={index} className="flex items-start space-x-3">
                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                   <span className="text-white text-sm font-bold">{index + 1}</span>
                 </div>
-                <p className="text-gray-700">{solution}</p>
+                <p className="text-foreground">{solution}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Call to Action */}
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg p-8 text-center text-white">
+                 <div className="bg-brand-green rounded-lg p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-4">Join the Movement</h2>
           <p className="text-lg mb-6">
             Every rescued meal makes a difference. Start saving food and money today.
           </p>
-          <Button 
-            size="lg" 
-            className="bg-white text-orange-500 hover:bg-gray-100"
-            onClick={() => navigate('/')}
-          >
-            Start Rescuing Food
-          </Button>
+                     <Button 
+             size="lg" 
+             className="bg-brand-yellow text-brand-green hover:bg-brand-yellow/90"
+             onClick={() => navigate('/')}
+           >
+             Start Rescuing Food
+           </Button>
         </div>
       </div>
     </div>

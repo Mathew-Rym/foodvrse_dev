@@ -12,17 +12,17 @@ const Cart = () => {
   if (totalItems === 0) {
     return (
       <MobileLayout>
-        <div className="min-h-screen bg-gray-50 pb-20">
-          <div className="bg-white border-b border-gray-200 px-4 py-6">
-            <h1 className="text-2xl font-bold text-gray-900">Your Cart</h1>
+        <div className="min-h-screen bg-background pb-20">
+          <div className="bg-card border-b border-border px-4 py-6">
+            <h1 className="text-2xl font-bold text-foreground">Your Cart</h1>
           </div>
           
           <div className="flex flex-col items-center justify-center py-12 px-4">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <ShoppingBag className="w-12 h-12 text-gray-400" />
+            <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
+              <ShoppingBag className="w-12 h-12 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Your cart is empty</h3>
-            <p className="text-gray-600 text-center">Add some rescued food to get started</p>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Your cart is empty</h3>
+            <p className="text-muted-foreground text-center">Add some rescued food to get started</p>
           </div>
         </div>
       </MobileLayout>
@@ -31,23 +31,23 @@ const Cart = () => {
 
   return (
     <MobileLayout>
-      <div className="min-h-screen bg-gray-50 pb-20">
-        <div className="bg-white border-b border-gray-200 px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">Your Cart</h1>
-          <p className="text-gray-600 mt-1">{totalItems} item{totalItems !== 1 ? 's' : ''}</p>
+      <div className="min-h-screen bg-background pb-20">
+        <div className="bg-card border-b border-border px-4 py-6">
+          <h1 className="text-2xl font-bold text-foreground">Your Cart</h1>
+          <p className="text-muted-foreground mt-1">{totalItems} item{totalItems !== 1 ? 's' : ''}</p>
         </div>
 
         <div className="p-4 space-y-4">
           {items.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div key={item.id} className="bg-card rounded-lg shadow-sm border border-border p-4">
               <div className="flex items-start gap-3">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{item.title}</h3>
-                  <p className="text-sm text-gray-600 mb-2">{item.vendor}</p>
+                  <h3 className="font-semibold text-foreground">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-2">{item.vendor}</p>
                   <p className="text-lg font-bold text-green-600">KSh {item.price}</p>
-                  {item.originalPrice > item.price && (
-                    <p className="text-sm text-gray-500 line-through">KSh {item.originalPrice}</p>
-                  )}
+                                      {item.originalPrice > item.price && (
+                      <p className="text-sm text-muted-foreground line-through">KSh {item.originalPrice}</p>
+                    )}
                 </div>
                 
                 <div className="flex items-center gap-2">
@@ -80,8 +80,8 @@ const Cart = () => {
           ))}
 
           {selectedAddOns.length > 0 && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <h4 className="font-semibold text-gray-900 mb-3">Add-ons</h4>
+            <div className="bg-card rounded-lg shadow-sm border border-border p-4">
+              <h4 className="font-semibold text-foreground mb-3">Add-ons</h4>
               {selectedAddOns.map((addon) => (
                 <div key={addon.id} className="flex justify-between items-center text-sm py-1">
                   <span>{addon.name}</span>
@@ -91,7 +91,7 @@ const Cart = () => {
             </div>
           )}
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-card rounded-lg shadow-sm border border-border p-4">
             <div className="flex justify-between items-center text-xl font-bold">
               <span>Total:</span>
               <span className="text-green-600">KSh {totalPrice}</span>
@@ -99,7 +99,7 @@ const Cart = () => {
           </div>
 
           <Button 
-            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white h-12 text-lg"
+            className="w-full bg-brand-yellow text-brand-green h-12 text-lg font-semibold hover:bg-brand-yellow/90"
             onClick={() => setShowCheckout(true)}
           >
             Proceed to Checkout
