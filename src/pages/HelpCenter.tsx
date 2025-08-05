@@ -96,14 +96,7 @@ const HelpCenter = () => {
     }
   ];
 
-  const contactOptions = [
-    {
-      icon: Mail,
-      title: "Email Support",
-      description: "hello@foodvrse.com",
-      action: "Send Email"
-    }
-  ];
+
 
   const filteredFAQs = faqCategories.map(category => ({
     ...category,
@@ -141,21 +134,7 @@ const HelpCenter = () => {
           />
         </div>
 
-        {/* Contact Options */}
-        <div className="grid md:grid-cols-3 gap-4 mb-12">
-          {contactOptions.map((option, index) => (
-            <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 text-center">
-                          <div className="w-12 h-12 bg-brand-light-green rounded-full flex items-center justify-center mx-auto mb-4">
-              <option.icon className="w-6 h-6 text-brand-green" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">{option.title}</h3>
-              <p className="text-sm text-gray-600 mb-4">{option.description}</p>
-              <Button variant="outline" size="sm">
-                {option.action}
-              </Button>
-            </div>
-          ))}
-        </div>
+
 
         {/* FAQs */}
         <div className="space-y-8">
@@ -186,16 +165,7 @@ const HelpCenter = () => {
           ))}
         </div>
 
-        {/* Still Need Help */}
-        <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-6 mt-12 text-center">
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Still need help?</h3>
-          <p className="text-gray-600 mb-4">
-            Can't find what you're looking for? Our support team is here to help.
-          </p>
-          <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
-            Contact Support
-          </Button>
-        </div>
+
       </div>
       <BackToTop />
     </MobileLayout>

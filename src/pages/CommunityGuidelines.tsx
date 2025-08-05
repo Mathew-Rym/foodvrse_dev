@@ -11,8 +11,7 @@ const CommunityGuidelines = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const hideNavbar = location.state?.hideNavbar;
-  const [isReporting, setIsReporting] = useState(false);
-  const [isAsking, setIsAsking] = useState(false);
+
 
   const handleBack = () => {
     navigate(-1);
@@ -82,7 +81,7 @@ const CommunityGuidelines = () => {
       examples: [
         "Report fake listings or scams",
         "Flag inappropriate reviews or comments",
-        "Contact support for serious violations"
+        "Report serious violations through appropriate channels"
       ]
     }
   ];
@@ -112,7 +111,7 @@ const CommunityGuidelines = () => {
     {
       step: 3,
       title: "Submit Report",
-      description: "Use our reporting tools or contact support with detailed information about the violation."
+      description: "Use our reporting tools with detailed information about the violation."
     },
     {
       step: 4,
@@ -258,95 +257,7 @@ const CommunityGuidelines = () => {
           </div>
         </section>
 
-        {/* Contact Support */}
-        <section className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8 text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <MessageCircle className="w-8 h-8 text-green-600" />
-            <h2 className="text-2xl font-bold text-gray-900">Need to Report Something?</h2>
-          </div>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            If you've encountered behavior that violates our community guidelines, please report it immediately. 
-            Our team reviews all reports and takes appropriate action to maintain a safe community.
-          </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Button 
-              onClick={async () => {
-                setIsReporting(true);
-                try {
-                  const subject = encodeURIComponent("Community Guidelines Violation Report");
-                  const body = encodeURIComponent("Please provide details about the violation you're reporting:\n\n1. What happened?\n2. When did it occur?\n3. Who was involved?\n4. Any additional context?\n\nThank you for helping keep our community safe.");
-                  const mailtoLink = `mailto:hello@foodvrse.com?subject=${subject}&body=${body}`;
-                  
-                  // Try to open email client
-                  const emailWindow = window.open(mailtoLink, '_blank');
-                  
-                  // If mailto doesn't work, provide fallback
-                  if (!emailWindow) {
-                    // Copy email details to clipboard
-                    await navigator.clipboard.writeText(`Subject: Community Guidelines Violation Report\n\nPlease provide details about the violation you're reporting:\n\n1. What happened?\n2. When did it occur?\n3. Who was involved?\n4. Any additional context?\n\nThank you for helping keep our community safe.\n\nPlease email this to: hello@foodvrse.com`);
-                    alert('Email details copied to clipboard! Please paste them into your email client and send to hello@foodvrse.com');
-                  }
-                } catch (error) {
-                  console.error('Error opening email client:', error);
-                  alert('Please email hello@foodvrse.com with subject: "Community Guidelines Violation Report"');
-                } finally {
-                  setIsReporting(false);
-                }
-              }}
-              disabled={isReporting}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              {isReporting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Opening Email...
-                </>
-              ) : (
-                <>
-                  <Mail className="w-4 h-4 mr-2" />
-                  Report Violation
-                </>
-              )}
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={async () => {
-                setIsAsking(true);
-                try {
-                  const subject = encodeURIComponent("Community Guidelines Question");
-                  const body = encodeURIComponent("I have a question about the community guidelines:\n\n[Please describe your question here]\n\nThank you for your help!");
-                  const mailtoLink = `mailto:hello@foodvrse.com?subject=${subject}&body=${body}`;
-                  
-                  // Try to open email client
-                  const emailWindow = window.open(mailtoLink, '_blank');
-                  
-                  // If mailto doesn't work, provide fallback
-                  if (!emailWindow) {
-                    // Copy email details to clipboard
-                    await navigator.clipboard.writeText(`Subject: Community Guidelines Question\n\nI have a question about the community guidelines:\n\n[Please describe your question here]\n\nThank you for your help!\n\nPlease email this to: hello@foodvrse.com`);
-                    alert('Email details copied to clipboard! Please paste them into your email client and send to hello@foodvrse.com');
-                  }
-                } catch (error) {
-                  console.error('Error opening email client:', error);
-                  alert('Please email hello@foodvrse.com with subject: "Community Guidelines Question"');
-                } finally {
-                  setIsAsking(false);
-                }
-              }}
-              disabled={isAsking}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
-            >
-              {isAsking ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
-                  Opening Email...
-                </>
-              ) : (
-                'Ask Questions'
-              )}
-            </Button>
-          </div>
-        </section>
+
 
         {/* Footer Note */}
         <div className="text-center mt-8 p-4 bg-gray-50 rounded-lg">

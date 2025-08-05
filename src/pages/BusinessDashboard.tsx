@@ -205,10 +205,7 @@ const BusinessDashboard = () => {
     }
   };
 
-  const handleContactSupport = () => {
-    window.open('https://wa.me/1234567890?text=Hello, I need help with my FoodVrse business account', '_blank');
-    toast.success('Opening WhatsApp to contact support...');
-  };
+
 
   const handleSignOut = async () => {
     await signOut();
@@ -771,14 +768,7 @@ const BusinessDashboard = () => {
           <p className="text-sm text-white/90 mb-3">
             Contact our partner support team for assistance with your listings or account.
           </p>
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            className="bg-white text-blue-600 hover:bg-gray-100"
-            onClick={handleContactSupport}
-          >
-            Contact Support
-          </Button>
+
         </div>
       </div>
 

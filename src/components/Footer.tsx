@@ -258,14 +258,7 @@ const Footer = () => {
                   Community Guidelines
                 </button>
               </li>
-              <li>
-                <button 
-                  onClick={() => window.location.href = "mailto:hello@foodvrse.com"}
-                  className="hover:text-white text-left"
-                >
-                  Contact Support
-                </button>
-              </li>
+
             </ul>
           </div>
 
@@ -297,22 +290,7 @@ const Footer = () => {
                   Cookie Policy
                 </button>
               </li>
-              <li>
-                <button 
-                  onClick={() => handleLinkClick("/report-abuse")}
-                  className="hover:text-white text-left"
-                >
-                  Report Abuse
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => handleLinkClick("/report-security")}
-                  className="hover:text-white text-left"
-                >
-                  Report Security Concerns
-                </button>
-              </li>
+
             </ul>
           </div>
         </div>

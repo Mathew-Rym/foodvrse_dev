@@ -30,9 +30,7 @@ import CommunityGuidelines from "./pages/CommunityGuidelines";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
-import ContactSupport from "./pages/ContactSupport";
-import ReportAbuse from "./pages/ReportAbuse";
-import ReportSecurity from "./pages/ReportSecurity";
+
 import OurStory from "./pages/OurStory";
 import OurImpact from "./pages/OurImpact";
 import MeetTheTeam from "./pages/MeetTheTeam";
@@ -86,9 +84,7 @@ const App = () => {
                 <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/cookie-policy" element={<CookiePolicy />} />
-                <Route path="/contact-support" element={<ContactSupport />} />
-                <Route path="/report-abuse" element={<ReportAbuse />} />
-                <Route path="/report-security" element={<ReportSecurity />} />
+                
                 <Route path="/our-story" element={<OurStory />} />
                 <Route path="/our-impact" element={<OurImpact />} />
                 <Route path="/meet-the-team" element={<MeetTheTeam />} />
