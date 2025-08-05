@@ -245,7 +245,11 @@ const Press = () => {
                         </div>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => window.open('https://drive.google.com/drive/folders/1EDL1kaizYOjgohVrzjDoorWYMFh5ykSc?usp=drive_link', '_blank')}
+                    >
                       <Download className="h-4 w-4" />
                     </Button>
                   </div>
@@ -278,14 +282,7 @@ const Press = () => {
                     variant="outline" 
                     size="sm" 
                     className="w-full"
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = member.image;
-                      link.download = member.filename;
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
+                    onClick={() => window.open('https://drive.google.com/drive/folders/1EDL1kaizYOjgohVrzjDoorWYMFh5ykSc?usp=drive_link', '_blank')}
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Download
