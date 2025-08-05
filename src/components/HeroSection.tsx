@@ -1,4 +1,4 @@
-import { Leaf, Clock, DollarSign, Play } from "lucide-react";
+import { Leaf, Clock, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,17 +6,12 @@ import { useRealTimeMetrics } from "@/hooks/useRealTimeMetrics";
 import VideoSection from "./VideoSection";
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from "@/components/ui/skeleton";
-import VideoModal from "./VideoModal";
-import { useState } from "react";
 
 const HeroSection = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const metrics = useRealTimeMetrics();
   const { t } = useTranslation();
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-
-
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) {
@@ -125,18 +120,6 @@ const HeroSection = () => {
               >
                 {t('hero.for_businesses')}
               </Button>
-              <Button 
-                size="sm" 
-                variant="outline"
-                className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-xs px-3 py-2 transition-all duration-200"
-                onClick={() => {
-                  console.log('Test YouTube button clicked');
-                  setIsVideoModalOpen(true);
-                }}
-              >
-                <Play className="w-4 h-4 mr-1" />
-                Test Video
-              </Button>
             </div>
           </div>
 
@@ -146,13 +129,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-      
-      {/* Video Modal */}
-      <VideoModal 
-        isOpen={isVideoModalOpen}
-        onClose={() => setIsVideoModalOpen(false)}
-        videoUrl="https://youtu.be/OYe3_kovTrY"
-      />
     </section>
   );
 };

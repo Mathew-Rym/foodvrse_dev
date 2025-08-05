@@ -9,39 +9,19 @@ interface VideoModalProps {
 }
 
 const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) => {
-  const [isFirstTime, setIsFirstTime] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [showPlayButton, setShowPlayButton] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [showPlayButton, setShowPlayButton] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       console.log('🎥 VideoModal opened with URL:', videoUrl);
-      
-      // Check if this is the first time user has seen the video
-      const hasSeenVideo = localStorage.getItem('foodvrse-video-seen');
-      console.log('📺 Has user seen video before?', !hasSeenVideo);
-      
-      if (!hasSeenVideo) {
-        console.log('🎉 First time user - auto-playing video');
-        setIsFirstTime(true);
-        setShowPlayButton(false);
-        setIsPlaying(true);
-        
-        // Mark as seen after 5 seconds
-        setTimeout(() => {
-          localStorage.setItem('foodvrse-video-seen', 'true');
-          console.log('✅ Marked video as seen in localStorage');
-        }, 5000);
-      } else {
-        console.log('🔄 Returning user - showing play button');
-        setShowPlayButton(true);
-        setIsPlaying(false);
-      }
+      console.log('▶️ Auto-playing video for all users');
+      setIsPlaying(true);
+      setShowPlayButton(false);
     } else {
       // Reset states when modal closes
-      setIsFirstTime(false);
       setIsPlaying(false);
-      setShowPlayButton(true);
+      setShowPlayButton(false);
     }
   }, [isOpen, videoUrl]);
 
@@ -72,17 +52,6 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
     setIsPlaying(true);
   };
 
-  // Function to reset video seen status (for testing)
-  const resetVideoSeenStatus = () => {
-    localStorage.removeItem('foodvrse-video-seen');
-    console.log('🔄 Reset video seen status');
-  };
-
-  // Add reset function to window for testing
-  if (typeof window !== 'undefined') {
-    (window as any).resetFoodVrseVideo = resetVideoSeenStatus;
-  }
-
   const embedUrl = getEmbedUrl(videoUrl, isPlaying);
   console.log('🎬 Final embed URL:', embedUrl);
 
@@ -99,7 +68,7 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
         {/* Header */}
         <div className="flex items-center justify-between p-2 sm:p-4 border-b bg-gray-50">
           <h3 className="text-sm sm:text-lg font-semibold text-gray-900 truncate pr-2">
-            {isFirstTime ? '🎉 Welcome to FoodVrse!' : '📹 FoodVrse Video'}
+            📹 FoodVrse Video
           </h3>
           <Button
             variant="ghost"
@@ -137,19 +106,10 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
           />
         </div>
         
-        {/* First-time user message */}
-        {isFirstTime && (
-          <div className="p-3 sm:p-4 bg-green-50 border-t border-green-200">
-            <p className="text-xs sm:text-sm text-green-800 text-center">
-              🎉 Welcome to FoodVrse! Watch this quick intro to see how we're saving food and money together.
-            </p>
-          </div>
-        )}
-        
         {/* Debug info (only in development) */}
         {process.env.NODE_ENV === 'development' && (
           <div className="p-2 bg-gray-100 text-xs text-gray-600 border-t">
-            <p>Debug: First time: {isFirstTime.toString()}, Playing: {isPlaying.toString()}, Show button: {showPlayButton.toString()}</p>
+            <p>Debug: Playing: {isPlaying.toString()}, Show button: {showPlayButton.toString()}</p>
           </div>
         )}
       </div>
