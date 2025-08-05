@@ -15,9 +15,11 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
 
   useEffect(() => {
     if (isOpen) {
+      console.log('VideoModal opened with URL:', videoUrl);
       // Check if this is the first time user has seen the video
       const hasSeenVideo = localStorage.getItem('foodvrse-video-seen');
       if (!hasSeenVideo) {
+        console.log('First time user - auto-playing video');
         setIsFirstTime(true);
         setShowPlayButton(false);
         setIsPlaying(true);
@@ -26,30 +28,42 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
           localStorage.setItem('foodvrse-video-seen', 'true');
         }, 5000);
       } else {
+        console.log('Returning user - showing play button');
         setShowPlayButton(true);
         setIsPlaying(false);
       }
     }
-  }, [isOpen]);
+  }, [isOpen, videoUrl]);
 
   if (!isOpen) return null;
 
   // Convert YouTube URLs to embeddable format
   const getEmbedUrl = (url: string, autoplay: boolean = false) => {
+    console.log('Converting URL:', url, 'autoplay:', autoplay);
+    
     if (url.includes('youtube.com/watch?v=')) {
       const videoId = url.split('v=')[1]?.split('&')[0];
-      return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&rel=0&modestbranding=1&controls=1&showinfo=0`;
+      const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&rel=0&modestbranding=1&controls=1&showinfo=0`;
+      console.log('Generated embed URL:', embedUrl);
+      return embedUrl;
     } else if (url.includes('youtu.be/')) {
       const videoId = url.split('youtu.be/')[1]?.split('?')[0];
-      return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&rel=0&modestbranding=1&controls=1&showinfo=0`;
+      const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&rel=0&modestbranding=1&controls=1&showinfo=0`;
+      console.log('Generated embed URL:', embedUrl);
+      return embedUrl;
     }
+    console.log('No YouTube URL pattern matched, returning original URL');
     return url;
   };
 
   const handlePlayClick = () => {
+    console.log('Play button clicked');
     setShowPlayButton(false);
     setIsPlaying(true);
   };
+
+  const embedUrl = getEmbedUrl(videoUrl, isPlaying);
+  console.log('Final embed URL:', embedUrl);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
@@ -92,11 +106,13 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
           ) : null}
           
           <iframe
-            src={getEmbedUrl(videoUrl, isPlaying)}
+            src={embedUrl}
             className="w-full h-full"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
+            onLoad={() => console.log('YouTube iframe loaded successfully')}
+            onError={(e) => console.error('YouTube iframe error:', e)}
           />
         </div>
         

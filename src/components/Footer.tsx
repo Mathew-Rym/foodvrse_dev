@@ -73,7 +73,11 @@ const Footer = () => {
                 <Linkedin className="w-5 h-5" />
               </a>
               <button 
-                onClick={() => setIsVideoModalOpen(true)}
+                onClick={() => {
+                  console.log('YouTube button clicked');
+                  console.log('Opening video modal with URL: https://youtu.be/OYe3_kovTrY');
+                  setIsVideoModalOpen(true);
+                }}
                 className="text-gray-400 hover:text-white transition-colors"
                 aria-label="Watch our FoodVrse video"
               >
