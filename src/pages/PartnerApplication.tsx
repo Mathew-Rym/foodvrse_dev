@@ -47,7 +47,7 @@ Job Title: ${formData.jobTitle}
 This enquiry was submitted through the FoodVrse website.
     `);
     
-    const mailtoLink = `mailto:hello@foodvrse.com?subject=${subject}&body=${body}`;
+    const mailtoLink = `mailto:support@foodvrse.com?subject=${subject}&body=${body}`;
     window.open(mailtoLink, '_blank');
     
     toast.success("Enquiry submitted! We'll get back to you soon.");
@@ -74,7 +74,7 @@ This enquiry was submitted through the FoodVrse website.
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-brand-green to-brand-yellow text-white p-6">
+      <div className="bg-blue-600 text-white p-6">
         <div className="flex items-center gap-3 mb-4">
           <Button 
             variant="ghost" 
@@ -104,7 +104,7 @@ This enquiry was submitted through the FoodVrse website.
               required
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-brand-green rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green bg-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
               placeholder="Email"
             />
           </div>
@@ -120,7 +120,7 @@ This enquiry was submitted through the FoodVrse website.
               required
               value={formData.company}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-brand-green rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green bg-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
               placeholder="Name"
             />
           </div>
@@ -136,7 +136,7 @@ This enquiry was submitted through the FoodVrse website.
               required
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-brand-green rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green bg-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
               placeholder="Name"
             />
           </div>
@@ -147,7 +147,7 @@ This enquiry was submitted through the FoodVrse website.
               Phone number
             </label>
             <div className="flex gap-2">
-              <select className="px-3 py-2 border border-brand-green rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green bg-white">
+              <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
                 <option value="+254">+254</option>
                 <option value="+1">+1</option>
                 <option value="+44">+44</option>
@@ -159,7 +159,7 @@ This enquiry was submitted through the FoodVrse website.
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                className="flex-1 px-3 py-2 border border-brand-green rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green bg-white"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                 placeholder="Your phone number"
               />
             </div>
@@ -175,7 +175,7 @@ This enquiry was submitted through the FoodVrse website.
               name="jobTitle"
               value={formData.jobTitle}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-brand-green rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green bg-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
               placeholder="Job title"
             />
           </div>
@@ -198,7 +198,7 @@ This enquiry was submitted through the FoodVrse website.
             By signing up you accept the{" "}
             <a 
               href="/privacy-policy" 
-              className="underline text-brand-green hover:text-brand-yellow"
+              className="underline text-blue-600 hover:text-blue-800"
               onClick={(e) => {
                 e.preventDefault();
                 navigate("/privacy-policy");
@@ -224,8 +224,8 @@ This enquiry was submitted through the FoodVrse website.
             <div className="text-right">
               <div className="text-xs font-semibold text-gray-500">FOODVRSE</div>
               <div className="flex space-x-2 text-xs">
-                <a href="/privacy-policy" className="text-brand-green hover:text-brand-yellow">Privacy</a>
-                <a href="/terms" className="text-brand-green hover:text-brand-yellow">Terms</a>
+                <a href="/privacy-policy" className="text-blue-600 hover:text-blue-800">Privacy</a>
+                <a href="/terms" className="text-blue-600 hover:text-blue-800">Terms</a>
               </div>
             </div>
           </div>
@@ -233,7 +233,7 @@ This enquiry was submitted through the FoodVrse website.
           {/* Submit Button */}
           <Button 
             type="submit" 
-            className="w-full bg-brand-green hover:bg-brand-green/90 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center space-x-2"
+            className="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center space-x-2"
             size="lg"
           >
             <span>SUBMIT</span>

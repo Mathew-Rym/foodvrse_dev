@@ -17,7 +17,7 @@ import Impact from "./pages/Impact";
 import Profile from "./pages/Profile";
 import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
-import PartnerApplication from "./pages/PartnerApplication";
+
 import BusinessDashboard from "./pages/BusinessDashboard";
 import Auth from "./pages/Auth";
 import FoodWaste from "./pages/FoodWaste";
@@ -72,7 +72,7 @@ const App = () => {
                 <Route path="/impact" element={<Impact />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/favorites" element={<Favorites />} />
-                <Route path="/partner-application" element={<PartnerApplication />} />
+
                 <Route path="/business-dashboard" element={<BusinessDashboard />} />
                 <Route path="/food-waste" element={<FoodWaste />} />
                 <Route path="/mystery-boxes" element={<MysteryBags />} />

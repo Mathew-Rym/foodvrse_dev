@@ -68,8 +68,22 @@ const CVPopup = ({ isOpen, onClose }: CVPopupProps) => {
       formData.append('message', message);
       formData.append('cv', cvFile);
 
-      // Simulate API call - replace with actual endpoint
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create mailto link with CV information
+      const subject = encodeURIComponent(`CV Submission - ${subject}`);
+      const body = encodeURIComponent(`
+CV Submission from FoodVrse Careers Page:
+
+Email: ${email}
+Subject: ${subject}
+Message: ${message}
+
+CV File: ${cvFile.name} (${(cvFile.size / 1024 / 1024).toFixed(1)}MB)
+
+This CV was submitted through the FoodVrse careers page.
+      `);
+      
+      const mailtoLink = `mailto:support@foodvrse.com?subject=${subject}&body=${body}`;
+      window.open(mailtoLink, '_blank');
       
       toast.success('CV sent successfully! We will get back to you soon.');
       
