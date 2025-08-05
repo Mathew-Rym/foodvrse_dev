@@ -15,23 +15,33 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
 
   useEffect(() => {
     if (isOpen) {
-      console.log('VideoModal opened with URL:', videoUrl);
+      console.log('🎥 VideoModal opened with URL:', videoUrl);
+      
       // Check if this is the first time user has seen the video
       const hasSeenVideo = localStorage.getItem('foodvrse-video-seen');
+      console.log('📺 Has user seen video before?', !hasSeenVideo);
+      
       if (!hasSeenVideo) {
-        console.log('First time user - auto-playing video');
+        console.log('🎉 First time user - auto-playing video');
         setIsFirstTime(true);
         setShowPlayButton(false);
         setIsPlaying(true);
+        
         // Mark as seen after 5 seconds
         setTimeout(() => {
           localStorage.setItem('foodvrse-video-seen', 'true');
+          console.log('✅ Marked video as seen in localStorage');
         }, 5000);
       } else {
-        console.log('Returning user - showing play button');
+        console.log('🔄 Returning user - showing play button');
         setShowPlayButton(true);
         setIsPlaying(false);
       }
+    } else {
+      // Reset states when modal closes
+      setIsFirstTime(false);
+      setIsPlaying(false);
+      setShowPlayButton(true);
     }
   }, [isOpen, videoUrl]);
 
@@ -39,31 +49,42 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
 
   // Convert YouTube URLs to embeddable format
   const getEmbedUrl = (url: string, autoplay: boolean = false) => {
-    console.log('Converting URL:', url, 'autoplay:', autoplay);
+    console.log('🔗 Converting URL:', url, 'autoplay:', autoplay);
     
     if (url.includes('youtube.com/watch?v=')) {
       const videoId = url.split('v=')[1]?.split('&')[0];
-      const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&rel=0&modestbranding=1&controls=1&showinfo=0`;
-      console.log('Generated embed URL:', embedUrl);
+      const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&rel=0&modestbranding=1&controls=1&showinfo=0&mute=0`;
+      console.log('📹 Generated embed URL (youtube.com):', embedUrl);
       return embedUrl;
     } else if (url.includes('youtu.be/')) {
       const videoId = url.split('youtu.be/')[1]?.split('?')[0];
-      const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&rel=0&modestbranding=1&controls=1&showinfo=0`;
-      console.log('Generated embed URL:', embedUrl);
+      const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&rel=0&modestbranding=1&controls=1&showinfo=0&mute=0`;
+      console.log('📹 Generated embed URL (youtu.be):', embedUrl);
       return embedUrl;
     }
-    console.log('No YouTube URL pattern matched, returning original URL');
+    console.log('⚠️ No YouTube URL pattern matched, returning original URL');
     return url;
   };
 
   const handlePlayClick = () => {
-    console.log('Play button clicked');
+    console.log('▶️ Play button clicked');
     setShowPlayButton(false);
     setIsPlaying(true);
   };
 
+  // Function to reset video seen status (for testing)
+  const resetVideoSeenStatus = () => {
+    localStorage.removeItem('foodvrse-video-seen');
+    console.log('🔄 Reset video seen status');
+  };
+
+  // Add reset function to window for testing
+  if (typeof window !== 'undefined') {
+    (window as any).resetFoodVrseVideo = resetVideoSeenStatus;
+  }
+
   const embedUrl = getEmbedUrl(videoUrl, isPlaying);
-  console.log('Final embed URL:', embedUrl);
+  console.log('🎬 Final embed URL:', embedUrl);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
@@ -78,7 +99,7 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
         {/* Header */}
         <div className="flex items-center justify-between p-2 sm:p-4 border-b bg-gray-50">
           <h3 className="text-sm sm:text-lg font-semibold text-gray-900 truncate pr-2">
-            {isFirstTime ? 'Welcome to FoodVrse!' : 'FoodVrse Video'}
+            {isFirstTime ? '🎉 Welcome to FoodVrse!' : '📹 FoodVrse Video'}
           </h3>
           <Button
             variant="ghost"
@@ -109,10 +130,10 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
             src={embedUrl}
             className="w-full h-full"
             frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
-            onLoad={() => console.log('YouTube iframe loaded successfully')}
-            onError={(e) => console.error('YouTube iframe error:', e)}
+            onLoad={() => console.log('✅ YouTube iframe loaded successfully')}
+            onError={(e) => console.error('❌ YouTube iframe error:', e)}
           />
         </div>
         
@@ -122,6 +143,13 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
             <p className="text-xs sm:text-sm text-green-800 text-center">
               🎉 Welcome to FoodVrse! Watch this quick intro to see how we're saving food and money together.
             </p>
+          </div>
+        )}
+        
+        {/* Debug info (only in development) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="p-2 bg-gray-100 text-xs text-gray-600 border-t">
+            <p>Debug: First time: {isFirstTime.toString()}, Playing: {isPlaying.toString()}, Show button: {showPlayButton.toString()}</p>
           </div>
         )}
       </div>
