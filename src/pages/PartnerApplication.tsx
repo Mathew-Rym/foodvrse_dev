@@ -1,124 +1,80 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Building2, Mail, Phone, MapPin, Clock, Users, ChevronDown } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 import { toast } from "sonner";
 
 const PartnerApplication = () => {
   const navigate = useNavigate();
-  const { toast: toastHook } = useToast();
-  const [showHoursDialog, setShowHoursDialog] = useState(false);
-  const [showSurplusDialog, setShowSurplusDialog] = useState(false);
   
   const [formData, setFormData] = useState({
-    businessName: "",
-    ownerName: "",
     email: "",
+    company: "",
+    name: "",
     phone: "",
-    address: "",
-    businessType: "",
-    description: "",
-    operatingHours: "",
-    expectedWaste: ""
+    jobTitle: ""
   });
 
-  // Operating hours state
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
-  const [openTime, setOpenTime] = useState("");
-  const [closeTime, setCloseTime] = useState("");
-
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  const timeSlots = [
-    "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30",
-    "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
-    "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30",
-    "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"
-  ];
-
-  const surplusRanges = [
-    "5-10 kg",
-    "10-20 kg", 
-    "20-50 kg",
-    "50-100 kg",
-    "100+ kg"
-  ];
+  const [consent, setConsent] = useState(false);
+  const [humanVerification, setHumanVerification] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!consent) {
+      toast.error("Please agree to receive newsletters and information");
+      return;
+    }
+
+    if (!humanVerification) {
+      toast.error("Please verify you are human");
+      return;
+    }
+    
     // Create mailto link with form data
-    const subject = encodeURIComponent("New Partner Application - " + formData.businessName);
+    const subject = encodeURIComponent("Business Enquiry - " + formData.company);
     const body = encodeURIComponent(`
-New Partner Application:
+Business Enquiry Form Submission:
 
-Business Name: ${formData.businessName}
-Owner Name: ${formData.ownerName}
 Email: ${formData.email}
+Company: ${formData.company}
+Name: ${formData.name}
 Phone: ${formData.phone}
-Business Type: ${formData.businessType}
-Address: ${formData.address}
-Operating Hours: ${formData.operatingHours}
-Expected Daily Surplus: ${formData.expectedWaste}
-Business Description: ${formData.description}
+Job Title: ${formData.jobTitle}
 
-Please review this application.
+This enquiry was submitted through the FoodVrse website.
     `);
     
-    const mailtoLink = `mailto:partner@foodvrse.com?subject=${subject}&body=${body}`;
+    const mailtoLink = `mailto:hello@foodvrse.com?subject=${subject}&body=${body}`;
     window.open(mailtoLink, '_blank');
     
-    toastHook({
-      title: "Application Submitted!",
-      description: "We'll review your application and get back to you within 2-3 business days.",
-    });
+    toast.success("Enquiry submitted! We'll get back to you soon.");
     
-    // Redirect back to home after submission
-    setTimeout(() => {
-      navigate("/");
-    }, 2000);
+    // Reset form
+    setFormData({
+      email: "",
+      company: "",
+      name: "",
+      phone: "",
+      jobTitle: ""
+    });
+    setConsent(false);
+    setHumanVerification(false);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
 
-  const handleDayToggle = (day: string) => {
-    setSelectedDays(prev => 
-      prev.includes(day) 
-        ? prev.filter(d => d !== day)
-        : [...prev, day]
-    );
-  };
-
-  const handleHoursSave = () => {
-    if (selectedDays.length === 0 || !openTime || !closeTime) {
-      toast.error("Please select days and operating hours");
-      return;
-    }
-    
-    const hoursText = `${selectedDays.join(", ")} from ${openTime} to ${closeTime}`;
-    setFormData(prev => ({ ...prev, operatingHours: hoursText }));
-    setShowHoursDialog(false);
-  };
-
-  const handleSurplusSelect = (range: string) => {
-    setFormData(prev => ({ ...prev, expectedWaste: range }));
-    setShowSurplusDialog(false);
-  };
-
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-4">
+      <div className="bg-gradient-to-r from-brand-green to-brand-yellow text-white p-6">
         <div className="flex items-center gap-3 mb-4">
           <Button 
             variant="ghost" 
@@ -128,330 +84,162 @@ Please review this application.
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
-          <h1 className="text-xl font-bold">Become a Partner</h1>
         </div>
-        <p className="text-white/90 text-sm">
-          Join FoodVrse and help reduce food waste while growing your business
-        </p>
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-white mb-2">BUSINESS ENQUIRY FORM</h1>
+        </div>
       </div>
 
-      {/* Benefits Section */}
-      <div className="p-4">
-                  <div className="bg-card rounded-lg p-4 mb-6 shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">Why Partner with Us?</h2>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <span className="text-green-600 text-sm">💰</span>
-              </div>
-              <span className="text-sm text-gray-700">Make money on surplus food while reducing waste costs by up to 70%</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <Users className="w-4 h-4 text-blue-600" />
-              </div>
-              <span className="text-sm text-gray-700">Reach new customers in your area</span>
-            </div>
-            <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-brand-light-green rounded-full flex items-center justify-center">
-              <span className="text-brand-green text-sm">🌱</span>
-              </div>
-              <span className="text-sm text-gray-700">Make a positive environmental impact</span>
-            </div>
+      {/* Form Container */}
+      <div className="max-w-md mx-auto p-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email *
+            </label>
+            <input
+              type="email"
+              name="email"
+              required
+              value={formData.email}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-brand-green rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green bg-white"
+              placeholder="Email"
+            />
           </div>
-        </div>
 
-        {/* Application Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="bg-card rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold mb-4 flex items-center gap-2 text-foreground">
-              <Building2 className="w-4 h-4" />
-              Business Information
-            </h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Business Name *
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="businessName"
-                    required
-                    value={formData.businessName}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    placeholder="Your restaurant or business name"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                  onClick={() => toast.success('Google Maps search coming soon!')}
-                  >
-                    🗺️
-                  </Button>
-                </div>
-              </div>
+          {/* Company */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Company *
+            </label>
+            <input
+              type="text"
+              name="company"
+              required
+              value={formData.company}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-brand-green rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green bg-white"
+              placeholder="Name"
+            />
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Owner Name *
-                </label>
-                <input
-                  type="text"
-                  name="ownerName"
-                  required
-                  value={formData.ownerName}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="Your full name"
-                />
-              </div>
+          {/* Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Name *
+            </label>
+            <input
+              type="text"
+              name="name"
+              required
+              value={formData.name}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-brand-green rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green bg-white"
+              placeholder="Name"
+            />
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Business Type *
-                </label>
-                <select
-                  name="businessType"
-                  required
-                  value={formData.businessType}
-                  onChange={(e) => {
-                    handleInputChange(e);
-                    if (e.target.value === 'other') {
-                      toast.info('Please describe your business type in the "Tell us about your business" section below. Examples: Food truck, Catering service, Hotel restaurant, etc.');
-                    }
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Select business type</option>
-                  <option value="restaurant">Restaurant</option>
-                  <option value="bakery">Bakery</option>
-                  <option value="cafe">Cafe</option>
-                  <option value="grocery">Grocery Store</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
+          {/* Phone Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Phone number
+            </label>
+            <div className="flex gap-2">
+              <select className="px-3 py-2 border border-brand-green rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green bg-white">
+                <option value="+254">+254</option>
+                <option value="+1">+1</option>
+                <option value="+44">+44</option>
+                <option value="+91">+91</option>
+                <option value="+86">+86</option>
+              </select>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="flex-1 px-3 py-2 border border-brand-green rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green bg-white"
+                placeholder="Your phone number"
+              />
             </div>
           </div>
 
-                      <div className="bg-card rounded-lg p-4 shadow-sm">
-              <h3 className="font-semibold mb-4 flex items-center gap-2 text-foreground">
-                <Mail className="w-4 h-4" />
-                Contact Information
-              </h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="business@example.com"
-                />
-              </div>
+          {/* Job Title */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Job title
+            </label>
+            <input
+              type="text"
+              name="jobTitle"
+              value={formData.jobTitle}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-brand-green rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green bg-white"
+              placeholder="Job title"
+            />
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  required
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="+254 700 000 000"
-                />
-              </div>
+          {/* Consent Checkbox */}
+          <div className="flex items-start space-x-3">
+            <Checkbox
+              id="consent"
+              checked={consent}
+              onCheckedChange={(checked) => setConsent(checked as boolean)}
+              className="mt-1"
+            />
+            <label htmlFor="consent" className="text-sm text-gray-700 leading-relaxed">
+              I agree to receive newsletters and information from FoodVrse by email and by SMS. I can unsubscribe at any time.
+            </label>
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Business Address *
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="address"
-                    required
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    placeholder="Street, City, Kenya"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                    onClick={() => toast.success('Map location selector coming soon!')}
-                  >
-                    📍
-                  </Button>
-                </div>
+          {/* Privacy Policy */}
+          <p className="text-sm text-gray-600">
+            By signing up you accept the{" "}
+            <a 
+              href="/privacy-policy" 
+              className="underline text-brand-green hover:text-brand-yellow"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/privacy-policy");
+              }}
+            >
+              FoodVrse privacy policy
+            </a>
+            .
+          </p>
+
+          {/* Human Verification */}
+          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-white">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="human"
+                checked={humanVerification}
+                onCheckedChange={(checked) => setHumanVerification(checked as boolean)}
+              />
+              <label htmlFor="human" className="text-sm font-medium text-gray-700">
+                Verify you are human
+              </label>
+            </div>
+            <div className="text-right">
+              <div className="text-xs font-semibold text-gray-500">FOODVRSE</div>
+              <div className="flex space-x-2 text-xs">
+                <a href="/privacy-policy" className="text-brand-green hover:text-brand-yellow">Privacy</a>
+                <a href="/terms" className="text-brand-green hover:text-brand-yellow">Terms</a>
               </div>
             </div>
           </div>
 
-                      <div className="bg-card rounded-lg p-4 shadow-sm">
-              <h3 className="font-semibold mb-4 flex items-center gap-2 text-foreground">
-                <Clock className="w-4 h-4" />
-                Additional Details
-              </h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Operating Hours *
-                </label>
-                <Dialog open={showHoursDialog} onOpenChange={setShowHoursDialog}>
-                  <DialogTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full justify-between text-left"
-                    >
-                      <span className={formData.operatingHours ? "text-gray-900" : "text-gray-500"}>
-                        {formData.operatingHours || "Select operating days and hours"}
-                      </span>
-                      <ChevronDown className="w-4 h-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Select Operating Hours</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Operating Days</label>
-                        <div className="grid grid-cols-2 gap-2">
-                          {days.map((day) => (
-                            <div key={day} className="flex items-center space-x-2">
-                              <Checkbox
-                                id={day}
-                                checked={selectedDays.includes(day)}
-                                onCheckedChange={() => handleDayToggle(day)}
-                              />
-                              <label htmlFor={day} className="text-sm">{day}</label>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-sm font-medium mb-1 block">Opening Time</label>
-                          <Select value={openTime} onValueChange={setOpenTime}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select time" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white z-50">
-                              {timeSlots.map(time => (
-                                <SelectItem key={time} value={time}>{time}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div>
-                          <label className="text-sm font-medium mb-1 block">Closing Time</label>
-                          <Select value={closeTime} onValueChange={setCloseTime}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select time" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white z-50">
-                              {timeSlots.map(time => (
-                                <SelectItem key={time} value={time}>{time}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      
-                      <Button onClick={handleHoursSave} className="w-full">
-                        Save Operating Hours
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Expected Daily Food Surplus *
-                </label>
-                <Dialog open={showSurplusDialog} onOpenChange={setShowSurplusDialog}>
-                  <DialogTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full justify-between text-left"
-                    >
-                      <span className={formData.expectedWaste ? "text-gray-900" : "text-gray-500"}>
-                        {formData.expectedWaste || "Select expected daily surplus range"}
-                      </span>
-                      <ChevronDown className="w-4 h-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Select Daily Food Surplus Range</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-2">
-                      {surplusRanges.map((range) => (
-                        <Button
-                          key={range}
-                          variant="outline"
-                          className="w-full justify-start"
-                          onClick={() => handleSurplusSelect(range)}
-                        >
-                          {range}
-                        </Button>
-                      ))}
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tell us about your business *
-                </label>
-                <textarea
-                  name="description"
-                  required
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="Brief description of your business and why you want to partner with us"
-                />
-              </div>
-            </div>
-          </div>
-
+          {/* Submit Button */}
           <Button 
             type="submit" 
-            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3"
+            className="w-full bg-brand-green hover:bg-brand-green/90 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center space-x-2"
             size="lg"
           >
-            Submit Application
+            <span>SUBMIT</span>
+            <ArrowRight className="w-4 h-4" />
           </Button>
         </form>
-
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p>Questions? Contact us at partner@foodvrse.com</p>
-        </div>
       </div>
     </div>
   );

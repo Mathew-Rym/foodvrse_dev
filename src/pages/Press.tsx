@@ -91,16 +91,10 @@ const Press = () => {
 
   const mediaContacts = [
     {
-      name: "Rym Njuguna",
-      role: "CEO & Co-Founder",
-      email: "rym@foodvrse.com",
-      focus: "Company vision, sustainability impact"
-    },
-    {
-      name: "Rachel Wangu",
-      role: "CTO & Co-Founder",
-      email: "media@foodvrse.com",
-      focus: "Press inquiries, media relations"
+      name: "Hebrew Simeon",
+      role: "Co- Founder and Head of Strategic Partnerships",
+      email: "hebrew@foodvrse.com",
+      focus: "Manages PR, partnerships, and media relations."
     }
   ];
 

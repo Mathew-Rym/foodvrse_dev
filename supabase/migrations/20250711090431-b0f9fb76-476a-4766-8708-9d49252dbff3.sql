@@ -10,14 +10,14 @@ CREATE TABLE public.platform_impact_metrics (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
--- Insert initial record
+-- Insert initial record with updated real-world calculations
 INSERT INTO public.platform_impact_metrics (
   total_co2_saved_tonnes,
   total_water_conserved_liters,
   total_energy_saved_kwh,
   total_meals_rescued,
   total_money_saved_ksh
-) VALUES (12.7, 45200, 8450, 1247, 580000);
+) VALUES (3.12, 249400, 3117.5, 1247, 580000);
 
 -- Create orders table for tracking order completion
 CREATE TABLE public.orders (
@@ -201,10 +201,11 @@ BEGIN
     FROM public.mystery_bags 
     WHERE id = NEW.mystery_bag_id;
     
-    -- Calculate metrics
+    -- Calculate metrics with real-world calculations
     meals_count := NEW.quantity;
     money_saved := NEW.original_total - NEW.total_amount;
-    co2_saved := meals_count * 0.0008; -- 0.8 kg per meal = 0.0008 tonnes
+    -- Real-world CO2 calculation: 2.5 kg CO2 per meal saved (based on food production, transport, and waste)
+    co2_saved := meals_count * 0.0025; -- 2.5 kg per meal = 0.0025 tonnes
     water_saved := meals_count * 200; -- 200 liters per meal
     energy_saved := meals_count * 2.5; -- 2.5 kWh per meal
     
@@ -252,10 +253,10 @@ BEGIN
     FROM public.mystery_bags 
     WHERE id = NEW.mystery_bag_id;
     
-    -- Calculate metrics to subtract
+    -- Calculate metrics to subtract (using same real-world calculations)
     meals_count := NEW.quantity;
     money_saved := NEW.original_total - NEW.total_amount;
-    co2_saved := meals_count * 0.0008;
+    co2_saved := meals_count * 0.0025; -- 2.5 kg per meal = 0.0025 tonnes
     water_saved := meals_count * 200;
     energy_saved := meals_count * 2.5;
     

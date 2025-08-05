@@ -224,6 +224,7 @@ export const useRealTimeMetrics = () => {
       if (previousMetrics.current && !metrics.isLoading) {
         const mealsDiff = newMetrics.totalMealsRescued - previousMetrics.current.totalMealsRescued;
         const moneyDiff = newMetrics.totalMoneySavedKsh - previousMetrics.current.totalMoneySavedKsh;
+        const co2Diff = newMetrics.totalCo2SavedTonnes - previousMetrics.current.totalCo2SavedTonnes;
         
         if (mealsDiff > 0) {
           toast.success(`🎉 ${mealsDiff} more meals rescued! Total: ${newMetrics.totalMealsRescued.toLocaleString()}`, {
@@ -234,6 +235,13 @@ export const useRealTimeMetrics = () => {
         
         if (moneyDiff > 0) {
           toast.success(`💰 KSh ${moneyDiff.toLocaleString()} more saved! Total: KSh ${(newMetrics.totalMoneySavedKsh / 1000).toFixed(0)}K`, {
+            duration: 3000,
+            position: 'top-right'
+          });
+        }
+        
+        if (co2Diff > 0) {
+          toast.success(`🌱 ${co2Diff.toFixed(3)}T more CO₂ saved! Total: ${newMetrics.totalCo2SavedTonnes.toFixed(2)}T`, {
             duration: 3000,
             position: 'top-right'
           });
@@ -319,12 +327,26 @@ export const useRealTimeMetrics = () => {
       })
       .subscribe();
 
+    // Set up real-time subscription for mystery bags
+    const mysteryBagsSubscription = supabase
+      .channel('mystery_bags_changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'mystery_bags'
+      }, () => {
+        console.log('Mystery bag updated - fetching updated metrics');
+        fetchMetrics();
+      })
+      .subscribe();
+
     return () => {
       subscription.unsubscribe();
       ordersSubscription.unsubscribe();
       usersSubscription.unsubscribe();
       businessSubscription.unsubscribe();
       challengesSubscription.unsubscribe();
+      mysteryBagsSubscription.unsubscribe();
     };
   }, []);
 

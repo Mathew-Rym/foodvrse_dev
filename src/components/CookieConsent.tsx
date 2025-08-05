@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Cookie } from "lucide-react";
@@ -8,11 +9,17 @@ import { useAuth } from "@/contexts/AuthContext";
 const CookieConsent = () => {
   const [showBanner, setShowBanner] = useState(false);
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const consent = localStorage.getItem('foodvrse-cookie-consent');
     if (!consent) {
-      setShowBanner(true);
+      // Show banner after 5 minutes (300,000 milliseconds)
+      const timer = setTimeout(() => {
+        setShowBanner(true);
+      }, 300000);
+      
+      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -37,9 +44,12 @@ const CookieConsent = () => {
             <div className="flex-1">
               <p className="text-sm text-gray-700 mb-3">
                 We use cookies to enhance your experience and analyze site usage. By clicking 'Accept', you consent to our use of cookies. 
-                <a href="/privacy-policy" className="text-brand-green hover:text-brand-green/80 underline ml-1">
+                <button 
+                  onClick={() => navigate('/privacy-policy')}
+                  className="text-brand-green hover:text-brand-green/80 underline ml-1 bg-transparent border-none cursor-pointer"
+                >
                   Learn more in our Privacy Policy
-                </a>
+                </button>
               </p>
               <div className="flex gap-2">
                 <Button 
