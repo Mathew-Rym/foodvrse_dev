@@ -19,4 +19,31 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    target: [
+      'es2015', // Support for older browsers
+      'chrome >= 60',
+      'firefox >= 60',
+      'safari >= 12',
+      'edge >= 79'
+    ],
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-toast'],
+          maps: ['@googlemaps/js-api-loader'],
+          supabase: ['@supabase/supabase-js']
+        }
+      }
+    }
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      '@supabase/supabase-js',
+      '@googlemaps/js-api-loader'
+    ]
+  }
 }));

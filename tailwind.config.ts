@@ -9,6 +9,14 @@ export default {
 		"./src/**/*.{ts,tsx}",
 	],
 	prefix: "",
+	// Browser compatibility settings
+	corePlugins: {
+		preflight: true,
+	},
+	// Ensure compatibility with older browsers
+	future: {
+		hoverOnlyWhenSupported: true,
+	},
 	theme: {
 		container: {
 			center: true,

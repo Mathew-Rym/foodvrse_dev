@@ -4,7 +4,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com https://cdn.onesignal.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://maps.googleapis.com https://api.supabase.co https://onesignal.com https://cdn.onesignal.com; frame-src 'self' https://storage.googleapis.com https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com https://cdn.onesignal.com https://polyfill.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://maps.googleapis.com https://api.supabase.co https://onesignal.com https://cdn.onesignal.com https://polyfill.io; frame-src 'self' https://storage.googleapis.com https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com;">
+    
+    <!-- Cross-browser compatibility -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="format-detection" content="telephone=no" />
+    
+    <!-- Browser-specific meta tags -->
+    <meta name="msapplication-config" content="none" />
+    <meta name="msapplication-TileColor" content="#3D6C56" />
+    <meta name="msapplication-TileImage" content="/logo.png" />
     <title>FoodVrse - Rescue Meals</title>
     <meta name="description" content="Good food deserves a second chance - Save food, save money, save the planet" />
     <meta name="author" content="FoodVrse" />
@@ -54,6 +63,41 @@
 
   <body>
     <div id="root"></div>
+    
+    <!-- Polyfills for older browsers -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2Ces2016%2Ces2017%2Ces2018%2Ces2019%2Ces2020%2Ces2021%2Ces2022%2CIntersectionObserver%2CPromise%2CPromise.prototype.finally%2CObject.assign%2CObject.entries%2CObject.fromEntries%2CObject.values%2CArray.prototype.includes%2CArray.prototype.find%2CArray.prototype.findIndex%2CString.prototype.includes%2CString.prototype.startsWith%2CString.prototype.endsWith%2Cfetch%2CrequestAnimationFrame%2CCustomEvent%2CElement.prototype.matches%2CElement.prototype.closest%2CNodeList.prototype.forEach%2CURLSearchParams%2CResizeObserver%2CAbortController"></script>
+    
+    <!-- Browser compatibility check -->
+    <script>
+      // Check for essential browser features
+      const requiredFeatures = {
+        'ES6': typeof Promise !== 'undefined',
+        'Fetch': typeof fetch !== 'undefined',
+        'LocalStorage': typeof localStorage !== 'undefined',
+        'SessionStorage': typeof sessionStorage !== 'undefined',
+        'IntersectionObserver': typeof IntersectionObserver !== 'undefined'
+      };
+      
+      const missingFeatures = Object.entries(requiredFeatures)
+        .filter(([_, supported]) => !supported)
+        .map(([feature]) => feature);
+      
+      if (missingFeatures.length > 0) {
+        console.warn('Missing browser features:', missingFeatures);
+        // Show a warning to users with very old browsers
+        if (missingFeatures.includes('ES6') || missingFeatures.includes('Fetch')) {
+          document.body.innerHTML = `
+            <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+              <h2>Browser Not Supported</h2>
+              <p>Your browser is missing essential features required to run FoodVrse.</p>
+              <p>Please update to a modern browser like Chrome, Firefox, Safari, or Edge.</p>
+              <p>Minimum requirements: Chrome 60+, Firefox 60+, Safari 12+, Edge 79+</p>
+            </div>
+          `;
+        }
+      }
+    </script>
+    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

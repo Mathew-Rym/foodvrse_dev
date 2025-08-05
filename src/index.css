@@ -3,6 +3,50 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Cross-browser compatibility */
+@supports not (display: grid) {
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .grid > * {
+    flex: 1 1 300px;
+  }
+}
+
+/* Fallback for browsers that don't support CSS Grid */
+@supports not (gap: 1rem) {
+  .grid > * {
+    margin: 0.5rem;
+  }
+}
+
+/* Fallback for browsers that don't support CSS Custom Properties */
+@supports not (--custom: property) {
+  :root {
+    --background: #ffffff;
+    --foreground: #020817;
+    --card: #ffffff;
+    --card-foreground: #020817;
+    --popover: #ffffff;
+    --popover-foreground: #020817;
+    --primary: #3D6C56;
+    --primary-foreground: #ffffff;
+    --secondary: #E2F1E0;
+    --secondary-foreground: #3D6C56;
+    --muted: #E2F1E0;
+    --muted-foreground: #64748b;
+    --accent: #E2F1E0;
+    --accent-foreground: #3D6C56;
+    --destructive: #ef4444;
+    --destructive-foreground: #fafafa;
+    --border: #E2F1E0;
+    --input: #E2F1E0;
+    --ring: #3D6C56;
+    --radius: 0.5rem;
+  }
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
@@ -229,6 +273,78 @@ All colors MUST be HSL.
     50% { 
       opacity: 0.95; 
       box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+    }
+  }
+}
+
+/* Browser-specific fixes */
+@layer utilities {
+  /* Safari-specific fixes */
+  @supports (-webkit-appearance: none) {
+    .safari-fix {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+    
+    /* Fix for Safari flexbox issues */
+    .safari-flex-fix {
+      display: -webkit-flex;
+      display: flex;
+    }
+  }
+  
+  /* Firefox-specific fixes */
+  @supports (-moz-appearance: none) {
+    .firefox-fix {
+      /* Firefox-specific styles */
+    }
+  }
+  
+  /* IE11 fallbacks */
+  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .ie-fallback {
+      display: block;
+    }
+    
+    .ie-grid-fallback {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+  
+  /* Edge-specific fixes */
+  @supports (-ms-ime-align: auto) {
+    .edge-fix {
+      /* Edge-specific styles */
+    }
+  }
+  
+  /* Mobile browser fixes */
+  @media screen and (max-width: 768px) {
+    /* iOS Safari fixes */
+    .ios-safari-fix {
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Android Chrome fixes */
+    .android-chrome-fix {
+      /* Android-specific styles */
+    }
+  }
+  
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .high-contrast {
+      border: 2px solid currentColor;
+    }
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
     }
   }
 }
