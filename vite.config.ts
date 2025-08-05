@@ -20,13 +20,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    target: [
-      'es2015', // Support for older browsers
-      'chrome >= 60',
-      'firefox >= 60',
-      'safari >= 12',
-      'edge >= 79'
-    ],
+    target: 'es2015', // Support for older browsers
     rollupOptions: {
       output: {
         manualChunks: {
