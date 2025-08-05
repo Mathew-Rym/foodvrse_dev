@@ -1,88 +1,65 @@
-import { ArrowLeft, Linkedin, Twitter, Mail, MapPin } from "lucide-react";
+import { ArrowLeft, Linkedin, MapPin, Handshake, Lightbulb } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CVPopup from "@/components/CVPopup";
+import AdminTeamManager from "@/components/AdminTeamManager";
+import { useAuth } from "@/contexts/AuthContext";
 
 const MeetTheTeam = () => {
   const navigate = useNavigate();
   const [isCVPopupOpen, setIsCVPopupOpen] = useState(false);
+  const { isBusinessUser } = useAuth();
 
-  const teamMembers = [
+  const [teamMembers, setTeamMembers] = useState([
     {
+      id: "1",
       name: "Rym Njuguna",
-      role: "Founder CTO & CEO",
+      role: "Founder and CEO",
       bio: "Former Mechtronics Eng. consultant with 8 years of experience in business and sustainable food systems. Combines technical expertise with deep understanding of food industry operations & Passionate about creating technology solutions for environmental challenges.",
-      avatar: "/placeholder.svg",
+      avatar: "/team/rym-njuguna.jpg",
       initials: "RN",
       location: "Nairobi, Kenya",
-      linkedin: "#",
+      linkedin: "https://www.linkedin.com/in/mathewrym/",
       twitter: "#",
       email: "rym@foodvrse.com"
     },
-  ,
     {
+      id: "2",
       name: "Rachel Wangu",
-      role: "Head of Partnerships",
-      bio: "Environmental scientist and food systems expert. Expert in building relationships with restaurants and food businesses.",
-      avatar: "/placeholder.svg",
+      role: "Co- Founder and Chief Sustainability Officer (CSO)",
+      bio: "An environmental scientist from the University of Nairobi and a food systems expert, she excels at building strong relationships with restaurants and food businesses. With a sharp eye for data analytics and real-world experience in sustainability, she bridges science and strategy to drive FoodVrse’s mission forward. ",
+      avatar: "/team/rachel-wangu.jpg",
       initials: "RW",
       location: "Nairobi, Kenya",
-      linkedin: "#",
+      linkedin: "https://www.linkedin.com/in/rachel-wangu/",
       twitter: "#",
       email: "rachel@foodvrse.com"
     },
     {
-      name: "Peter Mwangi",
-      role: "Lead Developer",
-      bio: "Senior software engineer with expertise in React and mobile development. Previously worked at top fintech companies in Kenya.",
-      avatar: "/placeholder.svg",
-      initials: "PM",
-      location: "Nakuru, Kenya",
-      linkedin: "#",
-      twitter: "#",
-      email: "peter@foodvrse.com"
-    },
-    {
+      id: "3",
       name: "Hebrew Simeon",
-      role: "Operations Manager",
-      bio: "Operations specialist with background in logistics and supply chain. Ensures smooth operations between businesses and customers.",
-      avatar: "/placeholder.svg",
+      role: "Co- Founder and Head of Strategic Partnerships",
+      bio: "PhD candidate in Bioinformatics at Sorbonne Université, France, serves as Partnerships Lead at FoodVrse. He brings strong analytical skills, global perspective, and a passion for sustainability to drive strategic collaborations.",
+      avatar: "/team/hebrew-simeon.jpg",
       initials: "HS",
-      location: "Nairobi, Kenya",
-      linkedin: "#",
+      location: "Nairobi, Kenya & Paris, France",
+      linkedin: "https://www.linkedin.com/in/simeon-hebrew-b14662161/",
       twitter: "#",
       email: "hebrew@foodvrse.com"
-    },
-    {
-      name: "Michael Kiprotich",
-      role: "Marketing Lead",
-      bio: "Digital marketing expert with focus on sustainable brands. Helps spread awareness about food waste reduction and community impact.",
-      avatar: "/placeholder.svg",
-      initials: "MK",
-      location: "Eldoret, Kenya",
-      linkedin: "#",
-      twitter: "#",
-      email: "michael@foodvrse.com"
     }
-  ];
+  ]);
 
   const advisors = [
     {
-      name: "Dr. Rachel Nyong'o",
+      name: "Charity W. Kiarie",
       role: "Sustainability Advisor",
-      bio: "Environmental scientist and food systems expert. PhD in Sustainable Agriculture from University of Nairobi.",
-      avatar: "/placeholder.svg",
-      initials: "RN"
-    },
-    {
-      name: "David Kinyanjui",
-      role: "Business Advisor",
-      bio: "Serial entrepreneur and investor. Founded three successful startups in Kenya's tech ecosystem.",
-      avatar: "/placeholder.svg",
-      initials: "DK"
+      bio: "Passionate about driving sustainability solutions by Africa and for Africa. Leading the Pit to Palace Initiative. Holder of an Executive MBA in Intrapreneurship from emlyon business school, Paris.",
+      avatar: "/team/charity-kiarie.jpg",
+      initials: "CK",
+      linkedin: "https://www.linkedin.com/in/cwanjirukiarie/"
     }
   ];
 
@@ -104,12 +81,23 @@ const MeetTheTeam = () => {
           </p>
         </div>
 
+        {/* Admin Team Manager */}
+        {isBusinessUser && (
+          <section className="mb-12">
+            <AdminTeamManager 
+              teamMembers={teamMembers}
+              onUpdateTeam={setTeamMembers}
+              isAdmin={isBusinessUser}
+            />
+          </section>
+        )}
+
         {/* Core Team */}
         <section className="mb-12">
           <h2 className="text-3xl font-bold mb-8">Core Team</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {teamMembers.map((member, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
+            {teamMembers.map((member) => (
+              <Card key={member.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <div className="text-center mb-4">
                     <Avatar className="w-24 h-24 mx-auto mb-4">
@@ -130,20 +118,10 @@ const MeetTheTeam = () => {
                     {member.bio}
                   </p>
                   
-                  <div className="flex justify-center gap-3">
+                  <div className="flex justify-center">
                     <Button variant="ghost" size="sm" asChild>
                       <a href={member.linkedin} target="_blank" rel="noopener noreferrer">
                         <Linkedin className="h-4 w-4" />
-                      </a>
-                    </Button>
-                    <Button variant="ghost" size="sm" asChild>
-                      <a href={member.twitter} target="_blank" rel="noopener noreferrer">
-                        <Twitter className="h-4 w-4" />
-                      </a>
-                    </Button>
-                    <Button variant="ghost" size="sm" asChild>
-                      <a href={`mailto:${member.email}`}>
-                        <Mail className="h-4 w-4" />
                       </a>
                     </Button>
                   </div>
@@ -171,9 +149,19 @@ const MeetTheTeam = () => {
                     <p className="text-primary font-medium mb-3">{advisor.role}</p>
                   </div>
                   
-                  <p className="text-sm text-muted-foreground text-center leading-relaxed">
+                  <p className="text-sm text-muted-foreground text-center leading-relaxed mb-4">
                     {advisor.bio}
                   </p>
+                  
+                  {advisor.linkedin && (
+                    <div className="flex justify-center">
+                      <Button variant="ghost" size="sm" asChild>
+                        <a href={advisor.linkedin} target="_blank" rel="noopener noreferrer">
+                          <Linkedin className="h-4 w-4" />
+                        </a>
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -199,7 +187,7 @@ const MeetTheTeam = () => {
             <Card>
               <CardContent className="p-6 text-center">
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">🤝</span>
+                  <Handshake className="w-8 h-8 text-blue-600" />
                 </div>
                 <h3 className="font-semibold mb-2">Collaborative Spirit</h3>
                 <p className="text-sm text-muted-foreground">
@@ -211,7 +199,7 @@ const MeetTheTeam = () => {
             <Card>
               <CardContent className="p-6 text-center">
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">💡</span>
+                  <Lightbulb className="w-8 h-8 text-yellow-600" />
                 </div>
                 <h3 className="font-semibold mb-2">Innovation Driven</h3>
                 <p className="text-sm text-muted-foreground">

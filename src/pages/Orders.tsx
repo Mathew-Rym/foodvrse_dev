@@ -34,7 +34,7 @@ const Orders = () => {
 
   const handleCollectOrder = (orderId: string) => {
     updateOrderStatus(orderId, 'completed');
-    toast.success('Order collected! You\'re a saving champion! 🏆');
+            toast.success('Order collected! You\'re a saving champion!');
   };
 
   const handleOrderAgain = (order: any) => {

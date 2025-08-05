@@ -1,5 +1,6 @@
-import { ArrowLeft, AlertTriangle, Shield, FileText } from "lucide-react";
+import { ArrowLeft, AlertTriangle, Shield, FileText, Upload, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,9 +8,60 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 const ReportAbuse = () => {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    abuseType: '',
+    reportedUser: '',
+    incidentUrl: '',
+    description: ''
+  });
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      setUploadedFiles(prev => [...prev, ...fileArray]);
+      toast.success(`${fileArray.length} file(s) uploaded successfully`);
+    }
+  };
+
+  const handleSubmitReport = async () => {
+    if (!formData.abuseType || !formData.description) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // In a real app, you would send the data to your backend
+      console.log('Report submitted:', { ...formData, files: uploadedFiles });
+      
+      toast.success('Report submitted successfully! We will review it within 24 hours.');
+      navigate('/');
+    } catch (error) {
+      toast.error('Failed to submit report. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
@@ -49,17 +101,28 @@ const ReportAbuse = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="reporter-name">Your Name (Optional)</Label>
-                  <Input id="reporter-name" placeholder="Anonymous reporting is allowed" />
+                  <Input 
+                    id="reporter-name" 
+                    placeholder="Anonymous reporting is allowed"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                  />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="reporter-email">Your Email (Optional)</Label>
-                  <Input id="reporter-email" type="email" placeholder="For follow-up communications" />
+                  <Input 
+                    id="reporter-email" 
+                    type="email" 
+                    placeholder="For follow-up communications"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                  />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="abuse-type">Type of Abuse</Label>
-                  <Select>
+                  <Label htmlFor="abuse-type">Type of Abuse *</Label>
+                  <Select value={formData.abuseType} onValueChange={(value) => handleInputChange('abuseType', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select the type of abuse" />
                     </SelectTrigger>
@@ -79,20 +142,32 @@ const ReportAbuse = () => {
                 
                 <div className="space-y-2">
                   <Label htmlFor="reported-user">Reported User/Business (if applicable)</Label>
-                  <Input id="reported-user" placeholder="Username or business name" />
+                  <Input 
+                    id="reported-user" 
+                    placeholder="Username or business name"
+                    value={formData.reportedUser}
+                    onChange={(e) => handleInputChange('reportedUser', e.target.value)}
+                  />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="incident-url">URL or Location of Incident</Label>
-                  <Input id="incident-url" placeholder="Link to listing, profile, or message" />
+                  <Input 
+                    id="incident-url" 
+                    placeholder="Link to listing, profile, or message"
+                    value={formData.incidentUrl}
+                    onChange={(e) => handleInputChange('incidentUrl', e.target.value)}
+                  />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Detailed Description</Label>
+                  <Label htmlFor="description">Detailed Description *</Label>
                   <Textarea 
                     id="description" 
                     placeholder="Please provide as much detail as possible about the incident, including dates, times, and any relevant context..."
                     rows={6}
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
                   />
                 </div>
                 
@@ -103,11 +178,49 @@ const ReportAbuse = () => {
                     <p className="text-sm text-muted-foreground">
                       Screenshots, messages, or other evidence (files will be uploaded securely)
                     </p>
-                    <Button variant="outline" className="mt-2">Upload Files</Button>
+                    {uploadedFiles.length > 0 && (
+                      <div className="mt-2 text-sm text-muted-foreground">
+                        {uploadedFiles.length} file(s) uploaded
+                      </div>
+                    )}
+                    <div className="mt-2">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*,.pdf,.doc,.docx"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        id="file-upload"
+                      />
+                      <label htmlFor="file-upload">
+                        <Button variant="outline" className="cursor-pointer" asChild>
+                          <span>
+                            <Upload className="h-4 w-4 mr-2" />
+                            Upload Files
+                          </span>
+                        </Button>
+                      </label>
+                    </div>
                   </div>
                 </div>
                 
-                <Button className="w-full">Submit Report</Button>
+                <Button 
+                  className="w-full bg-gradient-to-r from-brand-green to-brand-yellow text-white"
+                  onClick={handleSubmitReport}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Submit Report
+                    </>
+                  )}
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -165,21 +278,17 @@ const ReportAbuse = () => {
                   <li>• No harassment, discrimination, or hate speech</li>
                   <li>• Report suspicious or inappropriate behavior</li>
                 </ul>
-                <Button variant="outline" className="w-full mt-4">Read Full Guidelines</Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4"
+                  onClick={() => navigate('/community-guidelines')}
+                >
+                  Read Full Guidelines
+                </Button>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Need immediate help?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">
-                  For urgent safety concerns or if you need immediate assistance
-                </p>
-                <Button variant="destructive" className="w-full">Emergency Contact</Button>
-              </CardContent>
-            </Card>
+
           </div>
         </div>
       </div>

@@ -192,19 +192,19 @@ const ReportSecurity = () => {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Critical vulnerabilities:</span>
-                    <Badge variant="destructive">$500 - $2000</Badge>
+                    <Badge variant="destructive">KSh 75,000 - KSh 300,000</Badge>
                   </div>
                   <div className="flex justify-between">
                     <span>High severity:</span>
-                    <Badge variant="secondary">$200 - $500</Badge>
+                    <Badge variant="secondary">KSh 30,000 - KSh 75,000</Badge>
                   </div>
                   <div className="flex justify-between">
                     <span>Medium severity:</span>
-                    <Badge variant="outline">$50 - $200</Badge>
+                    <Badge variant="outline">KSh 7,500 - KSh 30,000</Badge>
                   </div>
                   <div className="flex justify-between">
                     <span>Low severity:</span>
-                    <Badge variant="outline">$20 - $50</Badge>
+                    <Badge variant="outline">KSh 3,000 - KSh 7,500</Badge>
                   </div>
                 </div>
               </CardContent>

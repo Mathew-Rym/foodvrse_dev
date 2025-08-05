@@ -1,5 +1,6 @@
 
 import MobileNavigation from "./MobileNavigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface MobileLayoutProps {
   children: React.ReactNode;
@@ -7,10 +8,12 @@ interface MobileLayoutProps {
 }
 
 const MobileLayout = ({ children, hideNavbar = false }: MobileLayoutProps) => {
+  const { isAuthenticated } = useAuth();
+  
   return (
     <>
       {children}
-      {!hideNavbar && <MobileNavigation />}
+      {!hideNavbar && isAuthenticated && <MobileNavigation />}
     </>
   );
 };

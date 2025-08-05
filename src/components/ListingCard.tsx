@@ -222,7 +222,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
             <Button 
               size="sm" 
               onClick={handleFavoriteToggle}
-              className="bg-gradient-to-r from-orange-500 to-red-500 text-white"
+              className="bg-gradient-to-r from-brand-green to-brand-yellow text-white"
             >
               <Heart className="w-4 h-4 mr-1" />
               Add to Favorites

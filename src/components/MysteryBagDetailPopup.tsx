@@ -159,7 +159,9 @@ export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetail
               </div>
 
               <div className="flex items-center gap-2 text-gray-600">
-                <Clock className="w-4 h-4" />
+                <div className="flex items-center justify-center w-5 h-5 bg-gray-100 rounded-full">
+                  <Clock className="w-3 h-3 text-gray-600" />
+                </div>
                 <span className="text-sm">Collect: {bag.pickup} Today</span>
               </div>
 
@@ -198,7 +200,7 @@ export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetail
             {/* Ingredients & allergens */}
             <div className="flex items-center gap-2 text-gray-600 cursor-pointer hover:text-gray-800">
               <div className="w-5 h-5 bg-gray-200 rounded-full flex items-center justify-center">
-                <span className="text-xs">🥄</span>
+                <Utensils className="w-3 h-3" />
               </div>
               <span className="text-sm">Ingredients & allergens</span>
               <ChevronRight className="w-4 h-4" />
@@ -257,7 +259,7 @@ export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetail
         <DialogContent className="max-w-sm mx-auto p-6 text-center">
           <div className="mb-4">
             <div className="w-16 h-16 mx-auto mb-4 bg-yellow-100 rounded-full flex items-center justify-center">
-              <span className="text-2xl">⭐</span>
+                              <Star className="w-8 h-8 text-yellow-500" />
             </div>
             <h3 className="font-bold text-lg mb-2">Your Mystery Bag is a surprise</h3>
             <p className="text-gray-600 text-sm mb-4">

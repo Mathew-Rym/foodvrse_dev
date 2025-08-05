@@ -5,88 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import CVPopup from "@/components/CVPopup";
+import AdminJobManager from "@/components/AdminJobManager";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Careers = () => {
   const navigate = useNavigate();
   const [isCVPopupOpen, setIsCVPopupOpen] = useState(false);
+  const { isBusinessUser } = useAuth();
 
-  const openPositions = [
-    {
-      title: "Senior Frontend Developer",
-      department: "Engineering",
-      location: "Nairobi / Remote",
-      type: "Full-time",
-      description: "Lead our frontend development efforts using React, TypeScript, and modern web technologies. Help build the future of food waste reduction.",
-      requirements: [
-        "5+ years of React development experience",
-        "Strong TypeScript and modern JavaScript skills",
-        "Experience with responsive design and mobile development",
-        "Knowledge of state management (Redux, Context API)",
-        "Bachelor's degree in Computer Science or equivalent"
-      ],
-      posted: "2 days ago"
-    },
-    {
-      title: "Business Development Manager",
-      department: "Partnerships",
-      location: "Nairobi",
-      type: "Full-time",
-      description: "Drive growth by building relationships with restaurants, cafes, and food businesses. Help expand our partner network across Kenya.",
-      requirements: [
-        "3+ years in business development or sales",
-        "Experience in hospitality or food industry",
-        "Strong networking and relationship building skills",
-        "Excellent communication and presentation skills",
-        "Bachelor's degree in Business or related field"
-      ],
-      posted: "1 week ago"
-    },
-    {
-      title: "Product Designer",
-      department: "Design",
-      location: "Remote",
-      type: "Full-time",
-      description: "Design intuitive and beautiful user experiences for our web and mobile applications. Help create interfaces that make food saving effortless.",
-      requirements: [
-        "3+ years of UX/UI design experience",
-        "Proficiency in Figma and design systems",
-        "Experience with user research and testing",
-        "Portfolio showcasing mobile and web design",
-        "Understanding of accessibility principles"
-      ],
-      posted: "3 days ago"
-    },
-    {
-      title: "Marketing Coordinator",
-      department: "Marketing",
-      location: "Nairobi",
-      type: "Full-time",
-      description: "Support our marketing initiatives to spread awareness about food waste reduction and grow our user base across Kenya.",
-      requirements: [
-        "2+ years in digital marketing",
-        "Experience with social media marketing",
-        "Content creation and copywriting skills",
-        "Knowledge of SEO and analytics tools",
-        "Passion for sustainability and social impact"
-      ],
-      posted: "5 days ago"
-    },
-    {
-      title: "Customer Success Intern",
-      department: "Operations",
-      location: "Nairobi",
-      type: "Internship",
-      description: "Help ensure our users and business partners have an amazing experience with Foodvrse. Learn about operations in a fast-growing startup.",
-      requirements: [
-        "Currently pursuing a degree in Business, Communications, or related field",
-        "Excellent communication skills in English and Swahili",
-        "Interest in customer service and operations",
-        "Basic computer skills and willingness to learn",
-        "Passion for environmental sustainability"
-      ],
-      posted: "1 week ago"
-    }
-  ];
+  const [openPositions, setOpenPositions] = useState([
+    // Job listings can be managed dynamically by admin
+    // Currently no open positions
+  ]);
 
   const benefits = [
     {
@@ -159,55 +89,84 @@ const Careers = () => {
           </div>
         </section>
 
+        {/* Admin Job Manager */}
+        {isBusinessUser && (
+          <section className="mb-12">
+            <AdminJobManager 
+              jobPositions={openPositions}
+              onUpdateJobs={setOpenPositions}
+              isAdmin={isBusinessUser}
+            />
+          </section>
+        )}
+
         {/* Open Positions */}
         <section className="mb-12">
           <h2 className="text-3xl font-bold mb-6">Open Positions</h2>
-          <div className="space-y-6">
-            {openPositions.map((position, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div>
-                      <CardTitle className="text-xl mb-2">{position.title}</CardTitle>
-                      <div className="flex flex-wrap gap-2">
-                        <Badge variant="secondary">{position.department}</Badge>
-                        <Badge variant="outline" className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {position.location}
-                        </Badge>
-                        <Badge variant="outline" className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {position.type}
-                        </Badge>
+          {openPositions.length > 0 ? (
+            <div className="space-y-6">
+              {openPositions.map((position, index) => (
+                <Card key={index} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div>
+                        <CardTitle className="text-xl mb-2">{position.title}</CardTitle>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="secondary">{position.department}</Badge>
+                          <Badge variant="outline" className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            {position.location}
+                          </Badge>
+                          <Badge variant="outline" className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {position.type}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Posted {position.posted}
                       </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      Posted {position.posted}
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-4">{position.description}</p>
+                    
+                    <div className="mb-4">
+                      <h4 className="font-semibold mb-2">Requirements:</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        {position.requirements.map((req, reqIndex) => (
+                          <li key={reqIndex} className="flex items-start gap-2">
+                            <span className="text-primary mt-1">•</span>
+                            {req}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-4">{position.description}</p>
-                  
-                  <div className="mb-4">
-                    <h4 className="font-semibold mb-2">Requirements:</h4>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      {position.requirements.map((req, reqIndex) => (
-                        <li key={reqIndex} className="flex items-start gap-2">
-                          <span className="text-primary mt-1">•</span>
-                          {req}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  <Button className="w-full md:w-auto">
-                    Apply for this position
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    
+                    <Button className="w-full md:w-auto">
+                      Apply for this position
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card className="text-center py-12">
+              <CardContent>
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Briefcase className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">No Open Positions at the Moment</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  We're not currently hiring, but we're always interested in connecting with talented individuals 
+                  who are passionate about sustainability and making a positive impact.
+                </p>
+                <Button onClick={() => setIsCVPopupOpen(true)}>
+                  Send Your CV for Future Opportunities
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </section>
 
         {/* Application Process */}
@@ -280,7 +239,10 @@ const Careers = () => {
             
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-semibold mb-3">🚀 Fast-Growing</h3>
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <Rocket className="w-5 h-5 text-blue-600" />
+                  Fast-Growing
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Join a rapidly expanding startup where you can take ownership, learn quickly, 
                   and see the direct impact of your work.
@@ -290,7 +252,10 @@ const Careers = () => {
             
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-semibold mb-3">🤝 Collaborative</h3>
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <Handshake className="w-5 h-5 text-green-600" />
+                  Collaborative
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   We believe in teamwork, open communication, and supporting each other's 
                   professional growth and success.

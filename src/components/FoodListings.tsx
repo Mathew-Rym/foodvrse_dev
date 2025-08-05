@@ -10,7 +10,7 @@ const FoodListings = () => {
 
   const categories = [
     { id: "all", label: "All Items" },
-    { id: "Meals", label: "Mystery Boxes" },
+    { id: "Meals", label: "Mystery Bags" },
     { id: "Bakery", label: "Bakery" },
     { id: "Healthy", label: "Healthy" },
     { id: "Grocery", label: "Grocery" }
@@ -35,7 +35,7 @@ const FoodListings = () => {
               className={`${
                 filter === category.id 
                   ? "bg-gradient-to-r from-orange-500 to-red-500 text-white" 
-                  : "hover:bg-orange-50"
+                  : "hover:bg-brand-light-green"
               }`}
             >
               {category.label}

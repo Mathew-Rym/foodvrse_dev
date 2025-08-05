@@ -1,0 +1,232 @@
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Building, ShoppingBag, User } from 'lucide-react';
+
+interface GoogleOAuthHandlerProps {
+  onComplete: () => void;
+}
+
+const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) => {
+  const { user, refreshUserData } = useAuth();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
+  const [profileData, setProfileData] = useState({
+    display_name: '',
+    is_business: false,
+    business_name: ''
+  });
+
+  useEffect(() => {
+    const handleOAuthCallback = async () => {
+      if (!user) return;
+
+      // Check if user already has a profile
+      const { data: existingProfile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (existingProfile) {
+        // User already has a profile, redirect to appropriate dashboard
+        if (existingProfile.is_business) {
+          navigate('/business-dashboard');
+        } else {
+          navigate('/');
+        }
+        return;
+      }
+
+      // Check if this was a business sign-up
+      const isBusinessAuth = sessionStorage.getItem('google_business_auth') === 'true';
+      sessionStorage.removeItem('google_business_auth');
+
+      if (isBusinessAuth) {
+        // Pre-fill business data
+        setProfileData({
+          display_name: user.user_metadata?.full_name || '',
+          is_business: true,
+          business_name: user.user_metadata?.full_name || ''
+        });
+      } else {
+        // Pre-fill consumer data
+        setProfileData({
+          display_name: user.user_metadata?.full_name || '',
+          is_business: false,
+          business_name: ''
+        });
+      }
+
+      setShowProfileSetup(true);
+    };
+
+    handleOAuthCallback();
+  }, [user, navigate]);
+
+  const handleProfileSetup = async () => {
+    if (!user) return;
+
+    setIsLoading(true);
+    try {
+      // Create user profile
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .insert({
+          user_id: user.id,
+          email: user.email,
+          display_name: profileData.display_name,
+          is_business: profileData.is_business,
+          created_at: new Date().toISOString()
+        });
+
+      if (profileError) throw profileError;
+
+      // If business user, create business profile
+      if (profileData.is_business) {
+        const { error: businessError } = await supabase
+          .from('business_profiles')
+          .insert({
+            user_id: user.id,
+            business_name: profileData.business_name,
+            email: user.email,
+            created_at: new Date().toISOString()
+          });
+
+        if (businessError) throw businessError;
+      }
+
+      // Create user impact record
+      const { error: impactError } = await supabase
+        .from('user_impact')
+        .insert({
+          user_id: user.id,
+          meals_rescued: 0,
+          co2_saved_kg: 0,
+          money_saved_ksh: 0,
+          created_at: new Date().toISOString()
+        });
+
+      if (impactError) throw impactError;
+
+      // Refresh user data
+      await refreshUserData();
+
+      toast.success(
+        profileData.is_business 
+          ? 'Business account created successfully!' 
+          : 'Account created successfully!'
+      );
+
+      // Redirect to appropriate dashboard
+      if (profileData.is_business) {
+        navigate('/business-dashboard');
+      } else {
+        navigate('/');
+      }
+
+      onComplete();
+    } catch (error) {
+      console.error('Error setting up profile:', error);
+      toast.error('Failed to set up profile. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!showProfileSetup) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Setting up your account...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-screen p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-center">
+            Complete Your Profile
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="text-center mb-4">
+            <p className="text-sm text-gray-600">
+              Welcome! Please complete your profile to continue.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="display_name">
+                {profileData.is_business ? 'Business Name' : 'Full Name'}
+              </Label>
+              <Input
+                id="display_name"
+                value={profileData.display_name}
+                onChange={(e) => setProfileData({
+                  ...profileData,
+                  display_name: e.target.value,
+                  business_name: profileData.is_business ? e.target.value : profileData.business_name
+                })}
+                placeholder={profileData.is_business ? 'Enter business name' : 'Enter your full name'}
+              />
+            </div>
+
+            {!profileData.is_business && (
+              <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
+                <ShoppingBag className="w-5 h-5 text-green-600" />
+                <div>
+                  <p className="font-medium text-green-800">Consumer Account</p>
+                  <p className="text-sm text-green-600">Save money on food deals</p>
+                </div>
+              </div>
+            )}
+
+            {profileData.is_business && (
+              <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
+                <Building className="w-5 h-5 text-blue-600" />
+                <div>
+                  <p className="font-medium text-blue-800">Business Account</p>
+                  <p className="text-sm text-blue-600">List and sell your food items</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <Button
+            onClick={handleProfileSetup}
+            disabled={isLoading || !profileData.display_name.trim()}
+            className="w-full"
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Setting up account...
+              </>
+            ) : (
+              'Complete Setup'
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default GoogleOAuthHandler; 

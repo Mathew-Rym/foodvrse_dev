@@ -17,7 +17,11 @@ const BusinessOnboardingTour = ({ onComplete, onSkip }: BusinessOnboardingTourPr
       content: "Manage your food rescue listings and track your environmental impact",
       targetId: "business-header",
       position: { top: "20%", left: "50%" } as const,
-      icon: <DollarSign className="w-6 h-6 text-green-600" />
+      icon: (
+        <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-green-100 to-green-200 rounded-full shadow-sm border border-green-300">
+          <DollarSign className="w-4 h-4 text-green-700" />
+        </div>
+      )
     },
     {
       title: "Track Your Impact",
@@ -31,7 +35,7 @@ const BusinessOnboardingTour = ({ onComplete, onSkip }: BusinessOnboardingTourPr
       content: "Click here to list your first food rescue item with AI-powered suggestions",
       targetId: "add-item-button",
       position: { top: "50%", left: "50%" } as const,
-      icon: <Plus className="w-6 h-6 text-orange-600" />
+              icon: <Plus className="w-6 h-6 text-brand-green" />
     },
     {
       title: "Carbon Credits Coming Soon",
@@ -97,7 +101,7 @@ const BusinessOnboardingTour = ({ onComplete, onSkip }: BusinessOnboardingTourPr
       {/* Simple highlight border for current element */}
       {spotlightStyle && (
         <div 
-          className="fixed z-50 pointer-events-none border-2 border-orange-400 rounded-lg"
+          className="fixed z-50 pointer-events-none border-2 border-brand-green rounded-lg"
           style={{
             top: `${spotlightStyle.top}px`,
             left: `${spotlightStyle.left}px`,
@@ -144,7 +148,7 @@ const BusinessOnboardingTour = ({ onComplete, onSkip }: BusinessOnboardingTourPr
               <div
                 key={index}
                 className={`h-2 rounded-full flex-1 ${
-                  index <= currentStep ? 'bg-orange-500' : 'bg-gray-200'
+                  index <= currentStep ? 'bg-brand-green' : 'bg-gray-200'
                 }`}
               />
             ))}

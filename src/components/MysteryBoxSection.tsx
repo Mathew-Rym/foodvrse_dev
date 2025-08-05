@@ -85,7 +85,7 @@ const MysteryBoxSection = () => {
     setShowDetailPopup(true);
   };
 
-  const handleViewAllMysteryBoxes = () => {
+  const handleViewAllMysteryBags = () => {
     navigate("/mystery-boxes");
   };
 
@@ -107,7 +107,7 @@ const MysteryBoxSection = () => {
           </p>
         </div>
 
-        {/* Mystery Boxes Grid */}
+        {/* Mystery Bags Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
           {mysteryBoxes.map((box, index) => (
             <div key={index} className="bg-card rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group">
@@ -163,7 +163,7 @@ const MysteryBoxSection = () => {
           <Button 
             size="lg"
             variant="outline"
-            onClick={handleViewAllMysteryBoxes}
+                          onClick={handleViewAllMysteryBags}
             className="border-brand-green text-brand-green hover:bg-brand-light-green"
           >
             <Sparkles className="w-4 h-4 mr-2" />

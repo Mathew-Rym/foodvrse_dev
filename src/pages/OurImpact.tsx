@@ -1,28 +1,14 @@
-import { ArrowLeft, Leaf, Users, Utensils, DollarSign, TreePine, Droplets } from "lucide-react";
+import { ArrowLeft, Leaf, Users, Utensils, DollarSign, TreePine, Droplets, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useRealTimeMetrics } from "@/hooks/useRealTimeMetrics";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const OurImpact = () => {
   const navigate = useNavigate();
-
-  // Sample data - in real app this would come from API
-  const impactStats = {
-    mealsRescued: 12547,
-    co2Saved: 8.2, // tonnes
-    moneySaved: 847300, // KSH
-    businessPartners: 156,
-    activeUsers: 8432,
-    waterSaved: 125000, // liters
-    energySaved: 15.6, // MWh
-  };
-
-  const monthlyGrowth = {
-    meals: 18,
-    partners: 12,
-    users: 25
-  };
+  const metrics = useRealTimeMetrics();
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
@@ -47,38 +33,54 @@ const OurImpact = () => {
           <Card className="text-center">
             <CardContent className="p-6">
               <Utensils className="h-12 w-12 mx-auto mb-4 text-primary" />
-              <div className="text-3xl font-bold text-foreground mb-2">
-                {impactStats.mealsRescued.toLocaleString()}
-              </div>
+              {metrics.isLoading ? (
+                <Skeleton className="h-8 w-24 mx-auto mb-2" />
+              ) : (
+                <div className="text-3xl font-bold text-foreground mb-2">
+                  {metrics.totalMealsRescued.toLocaleString()}
+                </div>
+              )}
               <p className="text-muted-foreground">Meals Rescued</p>
               <div className="mt-2 text-sm text-green-600">
-                +{monthlyGrowth.meals}% this month
+                +{metrics.monthlyGrowth.meals}% this month
               </div>
             </CardContent>
           </Card>
 
           <Card className="text-center">
             <CardContent className="p-6">
-              <Leaf className="h-12 w-12 mx-auto mb-4 text-green-600" />
-              <div className="text-3xl font-bold text-foreground mb-2">
-                {impactStats.co2Saved}t
+              <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full mx-auto mb-4 shadow-lg border-2 border-blue-300">
+                <Leaf className="h-8 w-8 text-blue-700 drop-shadow-sm" />
               </div>
-              <p className="text-muted-foreground">CO₂ Emissions Saved</p>
-              <div className="mt-2 text-sm text-muted-foreground">
-                Equivalent to 36 trees planted
+              {metrics.isLoading ? (
+                <Skeleton className="h-8 w-16 mx-auto mb-2" />
+              ) : (
+                <div className="text-3xl font-bold text-blue-700 mb-2">
+                  {metrics.totalCo2SavedTonnes.toFixed(1)}t
+                </div>
+              )}
+              <p className="text-blue-600 font-medium">CO₂ Emissions Saved</p>
+              <div className="mt-2 text-sm text-blue-500">
+                Equivalent to {Math.round(metrics.totalCo2SavedTonnes * 4.4)} trees planted
               </div>
             </CardContent>
           </Card>
 
           <Card className="text-center">
             <CardContent className="p-6">
-              <DollarSign className="h-12 w-12 mx-auto mb-4 text-blue-600" />
-              <div className="text-3xl font-bold text-foreground mb-2">
-                KSH {(impactStats.moneySaved / 1000).toFixed(0)}K
+              <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full mx-auto mb-4 shadow-lg border-2 border-blue-300">
+                <DollarSign className="h-8 w-8 text-blue-700 drop-shadow-sm" />
               </div>
+              {metrics.isLoading ? (
+                <Skeleton className="h-8 w-20 mx-auto mb-2" />
+              ) : (
+                <div className="text-3xl font-bold text-foreground mb-2">
+                  KSH {(metrics.totalMoneySavedKsh / 1000).toFixed(0)}K
+                </div>
+              )}
               <p className="text-muted-foreground">Money Saved by Users</p>
               <div className="mt-2 text-sm text-muted-foreground">
-                Average 60% savings per meal
+                Average {metrics.totalUsers > 0 ? Math.round(metrics.totalMoneySavedKsh / metrics.totalUsers) : 0} KSH per user
               </div>
             </CardContent>
           </Card>
@@ -86,12 +88,16 @@ const OurImpact = () => {
           <Card className="text-center">
             <CardContent className="p-6">
               <Users className="h-12 w-12 mx-auto mb-4 text-purple-600" />
-              <div className="text-3xl font-bold text-foreground mb-2">
-                {impactStats.businessPartners}
-              </div>
+              {metrics.isLoading ? (
+                <Skeleton className="h-8 w-16 mx-auto mb-2" />
+              ) : (
+                <div className="text-3xl font-bold text-foreground mb-2">
+                  {metrics.totalBusinessPartners}
+                </div>
+              )}
               <p className="text-muted-foreground">Business Partners</p>
               <div className="mt-2 text-sm text-green-600">
-                +{monthlyGrowth.partners}% this month
+                +{metrics.monthlyGrowth.partners}% this month
               </div>
             </CardContent>
           </Card>
@@ -104,7 +110,7 @@ const OurImpact = () => {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <TreePine className="h-6 w-6 text-green-600" />
+                  <TreePine className="h-6 w-6 text-blue-600" />
                   Carbon Footprint Reduction
                 </CardTitle>
               </CardHeader>
@@ -112,12 +118,20 @@ const OurImpact = () => {
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span>CO₂ Saved</span>
-                      <span>{impactStats.co2Saved}t / 10t goal</span>
+                      <span className="text-blue-700 font-medium">CO₂ Saved</span>
+                      {metrics.isLoading ? (
+                        <Skeleton className="h-4 w-20" />
+                      ) : (
+                        <span className="text-blue-600">{metrics.totalCo2SavedTonnes.toFixed(1)}t / 10t goal</span>
+                      )}
                     </div>
-                    <Progress value={(impactStats.co2Saved / 10) * 100} className="h-2" />
+                    {metrics.isLoading ? (
+                      <Skeleton className="h-2 w-full" />
+                    ) : (
+                      <Progress value={(metrics.totalCo2SavedTonnes / 10) * 100} className="h-2 bg-blue-100" />
+                    )}
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-blue-600">
                     Every rescued meal prevents an average of 0.65kg of CO₂ emissions from food waste decomposition.
                   </p>
                 </div>
@@ -136,9 +150,17 @@ const OurImpact = () => {
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span>Water Saved</span>
-                      <span>{(impactStats.waterSaved / 1000).toFixed(0)}K / 200K liters</span>
+                      {metrics.isLoading ? (
+                        <Skeleton className="h-4 w-24" />
+                      ) : (
+                        <span>{(metrics.totalWaterConservedLiters / 1000).toFixed(0)}K / 200K liters</span>
+                      )}
                     </div>
-                    <Progress value={(impactStats.waterSaved / 200000) * 100} className="h-2" />
+                    {metrics.isLoading ? (
+                      <Skeleton className="h-2 w-full" />
+                    ) : (
+                      <Progress value={(metrics.totalWaterConservedLiters / 200000) * 100} className="h-2" />
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground">
                     Rescuing food saves the water that was used in production, processing, and transportation.
@@ -159,9 +181,17 @@ const OurImpact = () => {
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span>Energy Saved</span>
-                      <span>{impactStats.energySaved} / 25 MWh</span>
+                      {metrics.isLoading ? (
+                        <Skeleton className="h-4 w-20" />
+                      ) : (
+                        <span>{metrics.totalEnergySavedKwh.toFixed(1)} / 25 MWh</span>
+                      )}
                     </div>
-                    <Progress value={(impactStats.energySaved / 25) * 100} className="h-2" />
+                    {metrics.isLoading ? (
+                      <Skeleton className="h-2 w-full" />
+                    ) : (
+                      <Progress value={(metrics.totalEnergySavedKwh / 25) * 100} className="h-2" />
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground">
                     Preventing food waste saves the energy used in food production and reduces landfill methane.
@@ -183,19 +213,35 @@ const OurImpact = () => {
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span>Active Food Savers</span>
-                  <span className="font-semibold">{impactStats.activeUsers.toLocaleString()}</span>
+                  {metrics.isLoading ? (
+                    <Skeleton className="h-4 w-16" />
+                  ) : (
+                    <span className="font-semibold">{metrics.activeUsers.toLocaleString()}</span>
+                  )}
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Average Savings per User</span>
-                  <span className="font-semibold">KSH {Math.round(impactStats.moneySaved / impactStats.activeUsers)}</span>
+                  {metrics.isLoading ? (
+                    <Skeleton className="h-4 w-20" />
+                  ) : (
+                    <span className="font-semibold">KSH {metrics.averageSavingsPerUser}</span>
+                  )}
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Cities Served</span>
-                  <span className="font-semibold">12</span>
+                  {metrics.isLoading ? (
+                    <Skeleton className="h-4 w-8" />
+                  ) : (
+                    <span className="font-semibold">{metrics.citiesServed}</span>
+                  )}
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Monthly New Users</span>
-                  <span className="font-semibold text-green-600">+{monthlyGrowth.users}%</span>
+                  {metrics.isLoading ? (
+                    <Skeleton className="h-4 w-16" />
+                  ) : (
+                    <span className="font-semibold text-green-600">+{metrics.monthlyGrowth.users}%</span>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -207,19 +253,35 @@ const OurImpact = () => {
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span>Partner Restaurants</span>
-                  <span className="font-semibold">{impactStats.businessPartners}</span>
+                  {metrics.isLoading ? (
+                    <Skeleton className="h-4 w-12" />
+                  ) : (
+                    <span className="font-semibold">{metrics.totalBusinessPartners}</span>
+                  )}
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Average Revenue Recovery</span>
-                  <span className="font-semibold">35%</span>
+                  {metrics.isLoading ? (
+                    <Skeleton className="h-4 w-12" />
+                  ) : (
+                    <span className="font-semibold">{metrics.averageRevenueRecovery}%</span>
+                  )}
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Waste Reduction</span>
-                  <span className="font-semibold">72%</span>
+                  {metrics.isLoading ? (
+                    <Skeleton className="h-4 w-12" />
+                  ) : (
+                    <span className="font-semibold">{metrics.wasteReductionPercentage}%</span>
+                  )}
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Customer Satisfaction</span>
-                  <span className="font-semibold">4.8/5⭐</span>
+                  {metrics.isLoading ? (
+                    <Skeleton className="h-4 w-16" />
+                  ) : (
+                    <span className="font-semibold">{metrics.customerSatisfactionRating}/5<Star className="inline w-4 h-4 ml-1 text-yellow-500" /></span>
+                  )}
                 </div>
               </CardContent>
             </Card>

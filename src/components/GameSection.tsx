@@ -1,11 +1,12 @@
 
-import { Trophy, Users, Award, Star, TrendingUp } from "lucide-react";
+import { Trophy, Users, Award, Star, TrendingUp, Sparkles, Leaf, Recycle, Flame, Target, Crown, Globe } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import Logo from "./Logo";
 
 interface UserChallenge {
@@ -37,6 +38,7 @@ const GameSection = () => {
   const [challengeSettings, setChallengeSettings] = useState<ChallengeSettings | null>(null);
   const [userBadges, setUserBadges] = useState<UserBadge[]>([]);
   const [timeLeft, setTimeLeft] = useState<string>('');
+  const previousChallengeCount = useRef<number>(0);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -52,6 +54,34 @@ const GameSection = () => {
 
     return () => clearInterval(interval);
   }, [userChallenge]);
+
+  // Track challenge progress changes and show notifications
+  useEffect(() => {
+    if (userChallenge && previousChallengeCount.current > 0) {
+      const currentCount = userChallenge.current_count;
+      const previousCount = previousChallengeCount.current;
+      
+      if (currentCount > previousCount) {
+        const progress = currentCount - previousCount;
+        toast.success(`🎉 +${progress} meal${progress > 1 ? 's' : ''} saved!`, {
+          description: `You're ${currentCount}/${challengeSettings?.goal_value || 10} meals closer to your weekly goal!`,
+          duration: 4000,
+        });
+      }
+      
+      // Check if challenge was completed
+      if (currentCount >= (challengeSettings?.goal_value || 10) && !userChallenge.completed) {
+        toast.success('🏆 Weekly Challenge Completed!', {
+          description: `Congratulations! You've earned the "${challengeSettings?.badge_name || 'Weekly Hero'}" badge!`,
+          duration: 6000,
+        });
+      }
+    }
+    
+    if (userChallenge) {
+      previousChallengeCount.current = userChallenge.current_count;
+    }
+  }, [userChallenge, challengeSettings]);
 
   const fetchChallengeData = async () => {
     if (!user) return;
@@ -110,8 +140,25 @@ const GameSection = () => {
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
+          console.log('User challenge updated:', payload);
           if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
             setUserChallenge(payload.new as UserChallenge);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Order updated:', payload);
+          // Refresh challenge data when order status changes
+          if (payload.new.status === 'collected' || payload.new.status === 'refunded') {
+            fetchChallengeData();
           }
         }
       )
@@ -123,7 +170,8 @@ const GameSection = () => {
           table: 'user_badges',
           filter: `user_id=eq.${user.id}`
         },
-        () => {
+        (payload) => {
+          console.log('New badge awarded:', payload);
           fetchChallengeData(); // Refresh badges when new one is awarded
         }
       )
@@ -176,19 +224,19 @@ const GameSection = () => {
   };
 
   const leaderboard = [
-    { rank: 1, name: "Sarah K.", mealsSaved: 234, avatar: "🌟" },
-    { rank: 2, name: "Mike R.", mealsSaved: 189, avatar: "🏆" },
+    { rank: 1, name: "Sarah K.", mealsSaved: 234, avatar: "sparkles" },
+    { rank: 2, name: "Mike R.", mealsSaved: 189, avatar: "trophy" },
     { rank: 3, name: "You", mealsSaved: 127, avatar: "logo" },
-    { rank: 4, name: "Emma L.", mealsSaved: 98, avatar: "🌱" },
-    { rank: 5, name: "David M.", mealsSaved: 76, avatar: "♻️" }
+    { rank: 4, name: "Emma L.", mealsSaved: 98, avatar: "leaf" },
+    { rank: 5, name: "David M.", mealsSaved: 76, avatar: "recycle" }
   ];
 
   const achievements = [
-    { id: 1, title: "First Rescue", description: "Saved your first meal", completed: true, icon: "🎯" },
-    { id: 2, title: "Eco Warrior", description: "Saved 50 meals", completed: true, icon: "🌍" },
-    { id: 3, title: "Streak Master", description: "10-day saving streak", completed: true, icon: "🔥" },
-    { id: 4, title: "Century Club", description: "Save 100 meals", completed: true, icon: "💯" },
-    { id: 5, title: "Legendary Saver", description: "Save 500 meals", completed: false, icon: "👑" }
+    { id: 1, title: "First Rescue", description: "Saved your first meal", completed: true, icon: "target" },
+    { id: 2, title: "Eco Warrior", description: "Saved 50 meals", completed: true, icon: "globe" },
+    { id: 3, title: "Streak Master", description: "10-day saving streak", completed: true, icon: "flame" },
+    { id: 4, title: "Century Club", description: "Save 100 meals", completed: true, icon: "award" },
+    { id: 5, title: "Legendary Saver", description: "Save 500 meals", completed: false, icon: "crown" }
   ];
 
   const friends = [
@@ -232,7 +280,7 @@ const GameSection = () => {
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Current Streak</span>
                 <span className="font-bold text-lg flex items-center">
-                  {userStats.streak} <span className="ml-1">🔥</span>
+                  {userStats.streak} <Flame className="ml-1 w-4 h-4 text-orange-500" />
                 </span>
               </div>
             </CardContent>
@@ -258,6 +306,14 @@ const GameSection = () => {
                     <div className="flex items-center space-x-3">
                       {user.avatar === "logo" ? (
                         <Logo size="sm" />
+                      ) : user.avatar === "sparkles" ? (
+                        <Sparkles className="w-6 h-6 text-yellow-500" />
+                      ) : user.avatar === "trophy" ? (
+                        <Trophy className="w-6 h-6 text-yellow-600" />
+                      ) : user.avatar === "leaf" ? (
+                        <Leaf className="w-6 h-6 text-green-500" />
+                      ) : user.avatar === "recycle" ? (
+                        <Recycle className="w-6 h-6 text-blue-500" />
                       ) : (
                         <span className="text-2xl">{user.avatar}</span>
                       )}
@@ -326,7 +382,21 @@ const GameSection = () => {
                     : 'bg-muted border-border'
                 }`}
               >
-                <div className="text-4xl mb-2">{achievement.icon}</div>
+                <div className="text-4xl mb-2">
+                  {achievement.icon === "target" ? (
+                    <Target className="w-8 h-8 text-blue-500 mx-auto" />
+                  ) : achievement.icon === "globe" ? (
+                    <Globe className="w-8 h-8 text-green-500 mx-auto" />
+                  ) : achievement.icon === "flame" ? (
+                    <Flame className="w-8 h-8 text-orange-500 mx-auto" />
+                  ) : achievement.icon === "award" ? (
+                    <Award className="w-8 h-8 text-purple-500 mx-auto" />
+                  ) : achievement.icon === "crown" ? (
+                    <Crown className="w-8 h-8 text-yellow-600 mx-auto" />
+                  ) : (
+                    <span className="text-4xl">{achievement.icon}</span>
+                  )}
+                </div>
                 <h4 className="font-semibold text-sm mb-1">{achievement.title}</h4>
                 <p className="text-xs text-gray-600">{achievement.description}</p>
                 {achievement.completed && (
@@ -341,7 +411,9 @@ const GameSection = () => {
 
         {/* Challenge Section */}
         <div className="mt-12 text-center">
-          <Card className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-8">
+          <Card className={`bg-gradient-to-r from-purple-500 to-pink-500 text-white p-8 transition-all duration-500 ${
+            userChallenge?.completed ? 'animate-pulse shadow-2xl' : ''
+          }`}>
             <h3 className="text-2xl font-bold mb-4">Weekly Challenge</h3>
             <p className="text-lg mb-4">
               Save {challengeSettings?.goal_value || 10} meals this week to earn the "{challengeSettings?.badge_name || 'Weekly Hero'}" badge!
@@ -358,20 +430,26 @@ const GameSection = () => {
                 <p className="text-sm">To Go!</p>
               </div>
             </div>
-            <div className="w-full bg-white bg-opacity-20 rounded-full h-3 mb-6">
+            <div className="w-full bg-white bg-opacity-20 rounded-full h-3 mb-6 overflow-hidden">
               <div 
-                className="bg-white h-3 rounded-full transition-all duration-500" 
+                className="bg-white h-3 rounded-full transition-all duration-700 ease-out relative"
                 style={{ 
                   width: `${Math.min(100, ((userChallenge?.current_count || 0) / (challengeSettings?.goal_value || 10)) * 100)}%` 
                 }}
-              ></div>
+              >
+                {/* Animated shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+              </div>
             </div>
             <p className="text-sm opacity-90">
               {userChallenge?.completed ? 'Challenge completed!' : `Challenge ends in ${timeLeft}`}
             </p>
             {userChallenge?.badge_awarded && (
               <div className="mt-4 p-3 bg-white bg-opacity-20 rounded-lg">
-                <p className="text-sm font-semibold">🏆 Badge Earned!</p>
+                <p className="text-sm font-semibold flex items-center gap-1">
+                  <Trophy className="w-4 h-4 text-yellow-600" />
+                  Badge Earned!
+                </p>
                 <p className="text-xs opacity-90">You've earned the {challengeSettings?.badge_name} badge!</p>
               </div>
             )}

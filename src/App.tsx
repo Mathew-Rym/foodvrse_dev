@@ -21,11 +21,12 @@ import PartnerApplication from "./pages/PartnerApplication";
 import BusinessDashboard from "./pages/BusinessDashboard";
 import Auth from "./pages/Auth";
 import FoodWaste from "./pages/FoodWaste";
-import MysteryBoxes from "./pages/MysteryBoxes";
+import MysteryBags from "./pages/MysteryBoxes";
 import HowItWorks from "./pages/HowItWorks";
 import ImpactTrackerPage from "./pages/ImpactTrackerPage";
 import HelpCenter from "./pages/HelpCenter";
 import SafetyGuidelines from "./pages/SafetyGuidelines";
+import CommunityGuidelines from "./pages/CommunityGuidelines";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
@@ -38,25 +39,35 @@ import MeetTheTeam from "./pages/MeetTheTeam";
 import Careers from "./pages/Careers";
 import Press from "./pages/Press";
 import Partners from "./pages/Partners";
+import ComingSoon from "./pages/ComingSoon";
+import GoogleOAuthHandler from "./components/GoogleOAuthHandler";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <BusinessItemsProvider>
-            <CartProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
+const App = () => {
+  // Check if this is an OAuth callback
+  const isOAuthCallback = window.location.search.includes('access_token') || 
+                         window.location.search.includes('error');
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <BusinessItemsProvider>
+              <CartProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/auth" element={<Auth />} />
+                      <Route path="/oauth-callback" element={
+                        <GoogleOAuthHandler onComplete={() => window.history.replaceState({}, '', '/')} />
+                      } />
                 <Route path="/discover" element={<Discover />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/orders" element={<Orders />} />
@@ -66,11 +77,12 @@ const App = () => (
                 <Route path="/partner-application" element={<PartnerApplication />} />
                 <Route path="/business-dashboard" element={<BusinessDashboard />} />
                 <Route path="/food-waste" element={<FoodWaste />} />
-                <Route path="/mystery-boxes" element={<MysteryBoxes />} />
+                <Route path="/mystery-boxes" element={<MysteryBags />} />
                 <Route path="/how-it-works" element={<HowItWorks />} />
                 <Route path="/impact-tracker" element={<ImpactTrackerPage />} />
                 <Route path="/help-center" element={<HelpCenter />} />
                 <Route path="/safety-guidelines" element={<SafetyGuidelines />} />
+                <Route path="/community-guidelines" element={<CommunityGuidelines />} />
                 <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/cookie-policy" element={<CookiePolicy />} />
@@ -83,6 +95,7 @@ const App = () => (
                 <Route path="/careers" element={<Careers />} />
                 <Route path="/press" element={<Press />} />
                 <Route path="/partners" element={<Partners />} />
+                <Route path="/coming-soon" element={<ComingSoon />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
@@ -95,6 +108,7 @@ const App = () => (
   </LanguageProvider>
 </ThemeProvider>
 </QueryClientProvider>
-);
+  );
+};
 
 export default App;

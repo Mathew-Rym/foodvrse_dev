@@ -134,10 +134,18 @@ const OrderManager = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'pending': return <Clock className="w-4 h-4" />;
+      case 'pending': return (
+        <div className="flex items-center justify-center w-4 h-4 bg-yellow-100 rounded-full">
+          <Clock className="w-2.5 h-2.5 text-yellow-600" />
+        </div>
+      );
       case 'paid': return <Package className="w-4 h-4" />;
       case 'collected': return <CheckCircle className="w-4 h-4" />;
-      default: return <Clock className="w-4 h-4" />;
+      default: return (
+        <div className="flex items-center justify-center w-4 h-4 bg-gray-100 rounded-full">
+          <Clock className="w-2.5 h-2.5 text-gray-600" />
+        </div>
+      );
     }
   };
 

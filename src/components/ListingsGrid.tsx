@@ -231,8 +231,8 @@ export const ListingsGrid: React.FC<ListingsGridProps> = ({
   if (listings.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-2xl">🔍</span>
+                    <div className="w-16 h-16 bg-brand-light-green rounded-full flex items-center justify-center mx-auto mb-4">
+                          <Search className="w-8 h-8 text-gray-400" />
         </div>
         <h3 className="text-lg font-semibold text-gray-900 mb-2">No items found</h3>
         <p className="text-gray-600 mb-6">
@@ -241,7 +241,7 @@ export const ListingsGrid: React.FC<ListingsGridProps> = ({
         <div className="flex gap-3 justify-center">
           <button 
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600"
+                          className="px-4 py-2 bg-gradient-to-r from-brand-green to-brand-yellow text-white rounded-lg hover:from-brand-green/90 hover:to-brand-yellow/90"
           >
             Discover More Bags!
           </button>

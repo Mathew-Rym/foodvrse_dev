@@ -153,8 +153,8 @@ Please review this application.
               <span className="text-sm text-gray-700">Reach new customers in your area</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                <span className="text-orange-600 text-sm">🌱</span>
+                          <div className="w-8 h-8 bg-brand-light-green rounded-full flex items-center justify-center">
+              <span className="text-brand-green text-sm">🌱</span>
               </div>
               <span className="text-sm text-gray-700">Make a positive environmental impact</span>
             </div>

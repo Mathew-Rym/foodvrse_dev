@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useRealTimeMetrics } from "@/hooks/useRealTimeMetrics";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Press = () => {
   const navigate = useNavigate();
+  const metrics = useRealTimeMetrics();
 
   const pressReleases = [
     {
@@ -46,12 +49,6 @@ const Press = () => {
       size: "2.3 MB"
     },
     {
-      name: "Executive Team Photos",
-      description: "Professional headshots of our leadership team",
-      type: "ZIP",
-      size: "8.7 MB"
-    },
-    {
       name: "Product Screenshots",
       description: "High-quality app screenshots and interface designs",
       type: "ZIP",
@@ -65,19 +62,44 @@ const Press = () => {
     }
   ];
 
+  const executiveTeamPhotos = [
+    {
+      name: "Rym Njuguna",
+      role: "CEO & Co-Founder",
+      image: "/team/rym-njuguna.jpg",
+      filename: "rym-njuguna.jpg"
+    },
+    {
+      name: "Rachel Wangu",
+      role: "Co- Founder and Chief Sustainability Officer (CSO) ", 
+      image: "/team/rachel-wangu.jpg",
+      filename: "rachel-wangu.jpg"
+    },
+    {
+      name: "Hebrew Simeon",
+      role: "Co- Founder and Head of Strategic Partnerships",
+      image: "/team/hebrew-simeon.jpg",
+      filename: "hebrew-simeon.jpg"
+    },
+    {
+      name: "Charity W. Kiarie",
+      role: "Sustainability Advisor",
+      image: "/team/charity-kiarie.jpg",
+      filename: "charity-kiarie.jpg"
+    }
+  ];
+
   const mediaContacts = [
     {
-      name: "Sarah Kimani",
+      name: "Rym Njuguna",
       role: "CEO & Co-Founder",
-      email: "sarah@foodvrse.com",
-      phone: "+254 700 123 456",
+      email: "rym@foodvrse.com",
       focus: "Company vision, sustainability impact"
     },
     {
-      name: "Michael Kiprotich",
-      role: "Marketing Lead",
+      name: "Rachel Wangu",
+      role: "CTO & Co-Founder",
       email: "media@foodvrse.com",
-      phone: "+254 700 789 012",
       focus: "Press inquiries, media relations"
     }
   ];
@@ -107,9 +129,9 @@ const Press = () => {
               <h2 className="text-2xl font-bold mb-4">About Foodvrse</h2>
               <p className="text-muted-foreground mb-4 leading-relaxed">
                 Foodvrse is Kenya's leading food waste reduction platform that connects restaurants, cafes, 
-                and food businesses with conscious consumers through "mystery bags" of surplus food. Founded 
-                in 2023, we've saved over 12,000 meals from waste, prevented 8.2 tonnes of CO₂ emissions, 
-                and helped users save more than KSH 847,000 on quality food.
+                and food businesses with conscious consumers through "mystery bags" of surplus food.                 Founded 
+                in 2024, we've saved over {metrics.isLoading ? '...' : metrics.totalMealsRescued.toLocaleString()} meals from waste, prevented {metrics.isLoading ? '...' : metrics.totalCo2SavedTonnes.toFixed(1)} tonnes of CO₂ emissions, 
+                and helped users save more than KSH {metrics.isLoading ? '...' : (metrics.totalMoneySavedKsh / 1000).toFixed(0)}K on quality food.
               </p>
               <p className="text-muted-foreground leading-relaxed">
                 Our mission is to eliminate food waste by creating a sustainable ecosystem where businesses 
@@ -126,26 +148,42 @@ const Press = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="text-center">
               <CardContent className="p-6">
-                <div className="text-3xl font-bold text-primary mb-2">12,547</div>
+                {metrics.isLoading ? (
+                  <Skeleton className="h-8 w-20 mx-auto mb-2" />
+                ) : (
+                  <div className="text-3xl font-bold text-primary mb-2">{metrics.totalMealsRescued.toLocaleString()}</div>
+                )}
                 <p className="text-muted-foreground">Meals Rescued</p>
               </CardContent>
             </Card>
             <Card className="text-center">
               <CardContent className="p-6">
-                <div className="text-3xl font-bold text-primary mb-2">156</div>
+                {metrics.isLoading ? (
+                  <Skeleton className="h-8 w-16 mx-auto mb-2" />
+                ) : (
+                  <div className="text-3xl font-bold text-primary mb-2">{metrics.totalBusinessPartners}</div>
+                )}
                 <p className="text-muted-foreground">Business Partners</p>
               </CardContent>
             </Card>
             <Card className="text-center">
               <CardContent className="p-6">
-                <div className="text-3xl font-bold text-primary mb-2">12</div>
+                {metrics.isLoading ? (
+                  <Skeleton className="h-8 w-8 mx-auto mb-2" />
+                ) : (
+                  <div className="text-3xl font-bold text-primary mb-2">{metrics.citiesServed}</div>
+                )}
                 <p className="text-muted-foreground">Cities Served</p>
               </CardContent>
             </Card>
             <Card className="text-center">
               <CardContent className="p-6">
-                <div className="text-3xl font-bold text-primary mb-2">8.2t</div>
-                <p className="text-muted-foreground">CO₂ Saved</p>
+                {metrics.isLoading ? (
+                  <Skeleton className="h-8 w-12 mx-auto mb-2" />
+                ) : (
+                  <div className="text-3xl font-bold text-blue-700 mb-2">{metrics.totalCo2SavedTonnes.toFixed(1)}t</div>
+                )}
+                <p className="text-blue-600 font-medium">CO₂ Saved</p>
               </CardContent>
             </Card>
           </div>
@@ -223,6 +261,47 @@ const Press = () => {
           </div>
         </section>
 
+        {/* Executive Team Photos */}
+        <section className="mb-12">
+          <h2 className="text-3xl font-bold mb-6">Executive Team Photos</h2>
+          <p className="text-muted-foreground mb-6">
+            Professional headshots of our leadership team. High-resolution images available for download.
+          </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {executiveTeamPhotos.map((member, index) => (
+              <Card key={index} className="overflow-hidden">
+                <div className="aspect-square overflow-hidden">
+                  <img 
+                    src={member.image} 
+                    alt={`${member.name} - ${member.role}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-sm mb-1">{member.name}</h3>
+                  <p className="text-xs text-muted-foreground mb-3">{member.role}</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = member.image;
+                      link.download = member.filename;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
         {/* Media Contacts */}
         <section className="mb-12">
           <h2 className="text-3xl font-bold mb-6">Media Contacts</h2>
@@ -239,9 +318,7 @@ const Press = () => {
                         {contact.email}
                       </a>
                     </p>
-                    <p>
-                      <strong>Phone:</strong> {contact.phone}
-                    </p>
+
                     <p>
                       <strong>Focus:</strong> {contact.focus}
                     </p>
@@ -304,12 +381,12 @@ const Press = () => {
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Button asChild>
-              <a href="mailto:media@foodvrse.com">
+              <a href="mailto:media@foodvrse.com?subject=Media Inquiry - FoodVrse">
                 Contact Media Team
               </a>
             </Button>
             <Button variant="outline" asChild>
-              <a href="mailto:sarah@foodvrse.com">
+              <a href="mailto:media@foodvrse.com?subject=Interview Request - FoodVrse">
                 Interview Request
               </a>
             </Button>

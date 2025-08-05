@@ -1,63 +1,12 @@
 
-import { Leaf, Droplets, Zap, Users } from "lucide-react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-
-interface PlatformMetrics {
-  total_co2_saved_tonnes: number;
-  total_water_conserved_liters: number;
-  total_energy_saved_kwh: number;
-  total_meals_rescued: number;
-  total_money_saved_ksh: number;
-}
+import { Leaf, Droplets, Zap, Users, CheckCircle, MapPin, Target } from "lucide-react";
+import { useRealTimeMetrics } from "@/hooks/useRealTimeMetrics";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ImpactTracker = () => {
-  const [metrics, setMetrics] = useState<PlatformMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const metrics = useRealTimeMetrics();
 
-  useEffect(() => {
-    const fetchMetrics = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('platform_impact_metrics')
-          .select('*')
-          .single();
 
-        if (error) {
-          console.error('Error fetching platform metrics:', error);
-          return;
-        }
-
-        setMetrics(data);
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMetrics();
-
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('platform-metrics-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'platform_impact_metrics'
-        },
-        (payload) => {
-          setMetrics(payload.new as PlatformMetrics);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) {
@@ -95,7 +44,7 @@ const ImpactTracker = () => {
     return Math.round(kwh / 150);
   };
 
-  if (loading) {
+  if (metrics.isLoading) {
     return (
       <section className="py-16 bg-gradient-to-br from-green-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -115,33 +64,33 @@ const ImpactTracker = () => {
   const impacts = [
     {
       icon: Leaf,
-      value: formatTonnes(metrics?.total_co2_saved_tonnes || 0),
+      value: formatTonnes(metrics?.totalCo2SavedTonnes || 0),
       label: "CO₂ Emissions Saved",
-      description: `Equivalent to planting ${calculateTreesEquivalent(metrics?.total_co2_saved_tonnes || 0)} trees`,
+      description: `Equivalent to planting ${calculateTreesEquivalent(metrics?.totalCo2SavedTonnes || 0)} trees`,
       color: "text-green-600",
       bg: "bg-green-100"
     },
     {
       icon: Droplets,
-      value: formatLiters(metrics?.total_water_conserved_liters || 0),
+      value: formatLiters(metrics?.totalWaterConservedLiters || 0),
       label: "Water Conserved",
-      description: `Enough for ${calculatePeopleWaterEquivalent(metrics?.total_water_conserved_liters || 0)} people for a day`,
+      description: `Enough for ${calculatePeopleWaterEquivalent(metrics?.totalWaterConservedLiters || 0)} people for a day`,
       color: "text-blue-600",
       bg: "bg-blue-100"
     },
     {
       icon: Zap,
-      value: formatKwh(metrics?.total_energy_saved_kwh || 0),
+      value: formatKwh(metrics?.totalEnergySavedKwh || 0),
       label: "Energy Saved",
-      description: `Powers ${calculateHomesEnergyEquivalent(metrics?.total_energy_saved_kwh || 0)} homes for a month`,
+      description: `Powers ${calculateHomesEnergyEquivalent(metrics?.totalEnergySavedKwh || 0)} homes for a month`,
       color: "text-yellow-600",
       bg: "bg-yellow-100"
     },
     {
       icon: Users,
-      value: formatNumber(metrics?.total_meals_rescued || 0),
+      value: formatNumber(metrics?.totalMealsRescued || 0),
       label: "Meals Rescued",
-      description: `Fed ${formatNumber(metrics?.total_meals_rescued || 0)} people this month`,
+      description: `Fed ${formatNumber(metrics?.totalMealsRescued || 0)} people this month`,
       color: "text-purple-600",
       bg: "bg-purple-100"
     }
@@ -164,7 +113,12 @@ const ImpactTracker = () => {
         {/* Impact Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {impacts.map((impact, index) => (
-            <div key={index} className="bg-card rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 text-center">
+            <div key={index} className="bg-card rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 text-center relative">
+              {metrics.isLoading && (
+                <div className="absolute top-2 right-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand-green"></div>
+                </div>
+              )}
               <div className={`inline-flex items-center justify-center w-16 h-16 ${impact.bg} rounded-full mb-4`}>
                 <impact.icon className={`w-8 h-8 ${impact.color}`} />
               </div>
@@ -179,45 +133,96 @@ const ImpactTracker = () => {
         <div className="bg-card rounded-2xl shadow-sm p-8">
           <div className="text-center mb-6">
             <h3 className="text-xl font-bold text-foreground mb-2">Community Achievement</h3>
-            <p className="text-muted-foreground">Together, we're making a difference</p>
+            <p className="text-muted-foreground">
+              Together, we're making a difference
+              {metrics.isLoading && (
+                <span className="ml-2 inline-flex items-center text-sm text-brand-green">
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-brand-green mr-1"></div>
+                  Updating...
+                </span>
+              )}
+            </p>
           </div>
 
           <div className="max-w-2xl mx-auto">
             {/* Progress Bar */}
             <div className="mb-6">
               <div className="flex justify-between text-sm text-muted-foreground mb-2">
-                <span>Progress to 2024 Goal</span>
-                <span>{Math.round(((metrics?.total_meals_rescued || 0) / 20000) * 100)}% Complete</span>
+                <span>Progress to 2025 Goal</span>
+                {metrics.isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-brand-green"></div>
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                ) : (
+                  <span className="flex items-center gap-1">
+                    {Math.round(((metrics?.totalMealsRescued || 0) / 20000) * 100)}% Complete
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  </span>
+                )}
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
-                <div 
-                  className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-500" 
-                  style={{ width: `${Math.min(((metrics?.total_meals_rescued || 0) / 20000) * 100, 100)}%` }}
-                ></div>
+                {metrics.isLoading ? (
+                  <Skeleton className="h-3 w-full" />
+                ) : (
+                  <div 
+                    className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-500 relative overflow-hidden" 
+                    style={{ width: `${Math.min(((metrics?.totalMealsRescued || 0) / 20000) * 100, 100)}%` }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Milestones */}
             <div className="grid grid-cols-3 gap-4 text-center text-sm">
               <div>
-                <p className={`font-semibold ${(metrics?.total_meals_rescued || 0) >= 1000 ? 'text-green-600' : 'text-gray-400'}`}>
-                  {(metrics?.total_meals_rescued || 0) >= 1000 ? '✓' : '○'} 1K Meals
-                </p>
-                <p className="text-muted-foreground">{(metrics?.total_meals_rescued || 0) >= 1000 ? 'Achieved' : 'Goal'}</p>
+                {metrics.isLoading ? (
+                  <>
+                    <Skeleton className="h-4 w-16 mx-auto mb-1" />
+                    <Skeleton className="h-3 w-12 mx-auto" />
+                  </>
+                ) : (
+                  <>
+                    <p className={`font-semibold ${(metrics?.totalMealsRescued || 0) >= 1000 ? 'text-green-600' : 'text-gray-400'}`}>
+                      {(metrics?.totalMealsRescued || 0) >= 1000 ? <CheckCircle className="inline w-4 h-4" /> : <span className="text-gray-400">○</span>} 1K Meals
+                    </p>
+                    <p className="text-muted-foreground">{(metrics?.totalMealsRescued || 0) >= 1000 ? 'Achieved' : 'Goal'}</p>
+                  </>
+                )}
               </div>
               <div>
-                <p className={`font-semibold ${(metrics?.total_meals_rescued || 0) >= 10000 ? 'text-green-600' : (metrics?.total_meals_rescued || 0) >= 1000 ? 'text-yellow-600' : 'text-gray-400'}`}>
-                  {(metrics?.total_meals_rescued || 0) >= 10000 ? '✓' : '📍'} 10K Meals
-                </p>
-                <p className="text-muted-foreground">
-                  {(metrics?.total_meals_rescued || 0) >= 10000 ? 'Achieved' : (metrics?.total_meals_rescued || 0) >= 1000 ? 'In Progress' : 'Goal'}
-                </p>
+                {metrics.isLoading ? (
+                  <>
+                    <Skeleton className="h-4 w-20 mx-auto mb-1" />
+                    <Skeleton className="h-3 w-16 mx-auto" />
+                  </>
+                ) : (
+                  <>
+                    <p className={`font-semibold ${(metrics?.totalMealsRescued || 0) >= 10000 ? 'text-green-600' : (metrics?.totalMealsRescued || 0) >= 1000 ? 'text-yellow-600' : 'text-gray-400'}`}>
+                      {(metrics?.totalMealsRescued || 0) >= 10000 ? <CheckCircle className="inline w-4 h-4" /> : <MapPin className="inline w-4 h-4" />} 10K Meals
+                    </p>
+                    <p className="text-muted-foreground">
+                      {(metrics?.totalMealsRescued || 0) >= 10000 ? 'Achieved' : (metrics?.totalMealsRescued || 0) >= 1000 ? 'In Progress' : 'Goal'}
+                    </p>
+                  </>
+                )}
               </div>
               <div>
-                <p className={`font-semibold ${(metrics?.total_meals_rescued || 0) >= 20000 ? 'text-green-600' : 'text-gray-400'}`}>
-                  🎯 20K Meals
-                </p>
-                <p className="text-muted-foreground">{(metrics?.total_meals_rescued || 0) >= 20000 ? 'Achieved' : 'Goal'}</p>
+                {metrics.isLoading ? (
+                  <>
+                    <Skeleton className="h-4 w-20 mx-auto mb-1" />
+                    <Skeleton className="h-3 w-8 mx-auto" />
+                  </>
+                ) : (
+                  <>
+                    <p className={`font-semibold ${(metrics?.totalMealsRescued || 0) >= 20000 ? 'text-green-600' : 'text-gray-400'}`}>
+                      <Target className="inline w-4 h-4" /> 20K Meals
+                    </p>
+                    <p className="text-muted-foreground">{(metrics?.totalMealsRescued || 0) >= 20000 ? 'Achieved' : 'Goal'}</p>
+                  </>
+                )}
               </div>
             </div>
           </div>

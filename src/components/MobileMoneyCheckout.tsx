@@ -117,7 +117,7 @@ const MobileMoneyCheckout = ({ isOpen, onClose }: MobileMoneyCheckoutProps) => {
 
         {paymentStep === 'processing' && (
           <div className="text-center py-8">
-            <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-orange-500" />
+            <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-brand-green" />
             <p className="text-lg font-medium mb-2">Processing Payment...</p>
             <p className="text-sm text-gray-600">
               Please check your phone for the M-Pesa prompt and enter your PIN

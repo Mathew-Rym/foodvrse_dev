@@ -17,7 +17,7 @@ const FoodWaste = () => {
       icon: TrendingDown,
       title: '30-40%',
       description: 'Of food supply is wasted',
-      color: 'text-orange-500',
+              color: 'text-brand-green',
     },
     {
       icon: Users,
@@ -47,7 +47,7 @@ const FoodWaste = () => {
     {
       title: 'Social Impact',
       description: 'While food is wasted, millions face hunger. Reducing waste can help redistribute resources to those in need.',
-      color: 'bg-orange-50 border-orange-200',
+              color: 'bg-brand-light-green border-brand-green',
     },
   ];
 

@@ -427,8 +427,8 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }: AddItemModalProps) => {
                     size="sm"
                     className={`h-8 text-xs ${
                       selectedTags.includes(tag) 
-                        ? 'bg-orange-500 text-white hover:bg-orange-600' 
-                        : 'hover:bg-orange-50'
+                                        ? 'bg-brand-green text-white hover:bg-brand-green/90'
+                : 'hover:bg-brand-light-green'
                     }`}
                     onClick={() => toggleTag(tag)}
                   >

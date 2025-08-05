@@ -179,7 +179,7 @@ const Profile = () => {
     <MobileLayout>
       <div className="min-h-screen bg-gray-50 pb-20">
         {/* Profile Header */}
-        <div className="bg-gradient-to-br from-orange-500 to-red-500 px-4 py-8 text-white">
+        <div className="bg-gradient-to-br from-brand-green to-brand-yellow px-4 py-8 text-white">
           <div className="flex items-center gap-4 mb-4">
             <div className="relative">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
@@ -200,24 +200,24 @@ const Profile = () => {
               </label>
             </div>
             <div>
-              <h1 className="text-xl font-bold">{userProfile?.display_name || user?.email}</h1>
-              <p className="text-white/90">{user?.email}</p>
-              <Badge className="bg-white/20 text-white mt-2">{userImpact?.level ? `Food Saver Level ${userImpact.level}` : 'Food Saver Level 1'}</Badge>
+              <h1 className="text-xl font-bold text-white">{userProfile?.display_name || user?.email}</h1>
+              <p className="text-white">{user?.email}</p>
+              <Badge className="bg-white/30 text-white mt-2 font-semibold">{userImpact?.level ? `Food Saver Level ${userImpact.level}` : 'Food Saver Level 1'}</Badge>
             </div>
           </div>
           
           <div className="grid grid-cols-3 gap-4 mt-6">
             <div className="text-center">
-              <p className="text-2xl font-bold">{userImpact?.total_meals_saved || 0}</p>
-              <p className="text-sm text-white/80">Meals Saved</p>
+              <p className="text-2xl font-bold text-white">{userImpact?.total_meals_saved || 0}</p>
+              <p className="text-sm text-white font-medium">Meals Saved</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold">{userImpact?.total_co2_saved_kg || 0}kg</p>
-              <p className="text-sm text-white/80">CO₂ Saved</p>
+              <p className="text-2xl font-bold text-white">{userImpact?.total_co2_saved_kg || 0}kg</p>
+              <p className="text-sm text-white font-medium">CO₂ Saved</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold">KSh {userImpact?.total_money_saved_ksh || 0}</p>
-              <p className="text-sm text-white/80">Money Saved</p>
+              <p className="text-2xl font-bold text-white">KSh {userImpact?.total_money_saved_ksh || 0}</p>
+              <p className="text-sm text-white font-medium">Money Saved</p>
             </div>
           </div>
         </div>
@@ -235,24 +235,24 @@ const Profile = () => {
                     index !== menuItems.length - 1 ? "border-b border-gray-100" : ""
                   }`}
                 >
-                  <Icon className="w-5 h-5 text-gray-600" />
-                  <span className="flex-1 text-gray-900">{item.label}</span>
-                  <span className="text-gray-400">›</span>
+                  <Icon className="w-5 h-5 text-gray-700" />
+                  <span className="flex-1 text-gray-900 font-medium">{item.label}</span>
+                  <span className="text-gray-500">›</span>
                 </button>
               );
             })}
           </div>
 
           {/* Become Partner */}
-          <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg p-4 text-white mb-4">
-            <h3 className="font-semibold mb-2">Become a Partner</h3>
-            <p className="text-sm text-white/90 mb-3">
+          <div className="bg-gradient-to-r from-brand-green to-brand-yellow rounded-lg p-4 text-white mb-4">
+            <h3 className="font-semibold mb-2 text-white">Become a Partner</h3>
+            <p className="text-sm text-white mb-3">
               Join our mission to reduce food waste. List your restaurant and start making an impact.
             </p>
             <Button 
               variant="secondary" 
               size="sm" 
-              className="bg-white text-orange-600 hover:bg-gray-100"
+              className="bg-white text-brand-green hover:bg-gray-100 font-semibold"
               onClick={handlePartnerClick}
             >
               Learn More
@@ -516,7 +516,10 @@ const Profile = () => {
                   <div>
                     <p className="font-medium">{favorite.name}</p>
                     <p className="text-sm text-gray-600">{favorite.location}</p>
-                    <p className="text-sm text-yellow-600">⭐ {favorite.rating}</p>
+                    <p className="text-sm text-yellow-600 flex items-center gap-1">
+                      <Star className="w-4 h-4" />
+                      {favorite.rating}
+                    </p>
                   </div>
                   <Button
                     variant="ghost"

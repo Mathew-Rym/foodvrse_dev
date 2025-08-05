@@ -112,8 +112,8 @@ export const StoreProfilePage = ({ isOpen, onClose, store }: StoreProfilePagePro
             <h3 className="font-semibold text-gray-900">ABOUT</h3>
             <div className="flex gap-4">
               <div className="flex-1 text-center">
-                <div className="w-16 h-16 mx-auto mb-2 bg-orange-100 rounded-full flex items-center justify-center">
-                  <span className="text-2xl font-bold text-orange-600">{store.yearsActive}</span>
+                            <div className="w-16 h-16 mx-auto mb-2 bg-brand-light-green rounded-full flex items-center justify-center">
+              <span className="text-2xl font-bold text-brand-green">{store.yearsActive}</span>
                 </div>
                 <p className="text-xs text-gray-600">Fighting food waste</p>
               </div>

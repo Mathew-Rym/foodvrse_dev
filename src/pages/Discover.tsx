@@ -247,7 +247,7 @@ const Discover = () => {
             {mockStores.map((store, index) => (
               <button
                 key={store.id}
-                className="absolute w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border-2 border-orange-500 cursor-pointer hover:scale-110 transition-transform"
+                className="absolute w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border-2 border-brand-green cursor-pointer hover:scale-110 transition-transform"
                 style={{
                   top: `${30 + index * 15}%`,
                   left: `${25 + index * 20}%`
@@ -291,7 +291,7 @@ const Discover = () => {
                     <h3 className="text-md font-medium text-gray-800">{category.name}</h3>
                     <button 
                       onClick={() => handleSeeAllCategory(category.name)}
-                      className="text-sm text-orange-500 hover:text-orange-600"
+                      className="text-sm text-brand-green hover:text-brand-green/80"
                     >
                       See all
                     </button>
@@ -373,7 +373,7 @@ const Discover = () => {
                   <button
                     key={tag}
                     onClick={() => handlePopularSearchClick(tag)}
-                    className="px-3 py-1 border border-gray-300 rounded-full text-sm hover:bg-orange-50 hover:border-orange-300 transition-colors"
+                    className="px-3 py-1 border border-gray-300 rounded-full text-sm hover:bg-brand-light-green hover:border-brand-green transition-colors"
                   >
                     {tag}
                   </button>

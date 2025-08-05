@@ -7,7 +7,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const MysteryBoxes = () => {
+const MysteryBags = () => {
   const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -121,14 +121,14 @@ const MysteryBoxes = () => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-xl font-bold">Mystery Boxes</h1>
+              <h1 className="text-xl font-bold">Mystery Bags</h1>
               <p className="text-white/90 text-sm">Surprise yourself, save more</p>
             </div>
             <Sparkles className="w-6 h-6 ml-auto" />
           </div>
         </div>
 
-        {/* Mystery Boxes Grid */}
+        {/* Mystery Bags Grid */}
         <div className="p-4 space-y-4">
           {allMysteryBoxes.map((box) => (
             <div key={box.id} className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -182,4 +182,4 @@ const MysteryBoxes = () => {
   );
 };
 
-export default MysteryBoxes;
+export default MysteryBags;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface WelcomeMessageProps {
@@ -71,7 +71,8 @@ const WelcomeMessage = ({ isFirstTime = false }: WelcomeMessageProps) => {
                   Discover surplus food (Mystery bags) from local restaurants and stores. Help reduce food waste while enjoying delicious meals at up to 70% off.
                 </p>
                 <p className="text-brand-green font-medium">
-                  ✨ Tap to explore. Swipe to save. Your next zero-waste meal awaits!
+                  <Sparkles className="inline w-4 h-4 mr-1" />
+                Tap to explore. Swipe to save. Your next zero-waste meal awaits!
                 </p>
               </>
             )}

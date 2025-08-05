@@ -61,7 +61,10 @@ export const CategoryCarousel = ({ category, items, onSeeAll, onItemClick }: Cat
                   <p className="text-sm text-gray-600 truncate">{item.type}</p>
                   
                   <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                    <span>⭐ {item.rating}</span>
+                    <span className="flex items-center gap-1">
+                  <Star className="w-4 h-4" />
+                  {item.rating}
+                </span>
                     <span>•</span>
                     <span>{item.distance}</span>
                   </div>

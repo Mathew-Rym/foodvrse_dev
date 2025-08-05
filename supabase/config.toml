@@ -25,10 +25,16 @@ image_transformation = { enabled = true }
 
 [auth]
 enabled = true
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://vsvhkkalfziuyttwityc.lovable.app"]
+site_url = "http://localhost:8080"
+additional_redirect_urls = ["https://vsvhkkalfziuyttwityc.lovable.app", "http://localhost:8080"]
 jwt_expiry = 3600
 enable_signup = true
+
+[auth.external.google]
+enabled = true
+client_id = "707536400304-6ogfei7hql85l4csjch467922du99hur.apps.googleusercontent.com"
+secret = ""
+redirect_uri = "http://localhost:8080/oauth-callback"
 
 [edge_runtime]
 enabled = true

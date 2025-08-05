@@ -13,6 +13,7 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, userData?: any) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithGoogle: (isBusinessAuth?: boolean) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refreshUserData: () => Promise<void>;
   isAuthenticated: boolean;
@@ -30,6 +31,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Handle OAuth callback
+    const handleOAuthCallback = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (data.session) {
+        setSession(data.session);
+        setUser(data.session.user);
+        
+        // Check if user needs profile setup
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('user_id', data.session.user.id)
+          .single();
+
+        if (!profile) {
+          // User needs profile setup, redirect to OAuth handler
+          window.location.href = '/oauth-callback';
+          return;
+        }
+
+        await fetchUserData(data.session.user.id);
+      }
+      setLoading(false);
+    };
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -63,6 +89,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       setLoading(false);
     });
+
+    // Handle OAuth callback if needed
+    if (window.location.search.includes('access_token') || window.location.search.includes('error')) {
+      handleOAuthCallback();
+    }
 
     return () => subscription.unsubscribe();
   }, []);
@@ -150,6 +181,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signInWithGoogle = async (isBusinessAuth = false) => {
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+          scopes: 'email profile',
+        }
+      });
+
+      if (error) {
+        console.error('Google OAuth error:', error);
+        toast.error(error.message);
+        return { error };
+      }
+
+      // Store business auth flag for after redirect
+      if (isBusinessAuth) {
+        sessionStorage.setItem('google_business_auth', 'true');
+      }
+
+      toast.success('Redirecting to Google...');
+      return { error: null };
+    } catch (error: any) {
+      console.error('Google OAuth exception:', error);
+      toast.error('Google sign-in failed');
+      return { error };
+    }
+  };
+
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -182,6 +249,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
     refreshUserData,
     isAuthenticated,

@@ -30,6 +30,7 @@ import AddItemModal from "@/components/AddItemModal";
 import Analytics from "@/components/Analytics";
 import BusinessOnboardingTour from "@/components/BusinessOnboardingTour";
 import GoogleMapsLocationPicker from "@/components/GoogleMapsLocationPicker";
+import GoogleAddressSelector from "@/components/GoogleAddressSelector";
 import { toast } from "sonner";
 
 const BusinessDashboard = () => {
@@ -52,6 +53,7 @@ const BusinessDashboard = () => {
     co2Missed: 0
   });
   const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [showAddressSelector, setShowAddressSelector] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -398,7 +400,9 @@ const BusinessDashboard = () => {
           <div id="stats-overview" className="grid grid-cols-2 gap-3 mb-6">
             <div className="bg-card rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <DollarSign className="w-4 h-4 text-green-600" />
+                <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-br from-green-100 to-green-200 rounded-full shadow-sm border border-green-300">
+                  <DollarSign className="w-3 h-3 text-green-700" />
+                </div>
                 <span className="text-sm text-muted-foreground">Total Sales</span>
               </div>
               <p className="text-xl font-bold text-foreground">KSh {businessStats.totalSales.toLocaleString()}</p>
@@ -418,16 +422,16 @@ const BusinessDashboard = () => {
 
             <div id="co2-stats" className="bg-card rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <Leaf className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-muted-foreground">CO₂ Saved</span>
+                <Leaf className="w-4 h-4 text-blue-600" />
+                <span className="text-sm text-blue-700 font-medium">CO₂ Saved</span>
               </div>
-              <p className="text-xl font-bold text-foreground">{businessStats.co2Saved.toFixed(1)}kg</p>
+              <p className="text-xl font-bold text-blue-700">{businessStats.co2Saved.toFixed(1)}kg</p>
               <div className="flex items-center gap-2 mt-1">
-                <p className="text-xs text-green-600">Environmental impact</p>
+                <p className="text-xs text-blue-600">Environmental impact</p>
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-6 px-2 text-xs bg-gradient-to-r from-green-500 to-blue-500 text-white"
+                  className="h-6 px-2 text-xs bg-gradient-to-r from-blue-500 to-blue-600 text-white"
                   onClick={() => setShowCarbonCredit(true)}
                 >
                   Carbon Market
@@ -569,13 +573,23 @@ const BusinessDashboard = () => {
                 <MapPin className="w-5 h-5 text-blue-600" />
                 <h3 className="font-semibold">Business Location</h3>
               </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowLocationPicker(!showLocationPicker)}
-              >
-                {businessProfile?.latitude ? 'Update Location' : 'Set Location'}
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowLocationPicker(!showLocationPicker)}
+                >
+                  {businessProfile?.latitude ? 'Update Location' : 'Set Location'}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowAddressSelector(true)}
+                  className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                >
+                  Advanced Address
+                </Button>
+              </div>
             </div>
             
             {businessProfile?.latitude ? (
@@ -719,7 +733,9 @@ const BusinessDashboard = () => {
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1 text-sm text-gray-600">
-                        <Clock className="w-3 h-3" />
+                        <div className="flex items-center justify-center w-4 h-4 bg-gray-100 rounded-full">
+                          <Clock className="w-2.5 h-2.5 text-gray-600" />
+                        </div>
                         <span>
                           {new Date(item.pickup_start).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - 
                           {new Date(item.pickup_end).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
@@ -814,10 +830,10 @@ const BusinessDashboard = () => {
                   These credits are sold to companies looking to offset their carbon footprint, putting money directly in your pocket.
                 </p>
                 <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-green-600">{businessStats.co2Saved.toFixed(1)}kg</p>
-                    <p className="text-sm text-green-700">CO₂ Saved So Far</p>
-                  </div>
+                                      <div className="text-center">
+                      <p className="text-2xl font-bold text-blue-600">{businessStats.co2Saved.toFixed(1)}kg</p>
+                      <p className="text-sm text-blue-700">CO₂ Saved So Far</p>
+                    </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold text-green-600">KSh {(businessStats.co2Saved * 1200).toFixed(0)}</p>
                     <p className="text-sm text-green-700">Potential Earnings*</p>
@@ -927,6 +943,19 @@ const BusinessDashboard = () => {
             </DialogContent>
           </Dialog>
         )}
+
+        {/* Google Address Selector */}
+        <GoogleAddressSelector
+          isOpen={showAddressSelector}
+          onClose={() => setShowAddressSelector(false)}
+          onAddressSelect={(address, lat, lng) => {
+            handleLocationUpdate({ lat, lng, address });
+            setShowAddressSelector(false);
+            toast.success('Address selected successfully!');
+          }}
+          title="Select Business Address"
+          description="Use Google's address selection tool to precisely set your business location"
+        />
     </div>
   );
 };

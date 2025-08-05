@@ -32,8 +32,8 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
       desktopPosition: { top: "25%", left: "50%" }
     },
     {
-      title: "Mystery Boxes",
-      content: "Try our surprise boxes filled with rescued ingredients at great prices - perfect for adventurous foodies!",
+      title: "Mystery Bags",
+              content: "Try our surprise bags filled with rescued ingredients at great prices - perfect for adventurous foodies!",
       targetId: "mystery-box-section",
       icon: <Gift className="w-5 h-5" />,
       mobilePosition: { top: "35%", left: "50%" },
@@ -58,10 +58,10 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
     {
       title: "Become a Partner",
       content: "Are you a business? Join our mission to reduce food waste and earn money while making a difference",
-      targetId: "partner-section",
+      targetId: "become-partner-button",
       icon: <Users className="w-5 h-5" />,
-      mobilePosition: { top: "75%", left: "50%" },
-      desktopPosition: { top: "70%", left: "50%" }
+      mobilePosition: { top: "15%", left: "50%" },
+      desktopPosition: { top: "15%", left: "50%" }
     }
   ];
 
@@ -71,11 +71,11 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
       const currentStepData = steps[currentStep];
       let targetElement = document.getElementById(currentStepData.targetId);
       
-      // Fallback elements for conditional rendering
+      // Enhanced fallback handling for conditional elements
       if (!targetElement) {
         switch (currentStepData.targetId) {
           case 'mobile-navigation':
-            // If mobile navigation is not rendered, highlight the bottom area
+            // Create a more visible fallback for mobile navigation
             targetElement = document.createElement('div');
             targetElement.id = 'mobile-navigation-fallback';
             targetElement.style.position = 'fixed';
@@ -83,33 +83,47 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
             targetElement.style.left = '0';
             targetElement.style.width = '100%';
             targetElement.style.height = '80px';
-            targetElement.style.backgroundColor = 'rgba(249, 115, 22, 0.2)';
-            targetElement.style.borderTop = '3px solid rgba(249, 115, 22, 0.8)';
+            targetElement.style.backgroundColor = 'rgba(61, 108, 86, 0.1)';
+            targetElement.style.borderTop = '4px solid #3D6C56';
             targetElement.style.pointerEvents = 'none';
             targetElement.style.zIndex = '9998';
+            targetElement.style.boxShadow = '0 -4px 20px rgba(61, 108, 86, 0.2)';
             document.body.appendChild(targetElement);
             break;
           case 'feedback-fab':
-            // If feedback FAB is not visible, create a more visible fallback
+            // Create a more visible fallback for feedback FAB
             targetElement = document.createElement('div');
             targetElement.id = 'feedback-fab-fallback';
             targetElement.style.position = 'fixed';
-            targetElement.style.bottom = '20px';
-            targetElement.style.right = '20px';
-            targetElement.style.width = '80px';
-            targetElement.style.height = '80px';
-            targetElement.style.backgroundColor = 'rgba(249, 115, 22, 0.2)';
-            targetElement.style.border = '3px solid rgba(249, 115, 22, 0.8)';
+            targetElement.style.bottom = isMobile ? '100px' : '120px';
+            targetElement.style.right = '24px';
+            targetElement.style.width = '56px';
+            targetElement.style.height = '56px';
+            targetElement.style.backgroundColor = 'rgba(252, 218, 91, 0.1)';
+            targetElement.style.border = '3px solid #FCDA5B';
             targetElement.style.borderRadius = '50%';
             targetElement.style.pointerEvents = 'none';
             targetElement.style.zIndex = '9998';
+            targetElement.style.boxShadow = '0 0 20px rgba(252, 218, 91, 0.3)';
             document.body.appendChild(targetElement);
             break;
-          case 'partner-section':
-            // Try alternative selectors for partner section
-            targetElement = document.querySelector('[data-partner-section]') || 
-                           document.querySelector('.partner-section') ||
-                           document.querySelector('footer');
+          case 'become-partner-button':
+            // Try to find the Become a Partner button
+            targetElement = document.getElementById('become-partner-button') || 
+                           document.getElementById('become-partner-button-mobile') ||
+                           document.querySelector('button[onclick*="handlePartnerClick"]') ||
+                           document.querySelector('button:contains("Become a Partner")');
+            break;
+          case 'hero-section':
+            // Fallback for hero section
+            targetElement = document.querySelector('main') || 
+                           document.querySelector('.hero-section') ||
+                           document.querySelector('section');
+            break;
+          case 'mystery-box-section':
+            // Fallback for mystery box section
+            targetElement = document.querySelector('.mystery-box') || 
+                           document.querySelector('[data-mystery-box]');
             break;
           default:
             break;
@@ -121,23 +135,22 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
         
-        // Responsive padding based on screen size
-        const padding = isMobile ? 12 : isTablet ? 10 : 8;
+        // Enhanced responsive padding
+        const padding = isMobile ? 16 : isTablet ? 12 : 10;
         
         // Ensure the element is visible in viewport
         const viewportHeight = window.innerHeight;
         const viewportWidth = window.innerWidth;
         
-        // Handle fixed positioned elements differently
         let top, left, width, height;
         
-                  if (currentStepData.targetId === 'feedback-fab' || targetElement.style.position === 'fixed') {
-            // For fixed elements, use viewport coordinates directly
-            top = rect.top - padding;
-            left = rect.left - padding;
-            width = rect.width + (padding * 2);
-            height = rect.height + (padding * 2);
-          } else {
+        if (currentStepData.targetId === 'feedback-fab' || targetElement.style.position === 'fixed') {
+          // For fixed elements, use viewport coordinates directly
+          top = rect.top - padding;
+          left = rect.left - padding;
+          width = rect.width + (padding * 2);
+          height = rect.height + (padding * 2);
+        } else {
           // For normal elements, use scroll-adjusted coordinates
           top = rect.top + scrollTop - padding;
           left = rect.left + scrollLeft - padding;
@@ -145,7 +158,7 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
           height = rect.height + (padding * 2);
         }
         
-        // Ensure highlight doesn't go off-screen
+        // Enhanced boundary checking
         if (top < 0) {
           top = 10;
         }
@@ -160,32 +173,41 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
         }
         
         // Ensure minimum size for visibility
-        const minSize = isMobile ? 80 : 60;
+        const minSize = isMobile ? 100 : 80;
         
         const finalStyle = {
           top: Math.max(0, top),
           left: Math.max(0, left),
           width: Math.max(width, minSize),
           height: Math.max(height, minSize),
-          borderRadius: isMobile ? '12px' : '8px'
+          borderRadius: isMobile ? '16px' : '12px'
         };
         
         setSpotlightStyle(finalStyle);
         
-        // Clean up fallback elements
+        // Clean up fallback elements with delay
         if (targetElement.id && (targetElement.id.includes('fallback') || targetElement.id.includes('focused'))) {
           setTimeout(() => {
             if (targetElement && targetElement.parentNode) {
               targetElement.parentNode.removeChild(targetElement);
             }
-          }, 200);
+          }, 300);
         }
-      } else {
-        setSpotlightStyle(null);
-      }
+              } else {
+          // If no target found, create a default spotlight in the center
+          const viewportHeight = window.innerHeight;
+          const viewportWidth = window.innerWidth;
+          setSpotlightStyle({
+            top: viewportHeight / 2 - 50,
+            left: viewportWidth / 2 - 50,
+            width: 100,
+            height: 100,
+            borderRadius: '16px'
+          });
+        }
     };
 
-    // Scroll to target element smoothly with responsive offset
+    // Enhanced scroll to target function
     const scrollToTarget = () => {
       const currentStepData = steps[currentStep];
       let targetElement = document.getElementById(currentStepData.targetId);
@@ -203,7 +225,7 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
           case 'feedback-fab':
             // Scroll to bottom right area for feedback FAB
             window.scrollTo({
-              top: document.body.scrollHeight - window.innerHeight + 100,
+              top: document.body.scrollHeight - window.innerHeight + 150,
               behavior: 'smooth'
             });
             return;
@@ -211,9 +233,11 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
             // Try to find game section or scroll to mystery box section
             targetElement = document.getElementById('game-section') || document.getElementById('mystery-box-section');
             break;
-          case 'partner-section':
-            // Try to find partner section or scroll to footer
-            targetElement = document.getElementById('partner-section') || document.querySelector('footer');
+          case 'become-partner-button':
+            // Try to find the Become a Partner button or scroll to header
+            targetElement = document.getElementById('become-partner-button') || 
+                           document.getElementById('become-partner-button-mobile') ||
+                           document.querySelector('header');
             break;
           default:
             break;
@@ -224,8 +248,8 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
         const targetRect = targetElement.getBoundingClientRect();
         const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
-        // Responsive offset based on screen size
-        const offset = isMobile ? 80 : isTablet ? 100 : 120;
+        // Enhanced responsive offset
+        const offset = isMobile ? 100 : isTablet ? 120 : 140;
         const targetScrollTop = currentScrollTop + targetRect.top - offset;
         
         // Smooth scroll to the target
@@ -236,28 +260,27 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
       }
     };
 
-    // Initial update and scroll with delay for better positioning
+    // Initial update and scroll with enhanced delay
     const timer = setTimeout(() => {
       updateSpotlight();
       scrollToTarget();
-    }, currentStepData.targetId === 'feedback-fab' ? 300 : 100);
+    }, currentStepData.targetId === 'feedback-fab' ? 400 : 150);
 
-    // Update on window resize with debouncing
+    // Enhanced resize and scroll handlers
     let resizeTimer: NodeJS.Timeout;
     const handleResize = () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
         updateSpotlight();
-      }, 150);
+      }, 200);
     };
 
-    // Update on scroll with throttling
     let scrollTimer: NodeJS.Timeout;
     const handleScroll = () => {
       clearTimeout(scrollTimer);
       scrollTimer = setTimeout(() => {
         updateSpotlight();
-      }, 50);
+      }, 100);
     };
 
     window.addEventListener('resize', handleResize);
@@ -272,7 +295,7 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
     };
   }, [currentStep, isMobile, isTablet]);
 
-  // Cleanup function to remove all fallback elements
+  // Enhanced cleanup function
   const cleanupFallbacks = () => {
     const fallbacks = document.querySelectorAll('[id*="fallback"], [id*="focused"]');
     fallbacks.forEach(fallback => {
@@ -324,27 +347,27 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
   const currentStepData = steps[currentStep];
   const position = isMobile ? currentStepData.mobilePosition : currentStepData.desktopPosition;
 
-  // Calculate responsive tooltip position
+  // Enhanced tooltip position calculation
   const getTooltipPosition = () => {
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
-    const tooltipHeight = isMobile ? 280 : 320; // Approximate tooltip height
-    const tooltipWidth = isMobile ? viewportWidth - 32 : 400; // Approximate tooltip width
+    const tooltipHeight = isMobile ? 300 : 340;
+    const tooltipWidth = isMobile ? viewportWidth - 32 : 420;
     
     let finalPosition = { ...position };
     
-    // Ensure tooltip doesn't go off-screen
+    // Enhanced boundary checking for tooltip
     if (position.top && typeof position.top === 'string') {
       const topPercent = parseInt(position.top);
-      if (topPercent > 70) {
-        finalPosition.top = '60%';
+      if (topPercent > 65) {
+        finalPosition.top = '55%';
       }
     }
     
     if (position.bottom && typeof position.bottom === 'string') {
       const bottomPercent = parseInt(position.bottom);
-      if (bottomPercent < 120) {
-        finalPosition.bottom = '140px';
+      if (bottomPercent < 140) {
+        finalPosition.bottom = '160px';
       }
     }
     
@@ -358,13 +381,13 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
 
   return (
     <>
-      {/* Dark overlay with spotlight cutout */}
-      <div className="fixed inset-0 bg-black bg-opacity-80 z-50">
-      {spotlightStyle && (
+      {/* Enhanced dark overlay with spotlight cutout */}
+      <div className="fixed inset-0 bg-black bg-opacity-40 z-50">
+        {spotlightStyle && (
           <>
-            {/* Simple highlight border - always visible */}
+            {/* Enhanced highlight border - completely transparent */}
             <div
-              className="absolute border-4 border-brand-green rounded-lg bg-brand-green bg-opacity-10"
+              className="absolute border-4 border-brand-green rounded-lg bg-transparent"
               style={{
                 top: `${spotlightStyle.top}px`,
                 left: `${spotlightStyle.left}px`,
@@ -372,67 +395,70 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
                 height: `${spotlightStyle.height}px`,
                 borderRadius: spotlightStyle.borderRadius,
                 zIndex: 55,
-                boxShadow: '0 0 20px rgba(249, 115, 22, 0.8)',
+                boxShadow: '0 0 30px rgba(61, 108, 86, 0.8), 0 0 60px rgba(61, 108, 86, 0.4)',
               }}
             />
-            {/* Glow effect */}
+            {/* Enhanced glow effect - reduced opacity */}
             <div
               className="absolute bg-transparent rounded-lg"
               style={{
-                top: `${spotlightStyle.top - 8}px`,
-                left: `${spotlightStyle.left - 8}px`,
-                width: `${spotlightStyle.width + 16}px`,
-                height: `${spotlightStyle.height + 16}px`,
+                top: `${spotlightStyle.top - 12}px`,
+                left: `${spotlightStyle.left - 12}px`,
+                width: `${spotlightStyle.width + 24}px`,
+                height: `${spotlightStyle.height + 24}px`,
                 borderRadius: spotlightStyle.borderRadius,
-                boxShadow: `0 0 30px rgba(249, 115, 22, 0.8), 0 0 60px rgba(249, 115, 22, 0.4)`,
+                boxShadow: `0 0 40px rgba(61, 108, 86, 0.3), 0 0 80px rgba(61, 108, 86, 0.2)`,
                 zIndex: 54,
               }}
             />
-            {/* Main spotlight cutout */}
+            {/* Main spotlight cutout - completely clear */}
             <div
               className="absolute bg-transparent border-4 border-brand-green rounded-lg"
-          style={{
-            top: `${spotlightStyle.top}px`,
-            left: `${spotlightStyle.left}px`,
-            width: `${spotlightStyle.width}px`,
-            height: `${spotlightStyle.height}px`,
+              style={{
+                top: `${spotlightStyle.top}px`,
+                left: `${spotlightStyle.left}px`,
+                width: `${spotlightStyle.width}px`,
+                height: `${spotlightStyle.height}px`,
                 borderRadius: spotlightStyle.borderRadius,
-                boxShadow: `0 0 0 9999px rgba(0,0,0,0.85)`,
+                boxShadow: `0 0 0 9999px rgba(0,0,0,0.3)`,
                 zIndex: 51,
               }}
             />
-            {/* Additional highlight for better visibility */}
+            {/* Enhanced white border for better visibility */}
             <div
-              className="absolute border-2 border-white rounded-lg"
+              className="absolute border-4 border-white rounded-lg"
               style={{
-                top: `${spotlightStyle.top - 2}px`,
-                left: `${spotlightStyle.left - 2}px`,
-                width: `${spotlightStyle.width + 4}px`,
-                height: `${spotlightStyle.height + 4}px`,
+                top: `${spotlightStyle.top - 4}px`,
+                left: `${spotlightStyle.left - 4}px`,
+                width: `${spotlightStyle.width + 8}px`,
+                height: `${spotlightStyle.height + 8}px`,
                 borderRadius: spotlightStyle.borderRadius,
                 zIndex: 56,
+                boxShadow: '0 0 20px rgba(255, 255, 255, 1), 0 0 40px rgba(255, 255, 255, 0.8), 0 0 60px rgba(255, 255, 255, 0.4)',
               }}
             />
           </>
         )}
       </div>
 
-      {/* Tooltip Card */}
+      {/* Enhanced Tooltip Card */}
       <Card 
         className={`fixed z-50 bg-card shadow-2xl border-0 ${
-          isMobile ? 'w-[calc(100vw-32px)] max-w-sm' : 'w-full max-w-md'
+          isMobile ? 'w-[calc(100vw-24px)] max-w-sm mx-3' : 'w-full max-w-md'
         }`}
         style={{
           ...getTooltipPosition(),
           transform: getTooltipPosition().left === "50%" ? "translateX(-50%)" : "none",
-          marginTop: getTooltipPosition().top ? "20px" : undefined,
-          marginBottom: getTooltipPosition().bottom ? "20px" : undefined,
+          marginTop: getTooltipPosition().top ? "16px" : undefined,
+          marginBottom: getTooltipPosition().bottom ? "16px" : undefined,
+          maxHeight: isMobile ? "calc(100vh - 32px)" : undefined,
+          overflowY: isMobile ? "auto" : undefined,
         }}
         role="dialog"
         aria-labelledby="tour-title"
         aria-describedby="tour-content"
       >
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           {/* Header */}
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-2">
@@ -440,7 +466,7 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
                 {currentStepData.icon}
               </div>
               <div className="text-sm text-muted-foreground font-medium">
-              Step {currentStep + 1} of {steps.length}
+                Step {currentStep + 1} of {steps.length}
               </div>
             </div>
             <Button 
@@ -455,20 +481,20 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
 
           {/* Content */}
           <div className="mb-6">
-                    <h2 id="tour-title" className="text-xl font-bold text-foreground mb-3">
+            <h2 id="tour-title" className="text-xl font-bold text-foreground mb-3">
               {currentStepData.title}
             </h2>
-        <p id="tour-content" className="text-muted-foreground leading-relaxed text-sm">
+            <p id="tour-content" className="text-muted-foreground leading-relaxed text-sm">
               {currentStepData.content}
             </p>
           </div>
 
-          {/* Progress bar */}
+          {/* Enhanced Progress bar */}
           <div className="flex items-center gap-2 mb-6">
             {steps.map((_, index) => (
               <div
                 key={index}
-                className={`h-1.5 rounded-full flex-1 transition-all duration-300 ${
+                className={`h-2 rounded-full flex-1 transition-all duration-300 ${
                   index <= currentStep ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gray-200'
                 }`}
               />
@@ -506,7 +532,6 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
             >
               Skip Tour
             </Button>
-
           </div>
         </CardContent>
       </Card>

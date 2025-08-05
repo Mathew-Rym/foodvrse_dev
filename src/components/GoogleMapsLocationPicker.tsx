@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { MapPin, Search } from "lucide-react";
+import { MapPin, Search, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -25,33 +25,18 @@ const GoogleMapsLocationPicker = ({
   const [searchValue, setSearchValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState(currentLocation);
+  const [showAddressSelector, setShowAddressSelector] = useState(false);
 
   useEffect(() => {
     const initializeMap = async () => {
       try {
-        // Get Google Maps API key from Supabase function
-        const { data, error } = await supabase.functions.invoke('get-google-maps-key');
-        
-        if (error || !data?.apiKey) {
-          // Fallback: prompt user to enter API key
-          const apiKey = prompt('Please enter your Google Maps API key:');
-          if (!apiKey) {
-            toast.error('Google Maps API key is required');
-            return;
-          }
-          await loadMap(apiKey);
-        } else {
-          await loadMap(data.apiKey);
-        }
+        // Use the provided Google Maps API key
+        const apiKey = 'AIzaSyABKMHMAiFihQZA_ql6rhqi1EsNxWgv8ts';
+        await loadMap(apiKey);
       } catch (error) {
-        console.error('Error getting API key:', error);
-        // Fallback: prompt user to enter API key
-        const apiKey = prompt('Please enter your Google Maps API key:');
-        if (apiKey) {
-          await loadMap(apiKey);
-        } else {
-          toast.error('Google Maps API key is required');
-        }
+        console.error('Error loading Google Maps:', error);
+        toast.error('Failed to load Google Maps. Please check your API key.');
+        setIsLoading(false);
       }
     };
 
@@ -224,7 +209,34 @@ const GoogleMapsLocationPicker = ({
           <Button onClick={handleSearch} variant="outline">
             <Search className="w-4 h-4" />
           </Button>
+          <Button 
+            onClick={() => setShowAddressSelector(!showAddressSelector)} 
+            variant="outline"
+            className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+          >
+            <Globe className="w-4 h-4" />
+          </Button>
         </div>
+
+        {/* Address Selection Iframe */}
+        {showAddressSelector && (
+          <div className="border rounded-lg overflow-hidden">
+            <div className="bg-green-50 p-3 border-b">
+              <h4 className="font-medium text-green-800">Advanced Address Selection</h4>
+              <p className="text-sm text-green-600">Use Google's address selection tool for precise location picking</p>
+            </div>
+            <div className="h-96">
+              <iframe 
+                src="https://storage.googleapis.com/maps-solutions-pafyahvhtl/address-selection/1zko/address-selection.html"
+                width="100%" 
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                title="Address Selection"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Map Container */}
         <div className="relative">

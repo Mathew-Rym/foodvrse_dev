@@ -128,7 +128,7 @@ const OurStory = () => {
               <div className="flex gap-4">
                 <div className="w-3 h-3 rounded-full bg-primary mt-2 flex-shrink-0"></div>
                 <div>
-                  <h3 className="font-semibold">2023 - The Idea</h3>
+                  <h3 className="font-semibold">2024 - The Idea</h3>
                   <p className="text-muted-foreground">Conceived the concept and built our first prototype</p>
                 </div>
               </div>

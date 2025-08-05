@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Loader } from '@googlemaps/js-api-loader';
 
 interface LocationData {
   lat: number;
@@ -46,16 +47,35 @@ export const useLocation = (): UseLocationReturn => {
         const locationData = { lat: latitude, lng: longitude };
 
         try {
-          // Try to get address from coordinates using reverse geocoding
-          // In a real app, you'd use Google Maps or another geocoding service
-          const address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-          const fullLocationData = { ...locationData, address };
+          // Use Google Maps API for reverse geocoding
+          const apiKey = 'AIzaSyABKMHMAiFihQZA_ql6rhqi1EsNxWgv8ts';
+          const loader = new Loader({
+            apiKey,
+            version: 'weekly',
+            libraries: ['geocoding']
+          });
+
+          await loader.load();
           
+          const geocoder = new google.maps.Geocoder();
+          const response = await geocoder.geocode({ 
+            location: { lat: latitude, lng: longitude } 
+          });
+          
+          let address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+          if (response.results[0]) {
+            address = response.results[0].formatted_address;
+          }
+          
+          const fullLocationData = { ...locationData, address };
           setLocation(fullLocationData);
           localStorage.setItem('userLocation', JSON.stringify(fullLocationData));
         } catch (e) {
-          setLocation(locationData);
-          localStorage.setItem('userLocation', JSON.stringify(locationData));
+          console.error('Geocoding error:', e);
+          const address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+          const fullLocationData = { ...locationData, address };
+          setLocation(fullLocationData);
+          localStorage.setItem('userLocation', JSON.stringify(fullLocationData));
         }
         
         setLoading(false);

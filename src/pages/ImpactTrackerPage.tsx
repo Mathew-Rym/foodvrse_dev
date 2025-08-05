@@ -45,7 +45,7 @@ const ImpactTrackerPage = () => {
   const stats = [
     { value: "12,000+", label: "Meals Saved", color: "text-green-600" },
     { value: "2.5T", label: "CO₂ Reduced", color: "text-blue-600" },
-    { value: "KSh 580K", label: "Money Saved", color: "text-orange-600" },
+            { value: "KSh 580K", label: "Money Saved", color: "text-brand-yellow" },
     { value: "500+", label: "Partner Restaurants", color: "text-purple-600" }
   ];
 
@@ -103,19 +103,19 @@ const ImpactTrackerPage = () => {
           <h2 className="text-xl font-bold text-gray-900 mb-4">How Impact Tracking Works</h2>
           <div className="space-y-3 text-gray-600">
             <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">1</div>
+              <div className="w-6 h-6 bg-brand-green text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">1</div>
               <div>Every mystery bag you purchase automatically tracks your environmental impact</div>
             </div>
             <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">2</div>
+              <div className="w-6 h-6 bg-brand-green text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">2</div>
               <div>View detailed analytics about your CO₂ savings and food waste reduction</div>
             </div>
             <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">3</div>
+              <div className="w-6 h-6 bg-brand-green text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">3</div>
               <div>Earn badges and achievements as you reach impact milestones</div>
             </div>
             <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">4</div>
+              <div className="w-6 h-6 bg-brand-green text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">4</div>
               <div>Share your impact with friends and inspire others to join the movement</div>
             </div>
           </div>
