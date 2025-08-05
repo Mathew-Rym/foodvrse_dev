@@ -1,1 +1,1 @@
-{"last_found_secrets": [{"match": "91c1686d99a25d2ae652e620df355017798293c6df2ea60c3e7dd8b3ae632248", "name": "JSON Web Token - /home/rym/Documents/BUSINESS/DEV_PROJECTS/foodvrse_dev/src/integrations/supabase/client.ts"}]}
+{"last_found_secrets": [{"name": "JSON Web Token - /home/rym/Documents/BUSINESS/DEV_PROJECTS/foodvrse_dev/scripts/test-oauth-config.js", "match": "91c1686d99a25d2ae652e620df355017798293c6df2ea60c3e7dd8b3ae632248"}]}
