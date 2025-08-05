@@ -7,6 +7,7 @@ import { MapPin, Search, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { API_CONFIG } from "@/config/api";
 
 interface GoogleMapsLocationPickerProps {
   businessId: string;
@@ -30,8 +31,8 @@ const GoogleMapsLocationPicker = ({
   useEffect(() => {
     const initializeMap = async () => {
       try {
-        // Use the provided Google Maps API key
-        const apiKey = 'AIzaSyABKMHMAiFihQZA_ql6rhqi1EsNxWgv8ts';
+        // Use the centralized API configuration
+        const apiKey = API_CONFIG.GOOGLE_MAPS_API_KEY;
         await loadMap(apiKey);
       } catch (error) {
         console.error('Error loading Google Maps:', error);

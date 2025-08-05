@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
+import { API_CONFIG } from '@/config/api';
 
 interface LocationData {
   lat: number;
@@ -48,7 +49,7 @@ export const useLocation = (): UseLocationReturn => {
 
         try {
           // Use Google Maps API for reverse geocoding
-          const apiKey = 'AIzaSyABKMHMAiFihQZA_ql6rhqi1EsNxWgv8ts';
+          const apiKey = API_CONFIG.GOOGLE_MAPS_API_KEY;
           const loader = new Loader({
             apiKey,
             version: 'weekly',

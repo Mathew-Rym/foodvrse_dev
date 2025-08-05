@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
+import { API_CONFIG } from '@/config/api';
 
 interface GoogleMapProps {
   center?: { lat: number; lng: number };
@@ -39,7 +40,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       if (!mapRef.current) return;
 
       try {
-        const apiKey = 'AIzaSyABKMHMAiFihQZA_ql6rhqi1EsNxWgv8ts';
+        const apiKey = API_CONFIG.GOOGLE_MAPS_API_KEY;
         const loader = new Loader({
           apiKey,
           version: 'weekly',
