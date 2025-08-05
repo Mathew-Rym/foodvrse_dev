@@ -375,12 +375,12 @@ const Press = () => {
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Button asChild>
-              <a href="mailto:media@foodvrse.com?subject=Media Inquiry - FoodVrse">
+              <a href="mailto:hebrew@foodvrse.com?subject=Media Inquiry - FoodVrse">
                 Contact Media Team
               </a>
             </Button>
             <Button variant="outline" asChild>
-              <a href="mailto:media@foodvrse.com?subject=Interview Request - FoodVrse">
+              <a href="mailto:hebrew@foodvrse.com?subject=Interview Request - FoodVrse">
                 Interview Request
               </a>
             </Button>
