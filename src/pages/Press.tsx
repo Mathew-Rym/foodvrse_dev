@@ -46,19 +46,22 @@ const Press = () => {
       name: "Company Logo Package",
       description: "High-resolution logos in various formats (PNG, SVG, EPS)",
       type: "ZIP",
-      size: "2.3 MB"
+      size: "2.3 MB",
+      link: "https://drive.google.com/drive/folders/1EDL1kaizYOjgohVrzjDoorWYMFh5ykSc?usp=drive_link"
     },
     {
       name: "Product Screenshots",
       description: "High-quality app screenshots and interface designs",
       type: "ZIP",
-      size: "15.2 MB"
+      size: "15.2 MB",
+      link: "https://drive.google.com/drive/folders/1EDL1kaizYOjgohVrzjDoorWYMFh5ykSc?usp=drive_link"
     },
     {
       name: "Company Fact Sheet",
       description: "Key statistics, milestones, and company information",
       type: "PDF",
-      size: "1.1 MB"
+      size: "1.1 MB",
+      link: "https://drive.google.com/file/d/1ew7u7coozwku90_xloRkwuBZjDDusCTM/view?usp=drive_link"
     }
   ];
 
@@ -248,7 +251,7 @@ const Press = () => {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => window.open('https://drive.google.com/drive/folders/1EDL1kaizYOjgohVrzjDoorWYMFh5ykSc?usp=drive_link', '_blank')}
+                      onClick={() => window.open(item.link, '_blank')}
                     >
                       <Download className="h-4 w-4" />
                     </Button>
