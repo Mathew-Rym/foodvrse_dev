@@ -16,11 +16,15 @@ export const useOnboarding = () => {
 
   const completeOnboarding = () => {
     localStorage.setItem('foodvrse-onboarding-complete', 'true');
+    // Set flag to trigger cookie consent
+    localStorage.setItem('foodvrse-onboarding-just-completed', 'true');
     setShowOnboarding(false);
   };
 
   const skipOnboarding = () => {
     localStorage.setItem('foodvrse-onboarding-complete', 'true');
+    // Set flag to trigger cookie consent
+    localStorage.setItem('foodvrse-onboarding-just-completed', 'true');
     setShowOnboarding(false);
   };
 

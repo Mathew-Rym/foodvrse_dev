@@ -1,1 +1,1 @@
-{"last_found_secrets": [{"name": "JSON Web Token - /home/rym/Documents/BUSINESS/DEV_PROJECTS/foodvrse_dev/scripts/test-env-supabase.js", "match": "91c1686d99a25d2ae652e620df355017798293c6df2ea60c3e7dd8b3ae632248"}]}
+{"last_found_secrets": [{"match": "9dc716c3e2dca957230335677a36061a03f213fb5df2d0b7fd5286f4dd6ac35a", "name": "Google API Key - /home/rym/Documents/BUSINESS/DEV_PROJECTS/foodvrse_dev/src/components/Header.tsx"}]}

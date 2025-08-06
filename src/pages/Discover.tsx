@@ -9,7 +9,7 @@ import { LocationSelector } from "@/components/LocationSelector";
 import { CategoryCarousel } from "@/components/CategoryCarousel";
 import { StoreProfilePage } from "@/components/StoreProfilePage";
 import ListingsGrid from "@/components/ListingsGrid";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/lib/supabaseClient';
 import { toast } from "sonner";
 
 const Discover = () => {

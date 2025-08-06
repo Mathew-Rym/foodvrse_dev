@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com https://cdn.onesignal.com https://polyfill.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://maps.googleapis.com https://api.supabase.co https://onesignal.com https://cdn.onesignal.com https://polyfill.io; frame-src 'self' https://storage.googleapis.com https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com https://cdn.onesignal.com https://polyfill.io https://player.vimeo.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://maps.googleapis.com https://api.supabase.co https://onesignal.com https://cdn.onesignal.com https://polyfill.io; frame-src 'self' https://storage.googleapis.com https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://player.vimeo.com;">
     
     <!-- Cross-browser compatibility -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -99,5 +99,8 @@
     </script>
     
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Vimeo Player API -->
+    <script src="https://player.vimeo.com/api/player.js"></script>
   </body>
 </html>

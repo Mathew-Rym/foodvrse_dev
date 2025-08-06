@@ -3,7 +3,7 @@ import { Heart, Star, Clock, MapPin, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { MysteryBagDetailPopup } from "./MysteryBagDetailPopup";

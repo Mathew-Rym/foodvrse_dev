@@ -325,7 +325,7 @@ const Footer = () => {
       <VideoModal 
         isOpen={isVideoModalOpen}
         onClose={() => setIsVideoModalOpen(false)}
-        videoUrl="https://youtu.be/OYe3_kovTrY"
+        videoUrl="https://vimeo.com/1107540626"
       />
     </footer>
   );

@@ -3,66 +3,98 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Cookie } from "lucide-react";
+import { Cookie, Settings, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { toast } from 'sonner';
 
 const CookieConsent = () => {
-  const [showBanner, setShowBanner] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const { 
+    preferences, 
+    loading, 
+    shouldShowCookieConsent, 
+    updateCookieConsent, 
+    hasConsent 
+  } = useUserPreferences();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const consent = localStorage.getItem('foodvrse-cookie-consent');
-    if (!consent) {
-      // Show banner after 5 minutes (300,000 milliseconds)
-      const timer = setTimeout(() => {
-        setShowBanner(true);
-      }, 300000);
-      
-      return () => clearTimeout(timer);
+  const handleAccept = async () => {
+    try {
+      await updateCookieConsent(true);
+      toast.success('Cookie preferences saved');
+    } catch (error) {
+      console.error('Error saving cookie consent:', error);
+      toast.error('Failed to save preferences');
     }
-  }, []);
-
-  const handleAccept = () => {
-    localStorage.setItem('foodvrse-cookie-consent', 'accepted');
-    setShowBanner(false);
   };
 
-  const handleDecline = () => {
-    localStorage.setItem('foodvrse-cookie-consent', 'declined');
-    setShowBanner(false);
+  const handleDecline = async () => {
+    try {
+      await updateCookieConsent(false);
+      toast.success('Cookie preferences saved');
+    } catch (error) {
+      console.error('Error saving cookie consent:', error);
+      toast.error('Failed to save preferences');
+    }
   };
 
-  if (!showBanner) return null;
+  const handleCustomize = () => {
+    // Navigate to preferences page or open preferences modal
+    navigate('/profile?tab=preferences');
+  };
+
+  // Don't show banner if user is not authenticated, loading, or shouldn't show consent
+  if (!isAuthenticated || loading || !shouldShowCookieConsent) {
+    return null;
+  }
 
   return (
-    <div className={`fixed left-0 right-0 z-40 p-4 ${isAuthenticated ? 'bottom-20' : 'bottom-0'}`}>
-              <Card className="bg-card shadow-lg border border-brand-green">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <Cookie className="w-5 h-5 text-brand-green mt-1 flex-shrink-0" />
+    <div className="fixed left-0 right-0 z-50 p-4 bottom-20">
+      <Card className="bg-card shadow-lg border border-brand-green max-w-4xl mx-auto">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex gap-2">
+              <Cookie className="w-6 h-6 text-brand-green mt-1 flex-shrink-0" />
+              <BarChart3 className="w-6 h-6 text-brand-green mt-1 flex-shrink-0" />
+            </div>
             <div className="flex-1">
-              <p className="text-sm text-gray-700 mb-3">
-                We use cookies to enhance your experience and analyze site usage. By clicking 'Accept', you consent to our use of cookies. 
+              <h3 className="font-semibold text-lg mb-2">Welcome to FoodVrse! 🎉</h3>
+              <p className="text-sm text-gray-700 mb-4 leading-relaxed">
+                We use cookies and analytics to enhance your experience, provide personalized content, 
+                and help us improve our service. This helps us understand how you use our platform 
+                and deliver better features for food waste reduction.
+              </p>
+              <p className="text-sm text-gray-600 mb-4">
                 <button 
                   onClick={() => navigate('/privacy-policy')}
-                  className="text-brand-green hover:text-brand-green/80 underline ml-1 bg-transparent border-none cursor-pointer"
+                  className="text-brand-green hover:text-brand-green/80 underline bg-transparent border-none cursor-pointer"
                 >
                   Learn more in our Privacy Policy
                 </button>
               </p>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-3">
                 <Button 
                   onClick={handleAccept}
-                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white"
+                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600"
                   size="sm"
                 >
-                  Accept
+                  Accept All
+                </Button>
+                <Button 
+                  onClick={handleCustomize}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Settings className="w-4 h-4" />
+                  Customize
                 </Button>
                 <Button 
                   onClick={handleDecline}
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
+                  className="text-gray-600 hover:text-gray-800"
                 >
                   Decline
                 </Button>
@@ -76,3 +108,4 @@ const CookieConsent = () => {
 };
 
 export default CookieConsent;
+

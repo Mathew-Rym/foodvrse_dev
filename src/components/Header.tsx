@@ -11,6 +11,7 @@ import LocationSearch from "./LocationSearch";
 import { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import Logo from "./Logo";
+import { API_CONFIG } from '@/config/api';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -18,15 +19,43 @@ const Header = () => {
   const { totalItems } = useCart();
   const { latitude, longitude } = useGeolocation();
   const [currentLocation, setCurrentLocation] = useState("Nairobi, Kenya");
+  const [isLocationSearchOpen, setIsLocationSearchOpen] = useState(false);
   const { t } = useTranslation();
 
   // Update location display when geolocation is available
   useEffect(() => {
     if (latitude && longitude) {
-      // In a real app, you'd reverse geocode these coordinates
-      setCurrentLocation(`${latitude.toFixed(3)}, ${longitude.toFixed(3)}`);
+      // Reverse geocode coordinates to get readable address
+      reverseGeocode(latitude, longitude);
     }
   }, [latitude, longitude]);
+
+  // Reverse geocode coordinates to get readable address
+  const reverseGeocode = async (lat: number, lng: number) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_CONFIG.GOOGLE_MAPS_API_KEY}`
+      );
+      const data = await response.json();
+      
+      if (data.status === 'OK' && data.results.length > 0) {
+        const address = data.results[0].formatted_address;
+        // Extract city and country for cleaner display
+        const addressParts = address.split(', ');
+        if (addressParts.length >= 2) {
+          const city = addressParts[0];
+          const country = addressParts[addressParts.length - 1];
+          setCurrentLocation(`${city}, ${country}`);
+        } else {
+          setCurrentLocation(address);
+        }
+      }
+    } catch (error) {
+      console.error('Error reverse geocoding:', error);
+      // Fallback to coordinates if geocoding fails
+      setCurrentLocation(`${lat.toFixed(3)}, ${lng.toFixed(3)}`);
+    }
+  };
 
   const handlePartnerClick = () => {
     navigate("/partner-application");
@@ -51,6 +80,7 @@ const Header = () => {
 
   const handleLocationSelect = (location: { lat: number; lng: number; address: string }) => {
     setCurrentLocation(location.address);
+    setIsLocationSearchOpen(false);
     console.log('Selected location:', location);
   };
 
@@ -68,11 +98,20 @@ const Header = () => {
 
           {/* Desktop location and actions */}
           <div className="hidden lg:flex items-center space-x-4 min-w-0">
-            <LocationSearch onLocationSelect={handleLocationSelect} />
-            <div className="flex items-center space-x-2 text-white/90 min-w-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center space-x-2 text-white/90 hover:text-white"
+              onClick={() => setIsLocationSearchOpen(true)}
+            >
               <MapPin className={`w-4 h-4 flex-shrink-0 ${latitude && longitude ? 'text-green-500' : ''}`} />
               <span className="text-sm truncate">{currentLocation}</span>
-            </div>
+            </Button>
+            <LocationSearch 
+              isOpen={isLocationSearchOpen}
+              onClose={() => setIsLocationSearchOpen(false)}
+              onLocationSelect={handleLocationSelect}
+            />
           </div>
 
           {/* Desktop Actions */}
@@ -163,9 +202,21 @@ const Header = () => {
               <span className="text-sm truncate">{currentLocation}</span>
             </div>
             <div className="md:block">
-              <LocationSearch onLocationSelect={handleLocationSelect} />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-600 hover:text-gray-800"
+                onClick={() => setIsLocationSearchOpen(true)}
+              >
+                Change
+              </Button>
             </div>
           </div>
+          <LocationSearch 
+            isOpen={isLocationSearchOpen}
+            onClose={() => setIsLocationSearchOpen(false)}
+            onLocationSelect={handleLocationSelect}
+          />
 
           {/* Action buttons row */}
           <div className="flex items-center justify-between space-x-2">

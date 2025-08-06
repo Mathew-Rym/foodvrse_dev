@@ -34,7 +34,9 @@ additional_redirect_urls = [
   "https://www.foodvrse.com/**",
   "https://www.foodvrse.com/oauth-callback",
   "http://localhost:3000/**",
-  "http://localhost:3000/oauth-callback"
+  "http://localhost:3000/oauth-callback",
+  "http://localhost:8080/**",
+  "http://localhost:8080/oauth-callback"
 ]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true

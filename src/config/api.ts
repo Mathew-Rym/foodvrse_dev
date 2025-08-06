@@ -8,6 +8,10 @@ export const API_CONFIG = {
   // Google OAuth
   GOOGLE_OAUTH_CLIENT_ID: '707536400304-6ogfei7hql85l4csjch467922du99hur.apps.googleusercontent.com',
   
+  // Google Analytics
+  GOOGLE_ANALYTICS_ID: import.meta.env.VITE_GOOGLE_ANALYTICS_ID || '',
+  GOOGLE_TAG_MANAGER_ID: import.meta.env.VITE_GOOGLE_TAG_MANAGER_ID || '',
+  
   // Supabase (already configured in client.ts)
   SUPABASE_URL: 'https://vsvhkkalfziuyttwityc.supabase.co',
   

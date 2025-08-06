@@ -37,6 +37,7 @@ import MeetTheTeam from "./pages/MeetTheTeam";
 import Careers from "./pages/Careers";
 import Press from "./pages/Press";
 import Partners from "./pages/Partners";
+import PartnerApplication from "./pages/PartnerApplication";
 import ComingSoon from "./pages/ComingSoon";
 import GoogleOAuthHandler from "./components/GoogleOAuthHandler";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -91,6 +92,7 @@ const App = () => {
                 <Route path="/careers" element={<Careers />} />
                 <Route path="/press" element={<Press />} />
                 <Route path="/partners" element={<Partners />} />
+                <Route path="/partner-application" element={<PartnerApplication />} />
                 <Route path="/coming-soon" element={<ComingSoon />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
