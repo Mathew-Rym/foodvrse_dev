@@ -9,35 +9,36 @@ interface VideoModalProps {
 }
 
 const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) => {
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [showPlayButton, setShowPlayButton] = useState(false);
-  const [videoType, setVideoType] = useState<'youtube' | 'vimeo' | 'unknown'>('unknown');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showPlayButton, setShowPlayButton] = useState(true);
+  const [videoType, setVideoType] = useState<'youtube' | 'vimeo' | 'embedded'>('embedded');
 
   useEffect(() => {
     if (isOpen) {
-      console.log('🎥 VideoModal opened with URL:', videoUrl);
-      console.log('▶️ Auto-playing video for all users');
-      setIsPlaying(true);
-      setShowPlayButton(false);
+      // Check if user just completed onboarding
+      const justCompletedOnboarding = localStorage.getItem('foodvrse-onboarding-just-completed');
       
-      // Determine video type
-      if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-        setVideoType('youtube');
-        console.log('🎬 Detected YouTube video');
-      } else if (videoUrl.includes('vimeo.com')) {
-        setVideoType('vimeo');
-        console.log('🎬 Detected Vimeo video');
+      if (justCompletedOnboarding) {
+        // Auto-play for first-time users who just completed onboarding
+        setIsPlaying(true);
+        setShowPlayButton(false);
+        // Remove the flag so it doesn't auto-play next time
+        localStorage.removeItem('foodvrse-onboarding-just-completed');
       } else {
-        setVideoType('unknown');
-        console.log('🎬 Unknown video type, using default Vimeo');
+        // Show play button for returning users
+        setIsPlaying(false);
+        setShowPlayButton(true);
       }
+      
+      // Always use embedded video
+      setVideoType('embedded');
     } else {
       // Reset states when modal closes
       setIsPlaying(false);
-      setShowPlayButton(false);
-      setVideoType('unknown');
+      setShowPlayButton(true);
+      setVideoType('embedded');
     }
-  }, [isOpen, videoUrl]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -75,60 +76,27 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
   };
 
   const handlePlayClick = () => {
-    console.log('▶️ Play button clicked');
     setShowPlayButton(false);
     setIsPlaying(true);
   };
 
   const renderVideoContent = () => {
-    console.log('🎬 Rendering video content for type:', videoType);
-    
-    if (videoType === 'youtube') {
-      const embedUrl = getYouTubeEmbedUrl(videoUrl, isPlaying);
-      return (
-        <iframe
-          src={embedUrl}
-          className="w-full h-full"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          onLoad={() => console.log('✅ YouTube iframe loaded successfully')}
-          onError={(e) => console.error('❌ YouTube iframe error:', e)}
+    // Use the provided embedded Vimeo code
+    return (
+      <div style={{padding: '56.25% 0 0 0', position: 'relative'}}>
+        <iframe 
+          src={`https://player.vimeo.com/video/1107540626?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=${isPlaying ? 1 : 0}`}
+          frameBorder="0" 
+          allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+          referrerPolicy="strict-origin-when-cross-origin" 
+          style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}} 
+          title="Foodvrse"
         />
-      );
-    } else if (videoType === 'vimeo') {
-      const embedUrl = getVimeoEmbedUrl(videoUrl, isPlaying);
-      return (
-        <iframe
-          src={embedUrl}
-          className="w-full h-full"
-          frameBorder="0"
-          allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          title="FoodVrse"
-          onLoad={() => console.log('✅ Vimeo iframe loaded successfully')}
-          onError={(e) => console.error('❌ Vimeo iframe error:', e)}
-        />
-      );
-    } else {
-      // Default Vimeo embed for FoodVrse video (fallback)
-      console.log('🎬 Using default Vimeo embed as fallback');
-      return (
-        <iframe
-          src="https://player.vimeo.com/video/1107540626?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1"
-          className="w-full h-full"
-          frameBorder="0"
-          allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          title="FoodVrse"
-          onLoad={() => console.log('✅ Default Vimeo iframe loaded successfully')}
-          onError={(e) => console.error('❌ Default Vimeo iframe error:', e)}
-        />
-      );
-    }
+      </div>
+    );
   };
 
-  console.log('🎬 Final video type:', videoType, 'URL:', videoUrl);
+  
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
@@ -156,7 +124,7 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
         </div>
         
         {/* Video Container */}
-        <div className="relative aspect-video bg-black">
+        <div className="relative bg-black">
           {showPlayButton && !isPlaying ? (
             // Play button overlay
             <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-10">
@@ -172,13 +140,6 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
           
           {renderVideoContent()}
         </div>
-        
-        {/* Debug info (only in development) */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="p-2 bg-gray-100 text-xs text-gray-600 border-t">
-            <p>Debug: Playing: {isPlaying.toString()}, Show button: {showPlayButton.toString()}, Type: {videoType}, URL: {videoUrl}</p>
-          </div>
-        )}
       </div>
     </div>
   );

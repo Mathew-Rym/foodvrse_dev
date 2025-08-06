@@ -198,47 +198,51 @@ All colors MUST be HSL.
 @layer utilities {
   /* Custom FoodVrse brand colors */
   .bg-brand-green {
-    background-color: #3D6C56;
+    background-color: hsl(158, 25%, 35%); /* #3D6C56 */
   }
   
   .text-brand-green {
-    color: #3D6C56;
+    color: hsl(158, 25%, 35%); /* #3D6C56 */
   }
   
   .bg-brand-light-green {
-    background-color: #E2F1E0;
+    background-color: hsl(120, 25%, 90%); /* #E2F1E0 */
   }
   
   .text-brand-light-green {
-    color: #E2F1E0;
+    color: hsl(120, 25%, 90%); /* #E2F1E0 */
   }
   
   .bg-brand-yellow {
-    background-color: #FCDA5B;
+    background-color: hsl(50, 94%, 68%); /* #FCDA5B */
   }
   
   .text-brand-yellow {
-    color: #FCDA5B;
+    color: hsl(50, 94%, 68%); /* #FCDA5B */
   }
   
   .border-brand-green {
-    border-color: #3D6C56;
+    border-color: hsl(158, 25%, 35%); /* #3D6C56 */
   }
   
   .border-brand-light-green {
-    border-color: #E2F1E0;
+    border-color: hsl(120, 25%, 90%); /* #E2F1E0 */
   }
   
   .border-brand-yellow {
-    border-color: #FCDA5B;
+    border-color: hsl(50, 94%, 68%); /* #FCDA5B */
   }
   
   .hover\:bg-brand-green:hover {
-    background-color: #2D5A46;
+    background-color: hsl(158, 25%, 30%); /* Darker shade of brand green */
   }
   
   .hover\:bg-brand-yellow:hover {
-    background-color: #F4D03F;
+    background-color: hsl(50, 94%, 60%); /* Darker shade of brand yellow */
+  }
+  
+  .hover\:bg-brand-light-green:hover {
+    background-color: hsl(120, 25%, 85%); /* Darker shade of light green */
   }
 }
 

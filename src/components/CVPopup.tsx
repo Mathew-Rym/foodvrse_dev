@@ -69,7 +69,7 @@ const CVPopup = ({ isOpen, onClose }: CVPopupProps) => {
       formData.append('cv', cvFile);
 
       // Create mailto link with CV information
-      const subject = encodeURIComponent(`CV Submission - ${subject}`);
+      const emailSubject = encodeURIComponent(`CV Submission - ${subject}`);
       const body = encodeURIComponent(`
 CV Submission from FoodVrse Careers Page:
 
@@ -82,7 +82,7 @@ CV File: ${cvFile.name} (${(cvFile.size / 1024 / 1024).toFixed(1)}MB)
 This CV was submitted through the FoodVrse careers page.
       `);
       
-      const mailtoLink = `mailto:support@foodvrse.com?subject=${subject}&body=${body}`;
+      const mailtoLink = `mailto:support@foodvrse.com?subject=${emailSubject}&body=${body}`;
       window.open(mailtoLink, '_blank');
       
       toast.success('CV sent successfully! We will get back to you soon.');

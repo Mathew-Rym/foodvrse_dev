@@ -20,7 +20,7 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [profileData, setProfileData] = useState({
     display_name: '',
-    is_business: false,
+    user_type: 'consumer' as 'consumer' | 'business',
     business_name: ''
   });
 
@@ -37,7 +37,7 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
 
       if (existingProfile) {
         // User already has a profile, redirect to appropriate dashboard
-        if (existingProfile.is_business) {
+        if (existingProfile.user_type === 'business') {
           navigate('/business-dashboard');
         } else {
           navigate('/');
@@ -53,14 +53,14 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
         // Pre-fill business data
         setProfileData({
           display_name: user.user_metadata?.full_name || '',
-          is_business: true,
+          user_type: 'business',
           business_name: user.user_metadata?.full_name || ''
         });
       } else {
         // Pre-fill consumer data
         setProfileData({
           display_name: user.user_metadata?.full_name || '',
-          is_business: false,
+          user_type: 'consumer',
           business_name: ''
         });
       }
@@ -81,22 +81,23 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
         .from('user_profiles')
         .insert({
           user_id: user.id,
-          email: user.email,
           display_name: profileData.display_name,
-          is_business: profileData.is_business,
+          user_type: profileData.user_type,
           created_at: new Date().toISOString()
         });
 
       if (profileError) throw profileError;
 
       // If business user, create business profile
-      if (profileData.is_business) {
+      if (profileData.user_type === 'business') {
         const { error: businessError } = await supabase
           .from('business_profiles')
           .insert({
             user_id: user.id,
             business_name: profileData.business_name,
-            email: user.email,
+            address: 'Address not provided',
+            location: 'Location not provided',
+            user_type: 'business',
             created_at: new Date().toISOString()
           });
 
@@ -108,9 +109,9 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
         .from('user_impact')
         .insert({
           user_id: user.id,
-          meals_rescued: 0,
-          co2_saved_kg: 0,
-          money_saved_ksh: 0,
+          total_meals_saved: 0,
+          total_co2_saved_kg: 0,
+          total_money_saved_ksh: 0,
           created_at: new Date().toISOString()
         });
 
@@ -120,13 +121,13 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
       await refreshUserData();
 
       toast.success(
-        profileData.is_business 
+        profileData.user_type === 'business' 
           ? 'Business account created successfully!' 
           : 'Account created successfully!'
       );
 
       // Redirect to appropriate dashboard
-      if (profileData.is_business) {
+      if (profileData.user_type === 'business') {
         navigate('/business-dashboard');
       } else {
         navigate('/');
@@ -174,7 +175,7 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
           <div className="space-y-3">
             <div>
               <Label htmlFor="display_name">
-                {profileData.is_business ? 'Business Name' : 'Full Name'}
+                {profileData.user_type === 'business' ? 'Business Name' : 'Full Name'}
               </Label>
               <Input
                 id="display_name"
@@ -182,13 +183,13 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
                 onChange={(e) => setProfileData({
                   ...profileData,
                   display_name: e.target.value,
-                  business_name: profileData.is_business ? e.target.value : profileData.business_name
+                  business_name: profileData.user_type === 'business' ? e.target.value : profileData.business_name
                 })}
-                placeholder={profileData.is_business ? 'Enter business name' : 'Enter your full name'}
+                placeholder={profileData.user_type === 'business' ? 'Enter business name' : 'Enter your full name'}
               />
             </div>
 
-            {!profileData.is_business && (
+            {profileData.user_type === 'consumer' && (
               <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
                 <ShoppingBag className="w-5 h-5 text-green-600" />
                 <div>
@@ -198,7 +199,7 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
               </div>
             )}
 
-            {profileData.is_business && (
+            {profileData.user_type === 'business' && (
               <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
                 <Building className="w-5 h-5 text-blue-600" />
                 <div>

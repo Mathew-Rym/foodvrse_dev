@@ -37,9 +37,12 @@ export const useUserPreferences = () => {
       setLoading(true);
       setError(null);
 
-      // Call the database function to get or create preferences
+      // Query user preferences directly from user profiles
       const { data, error: dbError } = await supabase
-        .rpc('get_or_create_user_preferences', { user_uuid: user.id });
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
       if (dbError) {
         console.error('Error loading user preferences:', dbError);
@@ -47,7 +50,23 @@ export const useUserPreferences = () => {
         return;
       }
 
-      setPreferences(data);
+      // Transform to match UserPreferences interface
+      const userPreferences: UserPreferences = {
+        id: data.id,
+        user_id: data.user_id,
+        cookie_consent: false, // Default values for missing fields
+        analytics_consent: false,
+        marketing_consent: false,
+        email_notifications: data.email_notifications || true,
+        push_notifications: data.push_notifications || true,
+        theme_preference: 'light',
+        language_preference: 'en',
+        last_activity: new Date().toISOString(),
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+      };
+
+      setPreferences(userPreferences);
     } catch (err) {
       console.error('Error in loadPreferences:', err);
       setError('Failed to load preferences');
@@ -96,7 +115,7 @@ export const useUserPreferences = () => {
 
     try {
       const { data, error: dbError } = await supabase
-        .from('user_preferences')
+        .from('user_profiles')
         .update(updates)
         .eq('user_id', user.id)
         .select()
@@ -108,7 +127,14 @@ export const useUserPreferences = () => {
         return;
       }
 
-      setPreferences(data);
+      // Update local state with new data
+      const updatedPreferences: UserPreferences = {
+        ...preferences,
+        ...updates,
+        updated_at: new Date().toISOString()
+      };
+      
+      setPreferences(updatedPreferences);
       toast.success('Preferences updated successfully');
     } catch (err) {
       console.error('Error in updatePreferences:', err);

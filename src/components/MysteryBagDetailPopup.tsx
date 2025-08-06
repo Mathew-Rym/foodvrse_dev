@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Share2, Heart, Clock, MapPin, Star, ShoppingBag, ChevronRight, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Share2, Heart, Clock, MapPin, Star, ShoppingBag, ChevronRight, X, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
