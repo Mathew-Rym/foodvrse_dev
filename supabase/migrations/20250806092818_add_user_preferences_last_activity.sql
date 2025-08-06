@@ -71,4 +71,3 @@ CREATE POLICY "Users can update their own preferences" ON user_preferences
 
 -- Grant permissions to authenticated users
 GRANT SELECT, INSERT, UPDATE ON user_preferences TO authenticated;
-GRANT USAGE ON SEQUENCE user_preferences_id_seq TO authenticated; 
