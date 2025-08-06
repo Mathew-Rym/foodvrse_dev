@@ -12,11 +12,20 @@ interface Location {
     main_text: string;
     secondary_text: string;
   };
-  geometry: {
+  geometry?: {
     location: {
       lat: number;
       lng: number;
     };
+  };
+}
+
+interface AutocompletePrediction {
+  place_id: string;
+  description: string;
+  structured_formatting: {
+    main_text: string;
+    secondary_text: string;
   };
 }
 
@@ -38,7 +47,7 @@ const GoogleLocationSearch: React.FC<GoogleLocationSearchProps> = ({
   placeholder = "Enter location, address, or landmark..."
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [predictions, setPredictions] = useState<Location[]>([]);
+  const [predictions, setPredictions] = useState<AutocompletePrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -102,7 +111,7 @@ const GoogleLocationSearch: React.FC<GoogleLocationSearchProps> = ({
           setIsLoading(false);
           
           if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-            setPredictions(predictions as Location[]);
+            setPredictions(predictions as AutocompletePrediction[]);
           } else {
             setPredictions([]);
             console.log('No predictions found for:', query);
@@ -129,31 +138,53 @@ const GoogleLocationSearch: React.FC<GoogleLocationSearchProps> = ({
   };
 
   // Handle location selection
-  const handleLocationSelect = (location: Location) => {
-    setSelectedLocation(location);
-    setSearchQuery(location.description);
-    setPredictions([]);
-    
-    // Update map
-    if (map && location.geometry) {
-      const position = location.geometry.location;
-      map.setCenter(position);
-      map.setZoom(15);
-      
-      // Add or update marker
-      if (marker) {
-        marker.setMap(null);
+  const handleLocationSelect = async (prediction: AutocompletePrediction) => {
+    if (!placesService.current) return;
+
+    // Get place details to fetch geometry
+    placesService.current.getDetails(
+      { placeId: prediction.place_id },
+      (place, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
+          const location: Location = {
+            place_id: prediction.place_id,
+            description: prediction.description,
+            structured_formatting: prediction.structured_formatting,
+            geometry: place.geometry ? {
+              location: {
+                lat: place.geometry.location!.lat(),
+                lng: place.geometry.location!.lng()
+              }
+            } : undefined
+          };
+
+          setSelectedLocation(location);
+          setSearchQuery(location.description);
+          setPredictions([]);
+          
+          // Update map
+          if (map && location.geometry) {
+            const position = location.geometry.location;
+            map.setCenter(position);
+            map.setZoom(15);
+            
+            // Add or update marker
+            if (marker) {
+              marker.setMap(null);
+            }
+            
+            const newMarker = new window.google.maps.Marker({
+              position,
+              map,
+              title: location.description,
+              animation: window.google.maps.Animation.DROP,
+            });
+            
+            setMarker(newMarker);
+          }
+        }
       }
-      
-      const newMarker = new window.google.maps.Marker({
-        position,
-        map,
-        title: location.description,
-        animation: window.google.maps.Animation.DROP,
-      });
-      
-      setMarker(newMarker);
-    }
+    );
   };
 
   // Handle final selection

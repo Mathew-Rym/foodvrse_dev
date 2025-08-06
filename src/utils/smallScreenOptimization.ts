@@ -130,7 +130,7 @@ export const optimizeLayout = () => {
     if (screenInfo.isVerySmall && fontSize) {
       const size = parseFloat(fontSize);
       if (size > 16) {
-        element.style.fontSize = `${Math.max(12, size * 0.75)}px`;
+        (element as HTMLElement).style.fontSize = `${Math.max(12, size * 0.75)}px`;
       }
     }
   });
@@ -176,9 +176,9 @@ export const optimizeTouchTargets = () => {
   buttons.forEach(button => {
     const rect = button.getBoundingClientRect();
     if (rect.width < minSize || rect.height < minSize) {
-      button.style.minWidth = `${minSize}px`;
-      button.style.minHeight = `${minSize}px`;
-      button.style.padding = `${Math.max(8, minSize / 4)}px`;
+      (button as HTMLElement).style.minWidth = `${minSize}px`;
+      (button as HTMLElement).style.minHeight = `${minSize}px`;
+      (button as HTMLElement).style.padding = `${Math.max(8, minSize / 4)}px`;
     }
   });
 };

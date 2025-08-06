@@ -185,21 +185,21 @@ export const useRealTimeMetrics = () => {
       // Calculate cities served (based on business locations)
       const { data: citiesData, error: citiesError } = await supabase
         .from('business_profiles')
-        .select('city')
-        .not('city', 'is', null);
+        .select('location')
+        .not('location', 'is', null);
 
       let citiesServed = 12; // Default
       if (!citiesError && citiesData) {
-        const uniqueCities = new Set(citiesData.map(business => business.city).filter(Boolean));
+        const uniqueCities = new Set(citiesData.map(business => business.location).filter(Boolean));
         citiesServed = uniqueCities.size || 12;
       }
 
       const newMetrics = {
-        totalMealsRescued: impactData.total_meals_rescued || 0,
-        totalMoneySavedKsh: parseFloat(impactData.total_money_saved_ksh) || 0,
-        totalCo2SavedTonnes: parseFloat(impactData.total_co2_saved_tonnes) || 0,
-        totalWaterConservedLiters: impactData.total_water_conserved_liters || 0,
-        totalEnergySavedKwh: parseFloat(impactData.total_energy_saved_kwh) || 0,
+        totalMealsRescued: Number(impactData.total_meals_rescued) || 0,
+        totalMoneySavedKsh: Number(impactData.total_money_saved_ksh) || 0,
+        totalCo2SavedTonnes: Number(impactData.total_co2_saved_tonnes) || 0,
+        totalWaterConservedLiters: Number(impactData.total_water_conserved_liters) || 0,
+        totalEnergySavedKwh: Number(impactData.total_energy_saved_kwh) || 0,
         activeUsers: activeUsers || 0,
         totalUsers: totalUsers || 0,
         monthlyNewUsers: monthlyNewUsers || 0,
