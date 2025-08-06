@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Search } from "lucide-react";
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from "@/contexts/AuthContext";
 import ListingCard from "./ListingCard";

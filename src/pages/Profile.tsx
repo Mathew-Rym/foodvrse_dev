@@ -1,4 +1,4 @@
-import { User, Settings, Heart, HelpCircle, LogOut, MapPin, Bell, CreditCard, Camera, Receipt, Trash2, Edit3 } from "lucide-react";
+import { User, Settings, Heart, HelpCircle, LogOut, MapPin, Bell, CreditCard, Camera, Receipt, Trash2, Edit3, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
