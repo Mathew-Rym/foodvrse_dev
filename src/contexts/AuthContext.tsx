@@ -193,7 +193,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             access_type: 'offline',
             prompt: 'consent',
           },
-          scopes: 'email profile',
+          scopes: 'email profile openid',
         }
       });
 

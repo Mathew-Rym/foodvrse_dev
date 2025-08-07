@@ -12,9 +12,15 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || 'https://vsvhkkalfziuyttwityc.supabase.co';
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Missing Supabase configuration in Edge Function');
+      return new Response(JSON.stringify({ success: false, error: 'Missing Supabase configuration' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 });
+    }
     const supabase = createClient(
-      'https://vsvhkkalfziuyttwityc.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzdmhra2FsZnppdXl0dHdpdHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIxODcwMTYsImV4cCI6MjA2Nzc2MzAxNn0.p-fJO01t2--lAGT3KIXghVHA_IWp5L7XiK5D2XeV0C0'
+      SUPABASE_URL,
+      SUPABASE_SERVICE_ROLE_KEY
     );
 
     console.log('Starting weekly challenge reset...');
