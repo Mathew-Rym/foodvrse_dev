@@ -32,8 +32,23 @@ export const detectBrowser = (): BrowserInfo => {
     version = match ? match[1] : 'Unknown';
   } else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
     name = 'Safari';
-    const match = userAgent.match(/Version\/(\d+)/);
-    version = match ? match[1] : 'Unknown';
+    // Improved Safari version detection for iOS and macOS
+    let match = userAgent.match(/Version\/(\d+)/);
+    if (!match) {
+      // Try alternative patterns for newer Safari versions
+      match = userAgent.match(/Safari\/(\d+)/);
+    }
+    if (!match) {
+      // For iOS Safari, try to extract from the OS version
+      const iosMatch = userAgent.match(/OS (\d+)_(\d+)/);
+      if (iosMatch) {
+        const majorVersion = parseInt(iosMatch[1]);
+        // iOS Safari version roughly corresponds to iOS version
+        version = majorVersion.toString();
+      }
+    } else {
+      version = match[1];
+    }
   } else if (userAgent.includes('Edge')) {
     name = 'Edge';
     const match = userAgent.match(/Edge\/(\d+)/);
@@ -72,6 +87,11 @@ export const detectBrowser = (): BrowserInfo => {
       case 'Firefox':
         return versionNum >= 60;
       case 'Safari':
+        // More lenient Safari support - if we can't detect version, assume it's modern
+        if (version === 'Unknown') {
+          // Check if it's a modern Safari by testing features
+          return features.es6 && features.fetch && features.localStorage;
+        }
         return versionNum >= 12;
       case 'Edge':
         return versionNum >= 79;
@@ -208,8 +228,9 @@ export const initializeBrowserCompatibility = (): void => {
     }
   }
 
-  // Show critical warnings to user
-  if (!browserInfo.isSupported) {
+  // Show critical warnings only for Internet Explorer or very old browsers
+  if (browserInfo.name === 'Internet Explorer' || 
+      (browserInfo.name === 'Safari' && browserInfo.version !== 'Unknown' && parseInt(browserInfo.version) < 10)) {
     const warningDiv = document.createElement('div');
     warningDiv.style.cssText = `
       position: fixed;

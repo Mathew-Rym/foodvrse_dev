@@ -42,6 +42,56 @@ import ComingSoon from "./pages/ComingSoon";
 import GoogleOAuthHandler from "./components/GoogleOAuthHandler";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { Component, ErrorInfo, ReactNode } from "react";
+
+// Error Boundary Component
+class ErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('App Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          padding: '20px',
+          textAlign: 'center',
+          fontFamily: 'system-ui, sans-serif'
+        }}>
+          <h1>Something went wrong</h1>
+          <p>Please refresh the page or try again later.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#3D6C56',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Refresh Page
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 const queryClient = new QueryClient();
 
@@ -50,62 +100,73 @@ const App = () => {
   const isOAuthCallback = window.location.search.includes('access_token') || 
                          window.location.search.includes('error');
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <LanguageProvider>
-          <AuthProvider>
-            <BusinessItemsProvider>
-              <CartProvider>
-                <TooltipProvider>
-                  <Toaster />
-                  <Sonner />
-                  <BrowserRouter>
-                    <Routes>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/auth" element={<Auth />} />
-                      <Route path="/oauth-callback" element={
-                        <GoogleOAuthHandler onComplete={() => window.history.replaceState({}, '', '/')} />
-                      } />
-                <Route path="/discover" element={<Discover />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/impact" element={<Impact />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/favorites" element={<Favorites />} />
+  // Debug logging for Safari
+  if (typeof window !== 'undefined') {
+    console.log('App loading...', {
+      userAgent: navigator.userAgent,
+      isSafari: /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent),
+      isIOS: /iPad|iPhone|iPod/.test(navigator.userAgent)
+    });
+  }
 
-                <Route path="/business-dashboard" element={<BusinessDashboard />} />
-                <Route path="/food-waste" element={<FoodWaste />} />
-                <Route path="/mystery-boxes" element={<MysteryBags />} />
-                <Route path="/how-it-works" element={<HowItWorks />} />
-                <Route path="/impact-tracker" element={<ImpactTrackerPage />} />
-                <Route path="/help-center" element={<HelpCenter />} />
-                <Route path="/safety-guidelines" element={<SafetyGuidelines />} />
-                <Route path="/community-guidelines" element={<CommunityGuidelines />} />
-                <Route path="/terms-of-service" element={<TermsOfService />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="/cookie-policy" element={<CookiePolicy />} />
-                
-                <Route path="/our-story" element={<OurStory />} />
-                <Route path="/our-impact" element={<OurImpact />} />
-                <Route path="/meet-the-team" element={<MeetTheTeam />} />
-                <Route path="/careers" element={<Careers />} />
-                <Route path="/press" element={<Press />} />
-                <Route path="/partners" element={<Partners />} />
-                <Route path="/partner-application" element={<PartnerApplication />} />
-                <Route path="/coming-soon" element={<ComingSoon />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <FeedbackFAB />
-            </BrowserRouter>
-          </TooltipProvider>
-        </CartProvider>
-      </BusinessItemsProvider>
-    </AuthProvider>
-  </LanguageProvider>
-</ThemeProvider>
-</QueryClientProvider>
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <LanguageProvider>
+            <AuthProvider>
+              <BusinessItemsProvider>
+                <CartProvider>
+                  <TooltipProvider>
+                    <Toaster />
+                    <Sonner />
+                    <BrowserRouter>
+                      <Routes>
+                        <Route path="/" element={<Index />} />
+                        <Route path="/auth" element={<Auth />} />
+                        <Route path="/oauth-callback" element={
+                          <GoogleOAuthHandler onComplete={() => window.history.replaceState({}, '', '/')} />
+                        } />
+                    <Route path="/discover" element={<Discover />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/orders" element={<Orders />} />
+                    <Route path="/impact" element={<Impact />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/favorites" element={<Favorites />} />
+
+                    <Route path="/business-dashboard" element={<BusinessDashboard />} />
+                    <Route path="/food-waste" element={<FoodWaste />} />
+                    <Route path="/mystery-boxes" element={<MysteryBags />} />
+                    <Route path="/how-it-works" element={<HowItWorks />} />
+                    <Route path="/impact-tracker" element={<ImpactTrackerPage />} />
+                    <Route path="/help-center" element={<HelpCenter />} />
+                    <Route path="/safety-guidelines" element={<SafetyGuidelines />} />
+                    <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+                    <Route path="/terms-of-service" element={<TermsOfService />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                    <Route path="/cookie-policy" element={<CookiePolicy />} />
+                    
+                    <Route path="/our-story" element={<OurStory />} />
+                    <Route path="/our-impact" element={<OurImpact />} />
+                    <Route path="/meet-the-team" element={<MeetTheTeam />} />
+                    <Route path="/careers" element={<Careers />} />
+                    <Route path="/press" element={<Press />} />
+                    <Route path="/partners" element={<Partners />} />
+                    <Route path="/partner-application" element={<PartnerApplication />} />
+                    <Route path="/coming-soon" element={<ComingSoon />} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                  <FeedbackFAB />
+                </BrowserRouter>
+              </TooltipProvider>
+            </CartProvider>
+          </BusinessItemsProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
+    </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
