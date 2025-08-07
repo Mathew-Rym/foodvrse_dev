@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 import AddItemModal from "@/components/AddItemModal";
 import Analytics from "@/components/Analytics";
 import BusinessOnboardingTour from "@/components/BusinessOnboardingTour";

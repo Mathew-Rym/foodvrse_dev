@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MapPin, Search, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 import { API_CONFIG } from "@/config/api";
 
