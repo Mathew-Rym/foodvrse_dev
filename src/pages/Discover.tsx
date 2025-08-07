@@ -197,12 +197,12 @@ const Discover = () => {
           </div>
           
           {/* Current Location + Inline Search */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2 bg-brand-light-green text-brand-green rounded-xl px-3 py-1">
               <MapPin className="w-4 h-4 text-brand-green" />
               <span className="text-sm font-medium truncate max-w-[50vw]">{currentLocation.address}</span>
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="w-full sm:flex-1 min-w-[180px] mt-2 sm:mt-0">
               <GoogleMapsSearch
                 onLocationSelect={({ lat, lng, address }) => {
                   handleSearchLocationSelect({ lat, lng, address });
@@ -212,18 +212,19 @@ const Discover = () => {
             <Button
               variant="outline"
               size="sm"
+              className="shrink-0"
               onClick={() => setShowLocationSelector(true)}
             >
               <MapPin className="w-4 h-4" />
             </Button>
-            <Button variant="outline" size="sm" onClick={handleFilter}>
+            <Button variant="outline" size="sm" className="shrink-0" onClick={handleFilter}>
               <Filter className="w-4 h-4" />
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={handleDonate}
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-none hover:from-yellow-500 hover:to-orange-600"
+              className="hidden sm:inline-flex shrink-0 bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-none hover:from-yellow-500 hover:to-orange-600"
             >
               <Hand className="w-4 h-4 mr-1" />
               Donate
