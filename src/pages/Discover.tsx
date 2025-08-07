@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Search, Filter, MapPin, Heart, Star, Clock, Map, List, Hand } from "lucide-react";
+import { Filter, MapPin, Heart, Star, Clock, Map, List, Hand } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MobileLayout from "@/components/MobileLayout";
@@ -9,6 +9,7 @@ import { LocationSelector } from "@/components/LocationSelector";
 import { CategoryCarousel } from "@/components/CategoryCarousel";
 import { StoreProfilePage } from "@/components/StoreProfilePage";
 import ListingsGrid from "@/components/ListingsGrid";
+import GoogleMapsSearch from "@/components/GoogleMapsSearch";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 
@@ -131,6 +132,12 @@ const Discover = () => {
     toast.success("Location updated");
   };
 
+  const handleSearchLocationSelect = (loc: { lat: number; lng: number; address: string }) => {
+    const updated = { ...currentLocation, ...loc };
+    setCurrentLocation(updated);
+    toast.success("Location updated");
+  };
+
   const handleCategoryClick = (categoryName: string) => {
     console.log("Selected category:", categoryName);
     // TODO: Navigate to category page or filter
@@ -169,31 +176,6 @@ const Discover = () => {
       <div className="min-h-screen bg-gray-50 pb-20">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-4 py-4">
-          {/* Search Bar */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search food, restaurants..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-            <Button variant="outline" size="sm" onClick={handleFilter}>
-              <Filter className="w-4 h-4" />
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setShowLocationSelector(true)}
-            >
-              <MapPin className="w-4 h-4" />
-            </Button>
-          </div>
-
           {/* View Toggle Buttons */}
           <div className="flex gap-2 mb-4">
             <Button
@@ -214,12 +196,29 @@ const Discover = () => {
             </Button>
           </div>
           
-          {/* Current Location */}
-          <div className="flex items-center justify-between">
+          {/* Current Location + Inline Search */}
+          <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-gray-600">
               <MapPin className="w-4 h-4 text-green-500" />
               <span className="text-sm">{currentLocation.address}</span>
             </div>
+            <div className="flex-1 max-w-md">
+              <GoogleMapsSearch
+                onLocationSelect={({ lat, lng, address }) => {
+                  handleSearchLocationSelect({ lat, lng, address });
+                }}
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowLocationSelector(true)}
+            >
+              <MapPin className="w-4 h-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleFilter}>
+              <Filter className="w-4 h-4" />
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -268,6 +267,8 @@ const Discover = () => {
                 pickupTimeFilter="now"
                 showSoldOut={false}
                 limit={4}
+                userLocation={{ lat: currentLocation.lat, lng: currentLocation.lng }}
+                distanceFilter={currentLocation.distance}
               />
             </div>
 
@@ -278,6 +279,8 @@ const Discover = () => {
                 pickupTimeFilter="tomorrow"
                 showSoldOut={false}
                 limit={4}
+                userLocation={{ lat: currentLocation.lat, lng: currentLocation.lng }}
+                distanceFilter={currentLocation.distance}
               />
             </div>
 
@@ -300,6 +303,8 @@ const Discover = () => {
                     categoryFilter={category.name}
                     showSoldOut={false}
                     limit={3}
+                    userLocation={{ lat: currentLocation.lat, lng: currentLocation.lng }}
+                    distanceFilter={currentLocation.distance}
                   />
                 </div>
               ))}
