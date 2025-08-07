@@ -198,11 +198,11 @@ const Discover = () => {
           
           {/* Current Location + Inline Search */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-gray-600">
-              <MapPin className="w-4 h-4 text-green-500" />
-              <span className="text-sm">{currentLocation.address}</span>
+            <div className="flex items-center gap-2 bg-brand-light-green text-brand-green rounded-xl px-3 py-1">
+              <MapPin className="w-4 h-4 text-brand-green" />
+              <span className="text-sm font-medium truncate max-w-[50vw]">{currentLocation.address}</span>
             </div>
-            <div className="flex-1 max-w-md">
+            <div className="flex-1 min-w-0">
               <GoogleMapsSearch
                 onLocationSelect={({ lat, lng, address }) => {
                   handleSearchLocationSelect({ lat, lng, address });

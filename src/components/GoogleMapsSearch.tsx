@@ -89,13 +89,14 @@ const GoogleMapsSearch = ({ onLocationSelect }: GoogleMapsSearchProps) => {
   return (
     <div className="relative">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-green w-5 h-5" />
         <Input
           type="text"
-          placeholder="Search cities worldwide: London, Tokyo, Nairobi..."
+          aria-label="Search location"
+          placeholder="Search location (e.g., Kenyatta Market, Nairobi)"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 pr-4 w-full"
+          className="h-12 pl-12 pr-4 w-full rounded-full border border-brand-green bg-background shadow-md focus-visible:ring-ring"
         />
       </div>
 
