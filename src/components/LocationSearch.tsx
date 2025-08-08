@@ -216,8 +216,8 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center p-4 pt-16">
-      <Card className="w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center p-4 pt-8">
+      <Card className="w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col mt-0">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
