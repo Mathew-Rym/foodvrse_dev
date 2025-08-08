@@ -31,9 +31,8 @@ Make sure these redirect URIs are configured:
 - `https://www.foodvrse.com/oauth-callback`
 
 ### Authorized JavaScript Origins
-Add these origins:
+Add this origin:
 - `https://www.foodvrse.com`
-- `https://foodvrse.lovable.app`
 
 ## After Updates
 

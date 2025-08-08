@@ -1,43 +1,33 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
-import path from "path";
-import { componentTagger } from "lovable-tagger";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
+import path from 'path'
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-  },
-  plugins: [
-    react(),
-    mode === 'development' &&
-    componentTagger(),
-  ].filter(Boolean),
+export default defineConfig({
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
   build: {
-    target: 'es2015', // Support for older browsers
+    target: 'es2015',
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-toast'],
-          maps: ['@googlemaps/js-api-loader'],
-          supabase: ['@supabase/supabase-js']
+          supabase: ['@supabase/supabase-js'],
+          maps: ['@googlemaps/js-api-loader']
         }
       }
+    },
+    optimizeDeps: {
+      include: ['react', 'react-dom', '@supabase/supabase-js']
     }
   },
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      '@supabase/supabase-js',
-      '@googlemaps/js-api-loader'
-    ]
+  server: {
+    port: 3000,
+    host: true
   }
-}));
+})

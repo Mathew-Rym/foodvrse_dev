@@ -28,9 +28,7 @@ enabled = true
 site_url = "https://www.foodvrse.com"
 additional_redirect_urls = [
   "https://www.foodvrse.com/**",
-  "https://www.foodvrse.com/oauth-callback",
-  "https://foodvrse.lovable.app/**",
-  "https://foodvrse.lovable.app/oauth-callback"
+  "https://www.foodvrse.com/oauth-callback"
 ]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true

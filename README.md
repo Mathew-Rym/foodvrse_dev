@@ -1,73 +1,96 @@
-# Welcome to your Lovable project
+# FoodVrse - Rescue Meals
 
-## Project info
+**Good food deserves a second chance - Save food, save money, save the planet**
 
-**URL**: https://lovable.dev/projects/7ed32c21-6ce4-4ba4-b153-74514b0212e7
+## About FoodVrse
 
-## How can I edit this code?
+FoodVrse is a platform that connects consumers with local businesses to rescue surplus food, reducing waste and saving money. Our mission is to create a sustainable food ecosystem where good food gets a second chance.
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- **Food Rescue**: Connect with local businesses to save surplus food
+- **Location-Based Search**: Find food deals near you
+- **Business Dashboard**: For restaurants and food businesses to list items
+- **Impact Tracking**: Monitor your environmental and financial impact
+- **Real-time Notifications**: Stay updated on new deals
+- **Mobile Optimized**: Works perfectly on all devices
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7ed32c21-6ce4-4ba4-b153-74514b0212e7) and start prompting.
+## Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend**: React + TypeScript + Vite
+- **Styling**: Tailwind CSS + Shadcn/ui
+- **Backend**: Supabase (PostgreSQL + Auth + Real-time)
+- **Deployment**: Vercel
+- **Maps**: Google Maps Platform
+- **Authentication**: Google OAuth + Email
+- **Notifications**: OneSignal
 
-**Use your preferred IDE**
+## Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Prerequisites
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Node.js 18+ 
+- npm or yarn
+- Supabase account
+- Google Cloud Platform account (for Maps and OAuth)
 
-Follow these steps:
+### Installation
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Mathew-Rym/foodvrse_dev.git
+   cd foodvrse_dev
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. **Set up environment variables**
+   Create a `.env.local` file with:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_KEY=your_supabase_anon_key
+   VITE_GOOGLE_MAPS_API_KEY=your_google_maps_key
+   VITE_GOOGLE_OAUTH_CLIENT_ID=your_google_oauth_client_id
+   VITE_ONESIGNAL_APP_ID=your_onesignal_app_id
+   ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+4. **Start development server**
+   ```bash
+   npm run dev
+   ```
 
-**Edit a file directly in GitHub**
+5. **Build for production**
+   ```bash
+   npm run build
+   ```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Deployment
 
-**Use GitHub Codespaces**
+### Vercel Deployment
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The app is automatically deployed to Vercel from the main branch. Any push to main will trigger a new deployment.
 
-## What technologies are used for this project?
+### Supabase Setup
 
-This project is built with:
+1. Create a new Supabase project
+2. Run the database migrations in `supabase/migrations/`
+3. Configure Google OAuth in Supabase dashboard
+4. Set up Row Level Security (RLS) policies
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Contributing
 
-## How can I deploy this project?
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-Simply open [Lovable](https://lovable.dev/projects/7ed32c21-6ce4-4ba4-b153-74514b0212e7) and click on Share -> Publish.
+## License
 
-## Can I connect a custom domain to my Lovable project?
+This project is proprietary software. All rights reserved.
 
-Yes, you can!
+## Support
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+For support, email: hello@foodvrse.com

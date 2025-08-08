@@ -183,8 +183,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async (isBusinessAuth = false) => {
     try {
-      // Use production URL for OAuth callback
-      const redirectUrl = 'https://www.foodvrse.com/oauth-callback';
+      // Use dynamic redirect URL based on environment
+      const redirectUrl = import.meta.env.PROD 
+        ? 'https://www.foodvrse.com/oauth-callback'
+        : `${window.location.origin}/oauth-callback`;
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
