@@ -51,6 +51,26 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
   }, []);
 
+  // Auto-focus search input when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      // Reset form when opening
+      setSearchQuery('');
+      setPredictions([]);
+      setShowExpansionForm(false);
+      
+      // Focus the search input after a short delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        const searchInput = document.querySelector('input[placeholder*="location"]') as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   // Search for locations using Google Places API
   const searchLocations = async (query: string) => {
     if (!query.trim()) {
@@ -196,8 +216,8 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center p-4 pt-16">
+      <Card className="w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -213,11 +233,11 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
           </p>
         </CardHeader>
         
-        <CardContent className="space-y-4">
+        <CardContent className="flex-1 overflow-hidden flex flex-col">
           {!showExpansionForm ? (
             <>
-              {/* Search Input */}
-              <div className="relative">
+              {/* Search Input - Always visible at top */}
+              <div className="relative mb-4 flex-shrink-0">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
                   type="text"
@@ -231,38 +251,40 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
                 )}
               </div>
 
-              {/* Search Results */}
-              {predictions.length > 0 && (
-                <div className="max-h-64 overflow-y-auto border rounded-lg">
-                  {predictions.map((prediction) => (
-                    <button
-                      key={prediction.place_id}
-                      onClick={() => handleLocationSelect(prediction)}
-                      className="w-full p-3 text-left hover:bg-gray-50 border-b last:border-b-0 flex items-start gap-3"
-                    >
-                      <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <div className="font-medium text-sm">
-                          {prediction.structured_formatting.main_text}
+              {/* Search Results - Scrollable area */}
+              <div className="flex-1 overflow-y-auto">
+                {predictions.length > 0 && (
+                  <div className="border rounded-lg">
+                    {predictions.map((prediction) => (
+                      <button
+                        key={prediction.place_id}
+                        onClick={() => handleLocationSelect(prediction)}
+                        className="w-full p-3 text-left hover:bg-gray-50 border-b last:border-b-0 flex items-start gap-3"
+                      >
+                        <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <div className="font-medium text-sm">
+                            {prediction.structured_formatting.main_text}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {prediction.structured_formatting.secondary_text}
+                          </div>
                         </div>
-                        <div className="text-xs text-gray-500">
-                          {prediction.structured_formatting.secondary_text}
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+                      </button>
+                    ))}
+                  </div>
+                )}
 
-              {searchQuery && predictions.length === 0 && !isLoading && (
-                <div className="text-center text-gray-500 py-4">
-                  No locations found for "{searchQuery}"
-                </div>
-              )}
+                {searchQuery && predictions.length === 0 && !isLoading && (
+                  <div className="text-center text-gray-500 py-4">
+                    No locations found for "{searchQuery}"
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             /* Expansion Form */
-            <div className="space-y-4">
+            <div className="space-y-4 overflow-y-auto">
               <div className="flex items-center gap-2 p-4 bg-blue-50 rounded-lg">
                 <AlertCircle className="w-5 h-5 text-blue-600" />
                 <div>
