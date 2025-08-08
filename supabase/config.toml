@@ -27,16 +27,10 @@ image_transformation = { enabled = true }
 enabled = true
 site_url = "https://www.foodvrse.com"
 additional_redirect_urls = [
-  "https://7ed32c21-6ce4-4ba4-b153-74514b0212e7.lovableproject.com/**", 
-  "https://foodvrse.lovable.app/**", 
-  "https://id-preview--7ed32c21-6ce4-4ba4-b153-74514b0212e7.lovable.app/**", 
-  "https://preview--foodvrse.lovable.app/**",
   "https://www.foodvrse.com/**",
   "https://www.foodvrse.com/oauth-callback",
-  "http://localhost:3000/**",
-  "http://localhost:3000/oauth-callback",
-  "http://localhost:8080/**",
-  "http://localhost:8080/oauth-callback"
+  "https://foodvrse.lovable.app/**",
+  "https://foodvrse.lovable.app/oauth-callback"
 ]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
