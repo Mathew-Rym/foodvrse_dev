@@ -237,17 +237,24 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
           {!showExpansionForm ? (
             <>
               {/* Search Input - Always visible at top */}
-              <div className="relative mb-4 flex-shrink-0">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <div className="relative mb-4 flex-shrink-0 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  🔍 Search for your location
+                </label>
+                <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                 <Input
                   type="text"
                   placeholder="Enter location, address, or landmark..."
                   value={searchQuery}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  className="pl-10"
+                  className="pl-12 pr-4 py-3 text-base border-2 border-gray-300 bg-white shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
+                  style={{
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                    backgroundColor: '#ffffff'
+                  }}
                 />
                 {isLoading && (
-                  <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin text-gray-400" />
+                  <Loader2 className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 animate-spin text-green-500" />
                 )}
               </div>
 
