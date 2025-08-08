@@ -97,8 +97,8 @@ const MeetTheTeam = () => {
           <h2 className="text-3xl font-bold mb-8">Core Team</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {teamMembers.map((member) => (
-              <Card key={member.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
+              <Card key={member.id} className="hover:shadow-lg transition-shadow h-full">
+                <CardContent className="p-6 flex flex-col h-full">
                   <div className="text-center mb-4">
                     <Avatar className="w-24 h-24 mx-auto mb-4">
                       <AvatarImage src={member.avatar} alt={member.name} />
@@ -114,13 +114,19 @@ const MeetTheTeam = () => {
                     </div>
                   </div>
                   
-                  <p className="text-sm text-muted-foreground text-center mb-4 leading-relaxed">
+                  <p className="text-sm text-muted-foreground text-center mb-6 leading-relaxed">
                     {member.bio}
                   </p>
                   
-                  <div className="flex justify-center">
+                  <div className="mt-auto flex justify-center">
                     <Button variant="ghost" size="sm" asChild>
-                      <a href={member.linkedin} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={member.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`LinkedIn profile of ${member.name}`}
+                        className="inline-flex items-center justify-center"
+                      >
                         <Linkedin className="h-4 w-4" />
                       </a>
                     </Button>
@@ -136,8 +142,8 @@ const MeetTheTeam = () => {
           <h2 className="text-3xl font-bold mb-8">Advisors</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
             {advisors.map((advisor, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
+              <Card key={index} className="hover:shadow-lg transition-shadow h-full">
+                <CardContent className="p-6 flex flex-col h-full">
                   <div className="text-center mb-4">
                     <Avatar className="w-20 h-20 mx-auto mb-4">
                       <AvatarImage src={advisor.avatar} alt={advisor.name} />
@@ -149,14 +155,20 @@ const MeetTheTeam = () => {
                     <p className="text-primary font-medium mb-3">{advisor.role}</p>
                   </div>
                   
-                  <p className="text-sm text-muted-foreground text-center leading-relaxed mb-4">
+                  <p className="text-sm text-muted-foreground text-center leading-relaxed mb-6">
                     {advisor.bio}
                   </p>
                   
                   {advisor.linkedin && (
-                    <div className="flex justify-center">
+                    <div className="mt-auto flex justify-center">
                       <Button variant="ghost" size="sm" asChild>
-                        <a href={advisor.linkedin} target="_blank" rel="noopener noreferrer">
+                        <a
+                          href={advisor.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`LinkedIn profile of ${advisor.name}`}
+                          className="inline-flex items-center justify-center"
+                        >
                           <Linkedin className="h-4 w-4" />
                         </a>
                       </Button>
