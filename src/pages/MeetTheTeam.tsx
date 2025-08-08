@@ -30,7 +30,7 @@ const MeetTheTeam = () => {
       id: "2",
       name: "Rachel Wangu",
       role: "Co- Founder and Chief Sustainability Officer (CSO)",
-      bio: "An environmental scientist from the University of Nairobi and a food systems expert, she excels at building strong relationships with restaurants and food businesses. With a sharp eye for data analytics and real-world experience in sustainability, she bridges science and strategy to drive FoodVrse’s mission forward. ",
+      bio: "An environmental scientist from Kenyatta University and a food systems expert, she excels at building strong relationships with restaurants and food businesses. With a sharp eye for data analytics and real-world experience in sustainability, she bridges science and strategy to drive FoodVrse’s mission forward. ",
       avatar: "/team/rachel-wangu.jpg",
       initials: "RW",
       location: "Nairobi, Kenya",
