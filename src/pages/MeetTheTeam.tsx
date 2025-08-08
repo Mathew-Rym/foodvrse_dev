@@ -42,7 +42,7 @@ const MeetTheTeam = () => {
       id: "3",
       name: "Hebrew Simeon",
       role: "Co- Founder and Head of Strategic Partnerships",
-      bio: "PhD candidate in Bioinformatics at Sorbonne Université, France, serves as Partnerships Lead at FoodVrse. He brings strong analytical skills, global perspective, and a passion for sustainability to drive strategic collaborations.",
+      bio: "PhD candidate in Bioinformatics at Sorbonne Université, France, and Partnerships Lead at FoodVrse. Having earned a postgraduate degree in Entrepreneurial Project Management from Sorbonne Université, he brings strong analytical skills, a global perspective, and a passion for sustainability to drive strategic collaborations.",
       avatar: "/team/hebrew-simeon.jpg",
       initials: "HS",
       location: "Nairobi, Kenya & Paris, France",

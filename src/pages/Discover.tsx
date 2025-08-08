@@ -10,6 +10,7 @@ import { CategoryCarousel } from "@/components/CategoryCarousel";
 import { StoreProfilePage } from "@/components/StoreProfilePage";
 import ListingsGrid from "@/components/ListingsGrid";
 import GoogleMapsSearch from "@/components/GoogleMapsSearch";
+import DonatePopup from "@/components/DonatePopup";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 
@@ -29,6 +30,7 @@ const Discover = () => {
   const [selectedStore, setSelectedStore] = useState<any>(null);
   const [categories, setCategories] = useState<any[]>([]);
   const [categoryData, setCategoryData] = useState<any>({});
+  const [showDonatePopup, setShowDonatePopup] = useState(false);
 
   // Mock data for demonstration
   const mockStores = [
@@ -167,8 +169,7 @@ const Discover = () => {
   };
 
   const handleDonate = () => {
-    // TODO: Implement donate functionality
-    toast.success("Thank you for your interest in donating!");
+    setShowDonatePopup(true);
   };
 
   return (
@@ -413,6 +414,12 @@ const Discover = () => {
           store={selectedStore}
         />
       )}
+
+      {/* Donate Popup */}
+      <DonatePopup
+        isOpen={showDonatePopup}
+        onClose={() => setShowDonatePopup(false)}
+      />
     </MobileLayout>
   );
 };
