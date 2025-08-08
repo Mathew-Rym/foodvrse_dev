@@ -17,7 +17,7 @@ const MeetTheTeam = () => {
     {
       id: "1",
       name: "Rym Njuguna",
-      role: "Founder and CEO",
+      role: "Founder and CEO, CTO",
       bio: "A Computer Science graduate and former mechatronics consultant, he is a seasoned leader and entrepreneur who has successfully founded and exited two companies, a surveillance tech company s and a juice processing startup. Leveraging his deep technical expertise and strong grasp of food systems, he now leads FoodVrse, a sustainable food company dedicated to reimagining how Africa eats. By turning food waste into opportunity, he's building scalable, impact-driven solutions that align with both consumer needs and global climate goals.",
       avatar: "/team/rym-njuguna.jpg",
       initials: "RN",
