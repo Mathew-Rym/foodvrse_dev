@@ -1,14 +1,12 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, ArrowRight, Building, MapPin, Users, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import emailjs from '@emailjs/browser';
-import ReCAPTCHA from 'react-google-recaptcha';
 import { EMAILJS_CONFIG } from '@/config/emailjs';
-import { RECAPTCHA_CONFIG } from '@/config/recaptcha';
 
 const PartnerApplication = () => {
   const navigate = useNavigate();
@@ -30,8 +28,6 @@ const PartnerApplication = () => {
   });
 
   const [consent, setConsent] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   // Initialize EmailJS
   useEffect(() => {
@@ -46,10 +42,6 @@ const PartnerApplication = () => {
       return;
     }
 
-    if (!recaptchaToken) {
-      toast.error("Please complete the reCAPTCHA verification");
-      return;
-    }
 
     setIsSubmitting(true);
 
@@ -119,9 +111,6 @@ This application was submitted through the FoodVrse website.
           partnershipInterest: "",
           monthlyWaste: ""
         });
-        setConsent(false);
-        setRecaptchaToken(null);
-        recaptchaRef.current?.reset();
       } else {
         throw new Error('Email sending failed');
       }
@@ -448,33 +437,6 @@ This application was submitted through the FoodVrse website.
                 .
               </p>
 
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
-                <div className="flex items-center space-x-3">
-                  <div className="text-sm font-medium text-gray-700">
-                    Verify you are human
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-xs font-semibold text-gray-500">FOODVRSE</div>
-                  <div className="flex space-x-2 text-xs">
-                    <a href="/privacy-policy" className="text-blue-600 hover:text-blue-800">Privacy</a>
-                    <a href="/terms" className="text-blue-600 hover:text-blue-800">Terms</a>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex justify-center">
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey={RECAPTCHA_CONFIG.SITE_KEY}
-                  onChange={(token) => setRecaptchaToken(token)}
-                  onExpired={() => setRecaptchaToken(null)}
-                  onError={() => {
-                    setRecaptchaToken(null);
-                    toast.error("reCAPTCHA verification failed. Please try again.");
-                  }}
-                />
-              </div>
             </div>
           </div>
 
