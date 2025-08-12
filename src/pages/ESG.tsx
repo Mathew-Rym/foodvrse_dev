@@ -180,8 +180,8 @@ const ESG = () => {
                   Start Saving Food
                 </Button>
                 <Button 
-                  variant="outline" 
-                  className="border-white text-white hover:bg-white hover:text-green-600"
+                  variant="secondary" 
+                  className="bg-white text-green-600 hover:bg-gray-100 font-semibold"
                   onClick={() => window.location.href = '/partner-application'}
                 >
                   Become a Partner
