@@ -7,10 +7,10 @@ import MobileLayout from "@/components/MobileLayout";
 
 const ESG = () => {
   const environmentalMetrics = [
-    { label: "CO2 Saved", value: "2,500+ kg", icon: Leaf, color: "text-green-600" },
-    { label: "Water Conserved", value: "200,000+ L", icon: Globe, color: "text-blue-600" },
-    { label: "Energy Saved", value: "2,500+ kWh", icon: TrendingUp, color: "text-yellow-600" },
-    { label: "Meals Rescued", value: "1,000+", icon: Heart, color: "text-red-600" }
+    { label: "CO2 Saved", value: "Significant", icon: Leaf, color: "text-green-600" },
+    { label: "Water Conserved", value: "Substantial", icon: Globe, color: "text-blue-600" },
+    { label: "Energy Saved", value: "Considerable", icon: TrendingUp, color: "text-yellow-600" },
+    { label: "Meals Rescued", value: "Thousands", icon: Heart, color: "text-red-600" }
   ];
 
   const socialInitiatives = [
