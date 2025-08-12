@@ -15,20 +15,9 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
 
   useEffect(() => {
     if (isOpen) {
-      // Check if user just completed onboarding
-      const justCompletedOnboarding = localStorage.getItem('foodvrse-onboarding-just-completed');
-      
-      if (justCompletedOnboarding) {
-        // Auto-play for first-time users who just completed onboarding
-        setIsPlaying(true);
-        setShowPlayButton(false);
-        // Remove the flag so it doesn't auto-play next time
-        localStorage.removeItem('foodvrse-onboarding-just-completed');
-      } else {
-        // Show play button for returning users
-        setIsPlaying(false);
-        setShowPlayButton(true);
-      }
+      // Auto-play for all users when modal opens
+      setIsPlaying(true);
+      setShowPlayButton(false);
       
       // Always use embedded video
       setVideoType('embedded');
