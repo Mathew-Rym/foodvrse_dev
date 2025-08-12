@@ -15,19 +15,36 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
 
   useEffect(() => {
     if (isOpen) {
-      // Auto-play for all users when modal opens
-      setIsPlaying(true);
-      setShowPlayButton(false);
+      // Check if user just completed onboarding
+      const justCompletedOnboarding = localStorage.getItem('foodvrse-onboarding-just-completed');
       
-      // Always use embedded video
-      setVideoType('embedded');
+      if (justCompletedOnboarding) {
+        // Auto-play for first-time users who just completed onboarding
+        setIsPlaying(true);
+        setShowPlayButton(false);
+        // Remove the flag so it doesn't auto-play next time
+        localStorage.removeItem('foodvrse-onboarding-just-completed');
+      } else {
+        // Show play button for returning users
+        setIsPlaying(false);
+        setShowPlayButton(true);
+      }
+      
+      // Detect video type based on URL
+      if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+        setVideoType('youtube');
+      } else if (videoUrl.includes('vimeo.com')) {
+        setVideoType('vimeo');
+      } else {
+        setVideoType('embedded');
+      }
     } else {
       // Reset states when modal closes
       setIsPlaying(false);
       setShowPlayButton(true);
       setVideoType('embedded');
     }
-  }, [isOpen]);
+  }, [isOpen, videoUrl]);
 
   if (!isOpen) return null;
 
@@ -70,19 +87,49 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
   };
 
   const renderVideoContent = () => {
-    // Use the provided embedded Vimeo code
-    return (
-      <div style={{padding: '56.25% 0 0 0', position: 'relative'}}>
-        <iframe 
-          src={`https://player.vimeo.com/video/1107540626?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=${isPlaying ? 1 : 0}`}
-          frameBorder="0" 
-          allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
-          referrerPolicy="strict-origin-when-cross-origin" 
-          style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}} 
-          title="Foodvrse"
-        />
-      </div>
-    );
+    if (videoType === 'youtube') {
+      const embedUrl = getYouTubeEmbedUrl(videoUrl, isPlaying);
+      return (
+        <div style={{padding: '56.25% 0 0 0', position: 'relative'}}>
+          <iframe 
+            src={embedUrl}
+            frameBorder="0" 
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+            referrerPolicy="strict-origin-when-cross-origin" 
+            style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}} 
+            title="FoodVrse"
+          />
+        </div>
+      );
+    } else if (videoType === 'vimeo') {
+      const embedUrl = getVimeoEmbedUrl(videoUrl, isPlaying);
+      return (
+        <div style={{padding: '56.25% 0 0 0', position: 'relative'}}>
+          <iframe 
+            src={embedUrl}
+            frameBorder="0" 
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+            referrerPolicy="strict-origin-when-cross-origin" 
+            style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}} 
+            title="FoodVrse"
+          />
+        </div>
+      );
+    } else {
+      // Default Vimeo embed for FoodVrse video (fallback)
+      return (
+        <div style={{padding: '56.25% 0 0 0', position: 'relative'}}>
+          <iframe 
+            src={`https://player.vimeo.com/video/1107540626?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=${isPlaying ? 1 : 0}`}
+            frameBorder="0" 
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+            referrerPolicy="strict-origin-when-cross-origin" 
+            style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}} 
+            title="FoodVrse"
+          />
+        </div>
+      );
+    }
   };
 
   
