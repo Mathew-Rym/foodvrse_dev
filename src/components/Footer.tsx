@@ -173,6 +173,14 @@ const Footer = () => {
                   Press
                 </button>
               </li>
+              <li>
+                <button 
+                  onClick={() => handleLinkClick("/esg")}
+                  className="hover:text-white text-left"
+                >
+                  ESG Commitment
+                </button>
+              </li>
             </ul>
           </div>
 

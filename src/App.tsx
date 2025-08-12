@@ -36,6 +36,7 @@ import OurImpact from "./pages/OurImpact";
 import MeetTheTeam from "./pages/MeetTheTeam";
 import Careers from "./pages/Careers";
 import Press from "./pages/Press";
+import ESG from "./pages/ESG";
 import Partners from "./pages/Partners";
 import PartnerApplication from "./pages/PartnerApplication";
 import ComingSoon from "./pages/ComingSoon";
@@ -151,6 +152,7 @@ const App = () => {
                     <Route path="/meet-the-team" element={<MeetTheTeam />} />
                     <Route path="/careers" element={<Careers />} />
                     <Route path="/press" element={<Press />} />
+                    <Route path="/esg" element={<ESG />} />
                     <Route path="/partners" element={<Partners />} />
                     <Route path="/partner-application" element={<PartnerApplication />} />
                     <Route path="/coming-soon" element={<ComingSoon />} />
