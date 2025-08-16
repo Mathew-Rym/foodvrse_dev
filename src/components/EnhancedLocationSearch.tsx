@@ -120,6 +120,25 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
     emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
   }, []);
 
+  // Debug component lifecycle
+  useEffect(() => {
+    console.log('🔧 EnhancedLocationSearch mounted. isOpen:', isOpen);
+    if (isOpen) {
+      console.log('🔧 Modal opened, current state:', {
+        searchQuery,
+        predictions: predictions.length,
+        isLoading,
+        showDeals,
+        selectedLocation
+      });
+    }
+  }, [isOpen, searchQuery, predictions.length, isLoading, showDeals, selectedLocation]);
+
+  // Debug predictions changes
+  useEffect(() => {
+    console.log('📊 Predictions changed:', predictions.length, predictions);
+  }, [predictions]);
+
   // Auto-focus search input when modal opens
   useEffect(() => {
     if (isOpen) {
@@ -173,75 +192,42 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
     }
 
     setIsLoading(true);
-    console.log('🔍 Searching for:', query);
+    console.log('🔍 Starting search for:', query);
     
     try {
-      // Try multiple search strategies
-      const searchStrategies = [
-        // Strategy 1: Basic search with establishment types
-        {
-          input: query,
-          types: 'establishment',
-          key: API_CONFIG.GOOGLE_MAPS_API_KEY
-        },
-        // Strategy 2: Geocode search
-        {
-          input: query,
-          types: 'geocode',
-          key: API_CONFIG.GOOGLE_MAPS_API_KEY
-        },
-        // Strategy 3: No type restrictions
-        {
-          input: query,
-          key: API_CONFIG.GOOGLE_MAPS_API_KEY
-        }
-      ];
+      // Simple, reliable search approach
+      const searchParams = new URLSearchParams({
+        input: query,
+        key: API_CONFIG.GOOGLE_MAPS_API_KEY
+      });
 
-      let allPredictions: any[] = [];
+      console.log('🌐 Making API request to:', `https://maps.googleapis.com/maps/api/place/autocomplete/json?${searchParams.toString()}`);
 
-      for (const strategy of searchStrategies) {
-        try {
-          const searchParams = new URLSearchParams(strategy);
-          const response = await fetch(
-            `https://maps.googleapis.com/maps/api/place/autocomplete/json?${searchParams.toString()}`,
-            {
-              method: 'GET',
-              headers: {
-                'Accept': 'application/json',
-              }
-            }
-          );
-          
-          if (!response.ok) {
-            console.error(`HTTP error for strategy:`, strategy, `Status:`, response.status);
-            continue;
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?${searchParams.toString()}`,
+        {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
           }
-          
-          const data = await response.json();
-          console.log(`Strategy result:`, strategy, data);
-          
-          if (data.status === 'OK' && data.predictions && data.predictions.length > 0) {
-            allPredictions = [...allPredictions, ...data.predictions];
-            console.log(`Found ${data.predictions.length} predictions with strategy:`, strategy);
-          }
-        } catch (strategyError) {
-          console.error('Error with search strategy:', strategy, strategyError);
         }
-      }
-
-      // Remove duplicates based on place_id
-      const uniquePredictions = allPredictions.filter((prediction, index, self) => 
-        index === self.findIndex(p => p.place_id === prediction.place_id)
       );
-
-      console.log('🎯 Final unique predictions:', uniquePredictions.length, uniquePredictions);
       
-      if (uniquePredictions.length > 0) {
-        setPredictions(uniquePredictions);
-        console.log('✅ Successfully set predictions:', uniquePredictions.length);
+      console.log('📡 Response status:', response.status, response.ok);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('📊 API Response:', data);
+      
+      if (data.status === 'OK' && data.predictions && data.predictions.length > 0) {
+        console.log('✅ Found predictions:', data.predictions.length);
+        setPredictions(data.predictions);
       } else {
+        console.log('❌ No predictions found. Status:', data.status);
         setPredictions([]);
-        console.log('❌ No predictions found for:', query);
       }
       
     } catch (error) {
@@ -250,6 +236,7 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
       toast.error('Failed to search locations. Please try again.');
     } finally {
       setIsLoading(false);
+      console.log('🏁 Search completed');
     }
   };
 
@@ -459,6 +446,20 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
                 {isLoading && (
                   <Loader2 className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
                 )}
+              </div>
+
+              {/* Test Button */}
+              <div className="mb-4 text-center">
+                <Button 
+                  onClick={() => {
+                    console.log('🧪 Test button clicked');
+                    searchLocations('kibra');
+                  }}
+                  variant="outline"
+                  size="sm"
+                >
+                  🧪 Test Search "kibra"
+                </Button>
               </div>
 
               {/* Location Predictions */}
