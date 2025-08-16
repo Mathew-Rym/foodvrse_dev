@@ -62,6 +62,7 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number; address: string } | null>(null);
   const [nearbyDeals, setNearbyDeals] = useState<BusinessDeal[]>([]);
   const [showDeals, setShowDeals] = useState(false);
+  const [showWaitlistForm, setShowWaitlistForm] = useState(false);
   const [expansionFormData, setExpansionFormData] = useState({
     name: '',
     email: '',
@@ -392,6 +393,75 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
     }
   };
 
+  // Handle expansion form submission
+  const handleExpansionFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!expansionFormData.name || !expansionFormData.email) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      const templateParams = {
+        from_name: expansionFormData.name,
+        from_email: expansionFormData.email,
+        location: expansionFormData.location,
+        message: expansionFormData.message || 'User wants FoodVrse in their area',
+        to_email: 'hello@foodvrse.com'
+      };
+
+      await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        templateParams,
+        EMAILJS_CONFIG.PUBLIC_KEY
+      );
+
+      toast.success('Thank you! We\'ll notify you when FoodVrse comes to your area.');
+      setShowWaitlistForm(false);
+      setExpansionFormData({ name: '', email: '', location: '', message: '' });
+      onClose();
+    } catch (error) {
+      console.error('Error sending email:', error);
+      toast.error('Failed to submit. Please try again.');
+    }
+  };
+
+  const handleWaitlistFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!expansionFormData.name || !expansionFormData.email) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      const templateParams = {
+        from_name: expansionFormData.name,
+        from_email: expansionFormData.email,
+        location: expansionFormData.location,
+        message: expansionFormData.message || 'User wants FoodVrse in their area',
+        to_email: 'hello@foodvrse.com'
+      };
+
+      await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        templateParams,
+        EMAILJS_CONFIG.PUBLIC_KEY
+      );
+
+      toast.success('Thank you! We\'ll notify you when FoodVrse comes to your area.');
+      setShowWaitlistForm(false);
+      setExpansionFormData({ name: '', email: '', location: '', message: '' });
+      onClose();
+    } catch (error) {
+      console.error('Error sending email:', error);
+      toast.error('Failed to submit. Please try again.');
+    }
+  };
+
   // Handle confirm location
   const handleConfirmLocation = () => {
     if (selectedLocation) {
@@ -573,7 +643,7 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
                 <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                 <p className="font-medium text-gray-700 mb-2">No locations found for "{searchQuery}"</p>
                 <p className="text-sm text-gray-500 mb-4">Try searching for:</p>
-                <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="grid grid-cols-2 gap-2 text-sm mb-6">
                   <div className="p-2 bg-gray-50 rounded-lg">
                     <div className="font-medium text-gray-700">Cities</div>
                     <div className="text-gray-500">nairobi, mombasa, kisumu</div>
@@ -591,6 +661,23 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
                     <div className="text-gray-500">citam woodley, westlands</div>
                   </div>
                 </div>
+                
+                {/* Waitlist Button */}
+                <div className="border-t border-gray-200 pt-6">
+                  <p className="text-sm text-gray-600 mb-4">
+                    Don't see your area? Request FoodVrse to come to your location!
+                  </p>
+                  <Button
+                    onClick={() => {
+                      setExpansionFormData(prev => ({ ...prev, location: searchQuery }));
+                      setShowWaitlistForm(true);
+                    }}
+                    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl"
+                  >
+                    Request FoodVrse in My Area
+                  </Button>
+                </div>
+                
                 <div className="mt-4 text-xs text-gray-400">
                   Debug: Search query: "{searchQuery}", Predictions: {predictions.length}, Loading: {isLoading.toString()}
                 </div>
@@ -599,6 +686,130 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Waitlist Form Popup */}
+      {showWaitlistForm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black bg-opacity-50"
+            onClick={() => setShowWaitlistForm(false)}
+          />
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden relative">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-green-100">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <Globe className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">FoodVrse (Mystery Bag)</h2>
+                  <p className="text-sm text-gray-600">Is Coming, Will Your Area Be Next?</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowWaitlistForm(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* Form Content */}
+            <div className="p-6">
+              <p className="text-sm text-gray-600 mb-6">
+                Friends and neighbors are already joining the waitlist, don't miss your chance! 
+                Request FoodVrse in your area today and unlock exclusive launch perks like 
+                first-order discounts and early access meals.
+              </p>
+
+              <form onSubmit={handleWaitlistFormSubmit} className="space-y-4">
+                {/* Name Field */}
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    Your Name *
+                  </label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Enter your name"
+                    value={expansionFormData.name}
+                    onChange={(e) => setExpansionFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full"
+                    required
+                  />
+                </div>
+
+                {/* Email Field */}
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email Address *
+                  </label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your.email@example.com"
+                    value={expansionFormData.email}
+                    onChange={(e) => setExpansionFormData(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full"
+                    required
+                  />
+                </div>
+
+                {/* Location Field */}
+                <div>
+                  <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                    Your Location
+                  </label>
+                  <Input
+                    id="location"
+                    type="text"
+                    placeholder="Enter your location"
+                    value={expansionFormData.location}
+                    onChange={(e) => setExpansionFormData(prev => ({ ...prev, location: e.target.value }))}
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Message Field */}
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                    Message (Optional)
+                  </label>
+                  <textarea
+                    id="message"
+                    placeholder="Tell us why you'd like FoodVrse in your area..."
+                    value={expansionFormData.message}
+                    onChange={(e) => setExpansionFormData(prev => ({ ...prev, message: e.target.value }))}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none"
+                    rows={3}
+                  />
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowWaitlistForm(false)}
+                    className="flex-1"
+                  >
+                    Back to Search
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <span className="mr-2">🎁</span>
+                    Claim My Spot
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
