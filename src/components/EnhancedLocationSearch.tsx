@@ -438,7 +438,12 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
                   value={searchQuery}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-12 pr-4 py-3 text-base border-2 border-gray-300 bg-white shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
-                  style={{ boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', backgroundColor: '#ffffff' }}
+                  style={{ 
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', 
+                    backgroundColor: '#ffffff'
+                  }}
+                  spellCheck="false"
+                  autoComplete="off"
                 />
                 {isLoading && (
                   <Loader2 className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
@@ -552,9 +557,27 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
               {/* No Results */}
               {searchQuery && predictions.length === 0 && !isLoading && (
                 <div className="text-center py-8 text-gray-500">
-                  <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                  <p>No locations found for "{searchQuery}"</p>
-                  <p className="text-sm">Try a different search term or check your spelling.</p>
+                  <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <p className="font-medium text-gray-700 mb-2">No locations found for "{searchQuery}"</p>
+                  <p className="text-sm text-gray-500 mb-4">Try searching for:</p>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="p-2 bg-gray-50 rounded-lg">
+                      <div className="font-medium text-gray-700">Cities</div>
+                      <div className="text-gray-500">nairobi, mombasa, kisumu</div>
+                    </div>
+                    <div className="p-2 bg-gray-50 rounded-lg">
+                      <div className="font-medium text-gray-700">Neighborhoods</div>
+                      <div className="text-gray-500">westlands, kilimani, cbd</div>
+                    </div>
+                    <div className="p-2 bg-gray-50 rounded-lg">
+                      <div className="font-medium text-gray-700">Landmarks</div>
+                      <div className="text-gray-500">two rivers, sarit centre</div>
+                    </div>
+                    <div className="p-2 bg-gray-50 rounded-lg">
+                      <div className="font-medium text-gray-700">Full Names</div>
+                      <div className="text-gray-500">kilimani, westlands</div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
