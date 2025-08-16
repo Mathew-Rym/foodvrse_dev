@@ -11,6 +11,7 @@ import { StoreProfilePage } from "@/components/StoreProfilePage";
 import ListingsGrid from "@/components/ListingsGrid";
 import GoogleMapsSearch from "@/components/GoogleMapsSearch";
 import DonatePopup from "@/components/DonatePopup";
+import EnhancedLocationSearch from "@/components/EnhancedLocationSearch";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 
@@ -31,6 +32,7 @@ const Discover = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [categoryData, setCategoryData] = useState<any>({});
   const [showDonatePopup, setShowDonatePopup] = useState(false);
+  const [showEnhancedLocationSearch, setShowEnhancedLocationSearch] = useState(false);
 
   // Mock data for demonstration
   const mockStores = [
@@ -214,7 +216,7 @@ const Discover = () => {
               variant="outline"
               size="sm"
               className="shrink-0"
-              onClick={() => setShowLocationSelector(true)}
+              onClick={() => setShowEnhancedLocationSearch(true)}
             >
               <MapPin className="w-4 h-4" />
             </Button>
@@ -419,6 +421,17 @@ const Discover = () => {
       <DonatePopup
         isOpen={showDonatePopup}
         onClose={() => setShowDonatePopup(false)}
+      />
+
+      {/* Enhanced Location Search */}
+      <EnhancedLocationSearch
+        isOpen={showEnhancedLocationSearch}
+        onClose={() => setShowEnhancedLocationSearch(false)}
+        onLocationSelect={handleLocationSelect}
+        onDealsFound={(deals) => {
+          console.log('Found deals:', deals);
+          toast.success(`Found ${deals.length} deals in your area!`);
+        }}
       />
     </MobileLayout>
   );

@@ -8,6 +8,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import CartSheet from "./CartSheet";
 import LocationSearch from "./LocationSearch";
+import EnhancedLocationSearch from "./EnhancedLocationSearch";
 import { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import Logo from "./Logo";

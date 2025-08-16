@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,14 +42,14 @@ interface BusinessDeal {
   };
 }
 
-interface LocationSearchProps {
+interface EnhancedLocationSearchProps {
   isOpen: boolean;
   onClose: () => void;
   onLocationSelect?: (location: { lat: number; lng: number; address: string }) => void;
   onDealsFound?: (deals: BusinessDeal[]) => void;
 }
 
-const LocationSearch: React.FC<LocationSearchProps> = ({
+const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
   isOpen,
   onClose,
   onLocationSelect,
@@ -70,7 +69,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     message: ''
   });
 
-  // Mock business deals data - in real app, this would come from API
+  // Mock business deals data
   const mockBusinessDeals: BusinessDeal[] = [
     {
       id: '1',
@@ -113,20 +112,6 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
       category: 'Restaurant',
       location: 'Kilimani, Nairobi',
       coordinates: { lat: -1.3000, lng: 36.8000 }
-    },
-    {
-      id: '4',
-      businessName: 'Healthy Bites CBD',
-      dealTitle: 'Healthy Meal Prep Bag',
-      price: 300,
-      originalPrice: 900,
-      pickupTime: 'Today: 16:30 - 17:30',
-      distance: '3.5 km',
-      rating: 4.7,
-      image: '🥗',
-      category: 'Healthy',
-      location: 'CBD, Nairobi',
-      coordinates: { lat: -1.2921, lng: 36.8219 }
     }
   ];
 
@@ -138,7 +123,6 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   // Auto-focus search input when modal opens
   useEffect(() => {
     if (isOpen) {
-      // Reset form when opening
       setSearchQuery('');
       setPredictions([]);
       setShowExpansionForm(false);
@@ -146,7 +130,6 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
       setSelectedLocation(null);
       setNearbyDeals([]);
       
-      // Focus the search input after a short delay to ensure DOM is ready
       const timer = setTimeout(() => {
         const searchInput = document.querySelector('input[placeholder*="location"]') as HTMLInputElement;
         if (searchInput) {
@@ -158,9 +141,9 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     }
   }, [isOpen]);
 
-  // Calculate distance between two coordinates
+  // Calculate distance between coordinates
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371; // Radius of the Earth in kilometers
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -170,19 +153,19 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     return R * c;
   };
 
-  // Find nearby deals based on selected location
+  // Find nearby deals
   const findNearbyDeals = (lat: number, lng: number): BusinessDeal[] => {
     return mockBusinessDeals
       .map(deal => ({
         ...deal,
         distance: `${calculateDistance(lat, lng, deal.coordinates.lat, deal.coordinates.lng).toFixed(1)} km`
       }))
-      .filter(deal => parseFloat(deal.distance) <= 10) // Within 10km
+      .filter(deal => parseFloat(deal.distance) <= 10)
       .sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance))
-      .slice(0, 6); // Show top 6 deals
+      .slice(0, 6);
   };
 
-  // Search for locations using Google Places API
+  // Search locations
   const searchLocations = async (query: string) => {
     if (!query.trim()) {
       setPredictions([]);
@@ -192,34 +175,96 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     setIsLoading(true);
     
     try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&types=geocode|establishment&key=${API_CONFIG.GOOGLE_MAPS_API_KEY}`
+      // First try with Kenya restriction
+      let searchParams = new URLSearchParams({
+        input: query,
+        types: 'geocode|establishment|locality|sublocality|administrative_area_level_1',
+        components: 'country:ke', // Restrict to Kenya
+        key: API_CONFIG.GOOGLE_MAPS_API_KEY
+      });
+
+      let response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?${searchParams.toString()}`
       );
       
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      let data = await response.json();
+      
+      console.log('Google Places API response (Kenya restricted):', data);
+      
+      // If no results with Kenya restriction, try global search
+      if (data.status === 'ZERO_RESULTS' || (data.status === 'OK' && data.predictions.length === 0)) {
+        console.log('No results in Kenya, trying global search...');
+        
+        searchParams = new URLSearchParams({
+          input: query,
+          types: 'geocode|establishment|locality|sublocality|administrative_area_level_1',
+          key: API_CONFIG.GOOGLE_MAPS_API_KEY
+        });
+
+        response = await fetch(
+          `https://maps.googleapis.com/maps/api/place/autocomplete/json?${searchParams.toString()}`
+        );
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        data = await response.json();
+        console.log('Google Places API response (global):', data);
+      }
       
       if (data.status === 'OK') {
         setPredictions(data.predictions);
-      } else {
+        console.log('Found predictions:', data.predictions.length);
+      } else if (data.status === 'ZERO_RESULTS') {
         setPredictions([]);
         console.log('No predictions found for:', query);
+      } else {
+        console.error('Google Places API error:', data.status, data.error_message);
+        setPredictions([]);
+        
+        // Show user-friendly error message
+        if (data.status === 'REQUEST_DENIED') {
+          toast.error('Location search is temporarily unavailable. Please try again later.');
+        } else if (data.status === 'OVER_QUERY_LIMIT') {
+          toast.error('Search limit reached. Please try again in a moment.');
+        } else {
+          toast.error('Unable to search locations. Please check your connection and try again.');
+        }
       }
     } catch (error) {
       console.error('Error searching locations:', error);
       setPredictions([]);
+      toast.error('Failed to search locations. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Get place details including coordinates
+  // Get place details
   const getPlaceDetails = async (placeId: string): Promise<{ lat: number; lng: number; address: string; country: string } | null> => {
     try {
+      const searchParams = new URLSearchParams({
+        place_id: placeId,
+        fields: 'geometry,formatted_address,address_components,place_id',
+        key: API_CONFIG.GOOGLE_MAPS_API_KEY
+      });
+
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry,formatted_address,address_components&key=${API_CONFIG.GOOGLE_MAPS_API_KEY}`
+        `https://maps.googleapis.com/maps/api/place/details/json?${searchParams.toString()}`
       );
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      
+      console.log('Place Details API response:', data);
       
       if (data.status === 'OK' && data.result) {
         const { geometry, formatted_address, address_components } = data.result;
@@ -230,30 +275,53 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
         );
         const country = countryComponent?.long_name || '';
         
+        console.log('Extracted location details:', {
+          lat: geometry.location.lat,
+          lng: geometry.location.lng,
+          address: formatted_address,
+          country
+        });
+        
         return {
           lat: geometry.location.lat,
           lng: geometry.location.lng,
           address: formatted_address,
           country
         };
+      } else {
+        console.error('Place Details API error:', data.status, data.error_message);
+        return null;
       }
     } catch (error) {
       console.error('Error getting place details:', error);
+      return null;
     }
-    
-    return null;
   };
 
   // Handle search input changes
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     
-    if (value.length > 2) {
+    if (value.length > 1) { // Reduced from 2 to 1 character
       searchLocations(value);
     } else {
       setPredictions([]);
     }
   };
+
+  // Popular locations in Kenya for quick access
+  const popularLocations = [
+    { name: 'Nairobi', description: 'Nairobi, Kenya' },
+    { name: 'Mombasa', description: 'Mombasa, Kenya' },
+    { name: 'Kisumu', description: 'Kisumu, Kenya' },
+    { name: 'Nakuru', description: 'Nakuru, Kenya' },
+    { name: 'Eldoret', description: 'Eldoret, Kenya' },
+    { name: 'Thika', description: 'Thika, Kenya' },
+    { name: 'Westlands', description: 'Westlands, Nairobi, Kenya' },
+    { name: 'Kilimani', description: 'Kilimani, Nairobi, Kenya' },
+    { name: 'CBD', description: 'Central Business District, Nairobi, Kenya' },
+    { name: 'Sarit', description: 'Sarit Centre, Nairobi, Kenya' }
+  ];
 
   // Handle location selection
   const handleLocationSelect = async (location: Location) => {
@@ -263,7 +331,6 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
       const placeDetails = await getPlaceDetails(location.place_id);
       
       if (placeDetails) {
-        // Check if location is in Kenya
         if (placeDetails.country.toLowerCase() !== 'kenya') {
           setShowExpansionForm(true);
           setExpansionFormData(prev => ({
@@ -273,7 +340,6 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
           return;
         }
         
-        // Location is in Kenya, find nearby deals
         const deals = findNearbyDeals(placeDetails.lat, placeDetails.lng);
         setNearbyDeals(deals);
         setSelectedLocation({
@@ -283,7 +349,6 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
         });
         setShowDeals(true);
         
-        // Notify parent component
         if (onLocationSelect) {
           onLocationSelect({
             lat: placeDetails.lat,
@@ -390,6 +455,25 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
                   <Loader2 className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
                 )}
               </div>
+
+              {/* Popular Locations */}
+              {!searchQuery && predictions.length === 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Popular Locations</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {popularLocations.map((location, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSearchChange(location.name)}
+                        className="p-2 text-left text-sm bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
+                      >
+                        <div className="font-medium text-gray-900">{location.name}</div>
+                        <div className="text-xs text-gray-600">{location.description}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Location Predictions */}
               {predictions.length > 0 && (
@@ -580,4 +664,4 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   );
 };
 
-export default LocationSearch;
+export default EnhancedLocationSearch;
