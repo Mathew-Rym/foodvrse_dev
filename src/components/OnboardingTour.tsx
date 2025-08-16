@@ -28,32 +28,24 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
       content: "Discover amazing rescue meals and help reduce food waste while saving money and the planet",
       targetId: "hero-section",
       icon: <MapPin className="w-5 h-5" />,
-      mobilePosition: { top: "15%", left: "50%" },
-      desktopPosition: { top: "25%", left: "50%" }
+      mobilePosition: { top: "20%", left: "50%" },
+      desktopPosition: { top: "30%", left: "50%" }
     },
     {
       title: "Mystery Bags",
       content: "Try our surprise bags filled with rescued ingredients at great prices - perfect for adventurous foodies!",
       targetId: "mystery-box-section",
       icon: <Gift className="w-5 h-5" />,
-      mobilePosition: { top: "35%", left: "50%" },
-      desktopPosition: { top: "40%", left: "50%" }
-    },
-    {
-      title: "Become a Partner",
-      content: "Are you a business? Join our mission to reduce food waste and earn money while making a difference",
-      targetId: "become-partner-button",
-      icon: <Users className="w-5 h-5" />,
-      mobilePosition: { top: "15%", left: "50%" },
-      desktopPosition: { top: "15%", left: "50%" }
+      mobilePosition: { top: "45%", left: "50%" },
+      desktopPosition: { top: "50%", left: "50%" }
     },
     {
       title: "Mobile Navigation",
       content: "When you sign in, you'll see a bottom navigation bar to explore all features and manage your orders",
       targetId: "mobile-navigation",
       icon: <Navigation className="w-5 h-5" />,
-      mobilePosition: { bottom: "120px", left: "50%" },
-      desktopPosition: { bottom: "140px", left: "50%" }
+      mobilePosition: { bottom: "100px", left: "50%" },
+      desktopPosition: { bottom: "120px", left: "50%" }
     },
     {
       title: "Share Feedback",
@@ -62,6 +54,14 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
       icon: <MessageCircle className="w-5 h-5" />,
       mobilePosition: { bottom: "80px", right: "20px" },
       desktopPosition: { bottom: "100px", right: "80px" }
+    },
+    {
+      title: "Become a Partner",
+      content: "Are you a business? Join our mission to reduce food waste and earn money while making a difference",
+      targetId: "partner-section",
+      icon: <Users className="w-5 h-5" />,
+      mobilePosition: { top: "70%", left: "50%" },
+      desktopPosition: { top: "75%", left: "50%" }
     }
   ];
 
@@ -107,31 +107,12 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
             targetElement.style.boxShadow = '0 0 20px rgba(252, 218, 91, 0.3)';
             document.body.appendChild(targetElement);
             break;
-          case 'become-partner-button':
-            // Try to find the Become a Partner button with better fallback
+          case 'partner-section':
+            // Try to find the Become a Partner button
             targetElement = document.getElementById('become-partner-button') || 
                            document.getElementById('become-partner-button-mobile') ||
                            document.querySelector('button[onclick*="handlePartnerClick"]') ||
-                           document.querySelector('button:contains("Become a Partner")') ||
-                           document.querySelector('button:contains("Partner")');
-            
-            // If still not found, create a fallback highlight in the header area
-            if (!targetElement) {
-              targetElement = document.createElement('div');
-              targetElement.id = 'become-partner-fallback';
-              targetElement.style.position = 'fixed';
-              targetElement.style.top = '80px';
-              targetElement.style.right = '20px';
-              targetElement.style.width = '140px';
-              targetElement.style.height = '40px';
-              targetElement.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
-              targetElement.style.border = '3px solid #22c55e';
-              targetElement.style.borderRadius = '8px';
-              targetElement.style.pointerEvents = 'none';
-              targetElement.style.zIndex = '9998';
-              targetElement.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.3)';
-              document.body.appendChild(targetElement);
-            }
+                           document.querySelector('button:contains("Become a Partner")');
             break;
           case 'hero-section':
             // Fallback for hero section
@@ -155,7 +136,7 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
         const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
         
         // Enhanced responsive padding
-        const padding = isMobile ? 16 : isTablet ? 12 : 10;
+        const padding = isMobile ? 20 : isTablet ? 16 : 12;
         
         // Ensure the element is visible in viewport
         const viewportHeight = window.innerHeight;
@@ -177,32 +158,41 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
           height = rect.height + (padding * 2);
         }
         
-        // Enhanced boundary checking
+        // Enhanced boundary checking with better positioning
         if (top < 0) {
-          top = 10;
+          top = 20;
         }
         if (left < 0) {
-          left = 10;
+          left = 20;
         }
         if (top + height > viewportHeight) {
-          height = viewportHeight - top - 10;
+          height = viewportHeight - top - 20;
         }
         if (left + width > viewportWidth) {
-          width = viewportWidth - left - 10;
+          width = viewportWidth - left - 20;
         }
         
         // Ensure minimum size for visibility
-        const minSize = isMobile ? 100 : 80;
+        const minSize = isMobile ? 120 : 100;
         
         const finalStyle = {
           top: Math.max(0, top),
           left: Math.max(0, left),
           width: Math.max(width, minSize),
           height: Math.max(height, minSize),
-          borderRadius: isMobile ? '16px' : '12px'
+          borderRadius: isMobile ? '20px' : '16px'
         };
         
         setSpotlightStyle(finalStyle);
+        
+        // Scroll element into view if needed
+        if (targetElement.scrollIntoView) {
+          targetElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center',
+            inline: 'center'
+          });
+        }
         
         // Clean up fallback elements with delay
         if (targetElement.id && (targetElement.id.includes('fallback') || targetElement.id.includes('focused'))) {
@@ -212,18 +202,18 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
             }
           }, 300);
         }
-              } else {
-          // If no target found, create a default spotlight in the center
-          const viewportHeight = window.innerHeight;
-          const viewportWidth = window.innerWidth;
-          setSpotlightStyle({
-            top: viewportHeight / 2 - 50,
-            left: viewportWidth / 2 - 50,
-            width: 100,
-            height: 100,
-            borderRadius: '16px'
-          });
-        }
+      } else {
+        // If no target found, create a default spotlight in the center
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+        setSpotlightStyle({
+          top: viewportHeight * 0.3,
+          left: viewportWidth * 0.1,
+          width: viewportWidth * 0.8,
+          height: viewportHeight * 0.4,
+          borderRadius: isMobile ? '20px' : '16px'
+        });
+      }
     };
 
     // Enhanced scroll to target function
@@ -248,11 +238,7 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
               behavior: 'smooth'
             });
             return;
-          case 'game-section':
-            // Try to find game section or scroll to mystery box section
-            targetElement = document.getElementById('game-section') || document.getElementById('mystery-box-section');
-            break;
-          case 'become-partner-button':
+          case 'partner-section':
             // Try to find the Become a Partner button or scroll to header
             targetElement = document.getElementById('become-partner-button') || 
                            document.getElementById('become-partner-button-mobile') ||
@@ -370,29 +356,47 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
   const getTooltipPosition = () => {
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
-    const tooltipHeight = isMobile ? 300 : 340;
-    const tooltipWidth = isMobile ? viewportWidth - 32 : 420;
+    const tooltipHeight = isMobile ? 280 : 320;
+    const tooltipWidth = isMobile ? viewportWidth - 32 : 400;
     
     let finalPosition = { ...position };
     
-    // Enhanced boundary checking for tooltip
+    // Enhanced boundary checking for tooltip with better positioning
     if (position.top && typeof position.top === 'string') {
       const topPercent = parseInt(position.top);
-      if (topPercent > 65) {
-        finalPosition.top = '55%';
+      // Ensure tooltip doesn't go off-screen
+      if (topPercent > 60) {
+        finalPosition.top = '50%';
+      } else if (topPercent < 15) {
+        finalPosition.top = '20%';
       }
     }
     
     if (position.bottom && typeof position.bottom === 'string') {
       const bottomPercent = parseInt(position.bottom);
-      if (bottomPercent < 140) {
-        finalPosition.bottom = '160px';
+      // Ensure tooltip doesn't overlap with bottom elements
+      if (bottomPercent < 150) {
+        finalPosition.bottom = '180px';
+      } else if (bottomPercent > 200) {
+        finalPosition.bottom = '120px';
       }
     }
     
-    // Adjust horizontal positioning for mobile
-    if (isMobile && position.left === '50%') {
-      finalPosition.left = '50%';
+    // Adjust horizontal positioning for better visibility
+    if (isMobile) {
+      if (position.left === '50%') {
+        finalPosition.left = '50%';
+      } else if (position.right && typeof position.right === 'string') {
+        const rightPercent = parseInt(position.right);
+        if (rightPercent < 15) {
+          finalPosition.right = '20px';
+        }
+      }
+    }
+    
+    // Ensure tooltip is always visible
+    if (!finalPosition.top && !finalPosition.bottom) {
+      finalPosition.top = '30%';
     }
     
     return finalPosition;
