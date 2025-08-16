@@ -450,20 +450,6 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
                 )}
               </div>
 
-              {/* Test Button */}
-              <div className="mb-4 text-center">
-                <Button 
-                  onClick={() => {
-                    console.log('🧪 Test button clicked');
-                    searchLocations('kibra');
-                  }}
-                  variant="outline"
-                  size="sm"
-                >
-                  🧪 Test Search "kibra"
-                </Button>
-              </div>
-
               {/* Location Predictions */}
               {predictions.length > 0 && (
                 <div className="space-y-2 max-h-48 overflow-y-auto">
