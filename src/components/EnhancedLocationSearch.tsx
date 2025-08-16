@@ -532,8 +532,8 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
               <div className="space-y-4">
                 <div className="text-center mb-6">
                   <Globe className="w-12 h-12 mx-auto mb-3 text-green-600" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">We&apos;re Not in Your Area Yet</h3>
-                  <p className="text-gray-600">Let us know you&apos;re interested, and we&apos;ll notify you when we expand to your location!</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">FoodVrse (Mystery Bag) Is Coming, Will Your Area Be Next?</h3>
+                  <p className="text-gray-600">Friends and neighbors are already joining the waitlist, don&apos;t miss your chance! Request FoodVrse in your area today and unlock exclusive launch perks like first-order discounts and early access meals.</p>
                 </div>
                 
                 <form onSubmit={handleExpansionSubmit} className="space-y-4">
