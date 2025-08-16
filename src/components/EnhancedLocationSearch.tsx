@@ -178,8 +178,7 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
       // First try with Kenya restriction
       let searchParams = new URLSearchParams({
         input: query,
-        types: 'geocode|establishment|locality|sublocality|administrative_area_level_1',
-        components: 'country:ke', // Restrict to Kenya
+        types: 'geocode|establishment', // Simplified types parameter
         key: API_CONFIG.GOOGLE_MAPS_API_KEY
       });
 
@@ -193,15 +192,14 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
       
       let data = await response.json();
       
-      console.log('Google Places API response (Kenya restricted):', data);
+      console.log('Google Places API response:', data);
       
-      // If no results with Kenya restriction, try global search
+      // If no results, try without any restrictions
       if (data.status === 'ZERO_RESULTS' || (data.status === 'OK' && data.predictions.length === 0)) {
-        console.log('No results in Kenya, trying global search...');
+        console.log('No results found, trying broader search...');
         
         searchParams = new URLSearchParams({
           input: query,
-          types: 'geocode|establishment|locality|sublocality|administrative_area_level_1',
           key: API_CONFIG.GOOGLE_MAPS_API_KEY
         });
 
@@ -214,7 +212,7 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
         }
         
         data = await response.json();
-        console.log('Google Places API response (global):', data);
+        console.log('Google Places API response (broader search):', data);
       }
       
       if (data.status === 'OK') {
@@ -232,6 +230,8 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
           toast.error('Location search is temporarily unavailable. Please try again later.');
         } else if (data.status === 'OVER_QUERY_LIMIT') {
           toast.error('Search limit reached. Please try again in a moment.');
+        } else if (data.status === 'INVALID_REQUEST') {
+          toast.error('Invalid search request. Please try a different search term.');
         } else {
           toast.error('Unable to search locations. Please check your connection and try again.');
         }
@@ -309,20 +309,6 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
     }
   };
 
-  // Popular locations in Kenya for quick access
-  const popularLocations = [
-    { name: 'Nairobi', description: 'Nairobi, Kenya' },
-    { name: 'Mombasa', description: 'Mombasa, Kenya' },
-    { name: 'Kisumu', description: 'Kisumu, Kenya' },
-    { name: 'Nakuru', description: 'Nakuru, Kenya' },
-    { name: 'Eldoret', description: 'Eldoret, Kenya' },
-    { name: 'Thika', description: 'Thika, Kenya' },
-    { name: 'Westlands', description: 'Westlands, Nairobi, Kenya' },
-    { name: 'Kilimani', description: 'Kilimani, Nairobi, Kenya' },
-    { name: 'CBD', description: 'Central Business District, Nairobi, Kenya' },
-    { name: 'Sarit', description: 'Sarit Centre, Nairobi, Kenya' }
-  ];
-
   // Handle location selection
   const handleLocationSelect = async (location: Location) => {
     setIsLoading(true);
@@ -331,6 +317,7 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
       const placeDetails = await getPlaceDetails(location.place_id);
       
       if (placeDetails) {
+        // Check if location is in Kenya
         if (placeDetails.country.toLowerCase() !== 'kenya') {
           setShowExpansionForm(true);
           setExpansionFormData(prev => ({
@@ -340,6 +327,7 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
           return;
         }
         
+        // Location is in Kenya, find nearby deals
         const deals = findNearbyDeals(placeDetails.lat, placeDetails.lng);
         setNearbyDeals(deals);
         setSelectedLocation({
@@ -349,6 +337,7 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
         });
         setShowDeals(true);
         
+        // Notify parent component
         if (onLocationSelect) {
           onLocationSelect({
             lat: placeDetails.lat,
@@ -440,12 +429,12 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
               {/* Search Input */}
               <div className="relative mb-4 flex-shrink-0 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  🔍 Search for your location
+                  🔍 Search for any location worldwide
                 </label>
                 <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                 <Input
                   type="text"
-                  placeholder="Enter location, address, or landmark..."
+                  placeholder="Enter any location, city, or landmark..."
                   value={searchQuery}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-12 pr-4 py-3 text-base border-2 border-gray-300 bg-white shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:ring-opacity-50 hover:border-gray-400 transition-all duration-200"
@@ -455,25 +444,6 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
                   <Loader2 className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
                 )}
               </div>
-
-              {/* Popular Locations */}
-              {!searchQuery && predictions.length === 0 && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Popular Locations</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    {popularLocations.map((location, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleSearchChange(location.name)}
-                        className="p-2 text-left text-sm bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
-                      >
-                        <div className="font-medium text-gray-900">{location.name}</div>
-                        <div className="text-xs text-gray-600">{location.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* Location Predictions */}
               {predictions.length > 0 && (
