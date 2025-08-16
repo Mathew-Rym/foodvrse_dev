@@ -184,7 +184,7 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
       .slice(0, 6);
   };
 
-  // Search locations
+  // Search locations using Google Maps JavaScript API
   const searchLocations = async (query: string) => {
     if (!query.trim()) {
       setPredictions([]);
@@ -195,100 +195,97 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
     console.log('🔍 Starting search for:', query);
     
     try {
-      // Simple, reliable search approach
-      const searchParams = new URLSearchParams({
-        input: query,
-        key: API_CONFIG.GOOGLE_MAPS_API_KEY
-      });
+      // Wait for Google Maps API to load
+      let attempts = 0;
+      while (!window.google || !window.google.maps || !window.google.maps.places) {
+        if (attempts > 10) {
+          console.error('❌ Google Maps JavaScript API not loaded after 10 attempts');
+          toast.error('Location search is not available. Please refresh the page.');
+          setIsLoading(false);
+          return;
+        }
+        console.log('⏳ Waiting for Google Maps API to load...', attempts + 1);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        attempts++;
+      }
 
-      console.log('🌐 Making API request to:', `https://maps.googleapis.com/maps/api/place/autocomplete/json?${searchParams.toString()}`);
+      console.log('✅ Google Maps API is ready');
 
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?${searchParams.toString()}`,
+      const service = new window.google.maps.places.AutocompleteService();
+      
+      service.getPlacePredictions(
         {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
+          input: query,
+          types: ['establishment', 'geocode']
+        },
+        (predictions, status) => {
+          console.log('📊 Google Maps API Response:', { status, predictions });
+          
+          if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
+            console.log('✅ Found predictions:', predictions.length);
+            setPredictions(predictions);
+          } else {
+            console.log('❌ No predictions found. Status:', status);
+            setPredictions([]);
           }
+          
+          setIsLoading(false);
+          console.log('🏁 Search completed');
         }
       );
-      
-      console.log('📡 Response status:', response.status, response.ok);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log('📊 API Response:', data);
-      
-      if (data.status === 'OK' && data.predictions && data.predictions.length > 0) {
-        console.log('✅ Found predictions:', data.predictions.length);
-        setPredictions(data.predictions);
-      } else {
-        console.log('❌ No predictions found. Status:', data.status);
-        setPredictions([]);
-      }
       
     } catch (error) {
       console.error('❌ Error searching locations:', error);
       setPredictions([]);
-      toast.error('Failed to search locations. Please try again.');
-    } finally {
       setIsLoading(false);
-      console.log('🏁 Search completed');
+      toast.error('Failed to search locations. Please try again.');
     }
   };
 
-  // Get place details
+  // Get place details using Google Maps JavaScript API
   const getPlaceDetails = async (placeId: string): Promise<{ lat: number; lng: number; address: string; country: string } | null> => {
     try {
-      const searchParams = new URLSearchParams({
-        place_id: placeId,
-        fields: 'geometry,formatted_address,address_components,place_id',
-        key: API_CONFIG.GOOGLE_MAPS_API_KEY
-      });
-
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?${searchParams.toString()}`
-      );
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      console.log('Place Details API response:', data);
-      
-      if (data.status === 'OK' && data.result) {
-        const { geometry, formatted_address, address_components } = data.result;
-        
-        // Extract country from address components
-        const countryComponent = address_components?.find((component: any) => 
-          component.types.includes('country')
-        );
-        const country = countryComponent?.long_name || '';
-        
-        console.log('Extracted location details:', {
-          lat: geometry.location.lat,
-          lng: geometry.location.lng,
-          address: formatted_address,
-          country
-        });
-        
-        return {
-          lat: geometry.location.lat,
-          lng: geometry.location.lng,
-          address: formatted_address,
-          country
-        };
-      } else {
-        console.error('Place Details API error:', data.status, data.error_message);
+      if (!window.google || !window.google.maps || !window.google.maps.places) {
+        console.error('❌ Google Maps JavaScript API not loaded');
         return null;
       }
+
+      const service = new window.google.maps.places.PlacesService(document.createElement('div'));
+      
+      return new Promise((resolve) => {
+        service.getDetails(
+          {
+            placeId: placeId,
+            fields: ['geometry', 'formatted_address', 'address_components']
+          },
+          (place, status) => {
+            console.log('📍 Place Details API Response:', { status, place });
+            
+            if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
+              const countryComponent = place.address_components?.find((component: any) =>
+                component.types.includes('country')
+              );
+              const country = countryComponent?.long_name || '';
+              
+              const result = {
+                lat: place.geometry?.location?.lat() || 0,
+                lng: place.geometry?.location?.lng() || 0,
+                address: place.formatted_address || '',
+                country: country
+              };
+              
+              console.log('📍 Extracted location details:', result);
+              resolve(result);
+            } else {
+              console.error('📍 Place Details API error:', status);
+              resolve(null);
+            }
+          }
+        );
+      });
+      
     } catch (error) {
-      console.error('Error getting place details:', error);
+      console.error('❌ Error getting place details:', error);
       return null;
     }
   };

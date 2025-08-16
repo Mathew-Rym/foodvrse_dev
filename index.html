@@ -67,6 +67,17 @@
         });
       });
     </script>
+
+    <!-- Google Maps JavaScript API -->
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABKMHMAiFihQZA_ql6rhqi1EsNxWgv8ts&libraries=places&callback=initGoogleMaps">
+    </script>
+    <script>
+      function initGoogleMaps() {
+        console.log('🗺️ Google Maps JavaScript API loaded successfully');
+        window.googleMapsLoaded = true;
+      }
+    </script>
   </head>
 
   <body>
