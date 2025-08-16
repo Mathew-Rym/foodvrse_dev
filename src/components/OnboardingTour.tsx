@@ -33,11 +33,19 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
     },
     {
       title: "Mystery Bags",
-              content: "Try our surprise bags filled with rescued ingredients at great prices - perfect for adventurous foodies!",
+      content: "Try our surprise bags filled with rescued ingredients at great prices - perfect for adventurous foodies!",
       targetId: "mystery-box-section",
       icon: <Gift className="w-5 h-5" />,
       mobilePosition: { top: "35%", left: "50%" },
       desktopPosition: { top: "40%", left: "50%" }
+    },
+    {
+      title: "Become a Partner",
+      content: "Are you a business? Join our mission to reduce food waste and earn money while making a difference",
+      targetId: "become-partner-button",
+      icon: <Users className="w-5 h-5" />,
+      mobilePosition: { top: "15%", left: "50%" },
+      desktopPosition: { top: "15%", left: "50%" }
     },
     {
       title: "Mobile Navigation",
@@ -54,14 +62,6 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
       icon: <MessageCircle className="w-5 h-5" />,
       mobilePosition: { bottom: "80px", right: "20px" },
       desktopPosition: { bottom: "100px", right: "80px" }
-    },
-    {
-      title: "Become a Partner",
-      content: "Are you a business? Join our mission to reduce food waste and earn money while making a difference",
-      targetId: "become-partner-button",
-      icon: <Users className="w-5 h-5" />,
-      mobilePosition: { top: "15%", left: "50%" },
-      desktopPosition: { top: "15%", left: "50%" }
     }
   ];
 
@@ -108,11 +108,30 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
             document.body.appendChild(targetElement);
             break;
           case 'become-partner-button':
-            // Try to find the Become a Partner button
+            // Try to find the Become a Partner button with better fallback
             targetElement = document.getElementById('become-partner-button') || 
                            document.getElementById('become-partner-button-mobile') ||
                            document.querySelector('button[onclick*="handlePartnerClick"]') ||
-                           document.querySelector('button:contains("Become a Partner")');
+                           document.querySelector('button:contains("Become a Partner")') ||
+                           document.querySelector('button:contains("Partner")');
+            
+            // If still not found, create a fallback highlight in the header area
+            if (!targetElement) {
+              targetElement = document.createElement('div');
+              targetElement.id = 'become-partner-fallback';
+              targetElement.style.position = 'fixed';
+              targetElement.style.top = '80px';
+              targetElement.style.right = '20px';
+              targetElement.style.width = '140px';
+              targetElement.style.height = '40px';
+              targetElement.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+              targetElement.style.border = '3px solid #22c55e';
+              targetElement.style.borderRadius = '8px';
+              targetElement.style.pointerEvents = 'none';
+              targetElement.style.zIndex = '9998';
+              targetElement.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.3)';
+              document.body.appendChild(targetElement);
+            }
             break;
           case 'hero-section':
             // Fallback for hero section
