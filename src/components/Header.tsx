@@ -7,7 +7,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import CartSheet from "./CartSheet";
-import LocationSearch from "./LocationSearch";
 import EnhancedLocationSearch from "./EnhancedLocationSearch";
 import { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
@@ -108,7 +107,7 @@ const Header = () => {
               <MapPin className={`w-4 h-4 flex-shrink-0 ${latitude && longitude ? 'text-green-500' : ''}`} />
               <span className="text-sm truncate">{currentLocation}</span>
             </Button>
-            <LocationSearch 
+            <EnhancedLocationSearch 
               isOpen={isLocationSearchOpen}
               onClose={() => setIsLocationSearchOpen(false)}
               onLocationSelect={handleLocationSelect}
@@ -213,7 +212,7 @@ const Header = () => {
               </Button>
             </div>
           </div>
-          <LocationSearch 
+          <EnhancedLocationSearch 
             isOpen={isLocationSearchOpen}
             onClose={() => setIsLocationSearchOpen(false)}
             onLocationSelect={handleLocationSelect}

@@ -193,6 +193,7 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
 
     setIsLoading(true);
     console.log('🔍 Starting search for:', query);
+    console.log('🔧 Using Google Maps JavaScript API (not REST API)');
     
     try {
       // Wait for Google Maps API to load
@@ -210,16 +211,20 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
       }
 
       console.log('✅ Google Maps API is ready');
+      console.log('🔧 Creating AutocompleteService...');
 
       const service = new window.google.maps.places.AutocompleteService();
+      console.log('🔧 AutocompleteService created successfully');
       
+      console.log('🔧 Calling getPlacePredictions...');
       service.getPlacePredictions(
         {
           input: query,
           types: ['establishment', 'geocode']
         },
         (predictions, status) => {
-          console.log('📊 Google Maps API Response:', { status, predictions });
+          console.log('📊 Google Maps JavaScript API Response:', { status, predictions });
+          console.log('🔧 Status comparison:', status, window.google.maps.places.PlacesServiceStatus.OK);
           
           if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
             console.log('✅ Found predictions:', predictions.length);
