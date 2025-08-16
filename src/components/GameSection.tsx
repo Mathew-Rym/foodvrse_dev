@@ -1,458 +1,379 @@
 
-import { Trophy, Users, Award, Star, TrendingUp, Sparkles, Leaf, Recycle, Flame, Target, Crown, Globe } from "lucide-react";
+import { Trophy, Users, Award, Star, TrendingUp, Sparkles, Leaf, Recycle, Flame, Target, Crown, Globe, Zap, Medal } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import { supabase } from '@/integrations/supabase/client';
+import { useGamification } from '@/hooks/useGamification';
+import { GamificationService } from '@/services/gamificationService';
 import { toast } from "sonner";
 import Logo from "./Logo";
-
-interface UserChallenge {
-  current_count: number;
-  week_start_date: string;
-  week_end_date: string;
-  completed: boolean;
-  badge_awarded: boolean;
-}
-
-interface ChallengeSettings {
-  goal_value: number;
-  badge_name: string;
-}
-
-interface UserBadge {
-  badge: {
-    name: string;
-    description: string;
-    icon: string;
-    color: string;
-  };
-}
 
 const GameSection = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
-  const [userChallenge, setUserChallenge] = useState<UserChallenge | null>(null);
-  const [challengeSettings, setChallengeSettings] = useState<ChallengeSettings | null>(null);
-  const [userBadges, setUserBadges] = useState<UserBadge[]>([]);
+  const {
+    userProgress,
+    userBadges,
+    weeklyChallenges,
+    isLoading,
+    updateUserProgress,
+    awardBadge,
+    updateWeeklyChallenge
+  } = useGamification();
+
+  const [showBadgeAnimation, setShowBadgeAnimation] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<string>('');
-  const previousChallengeCount = useRef<number>(0);
+
+  // Calculate level and experience
+  const calculateLevel = (exp: number) => {
+    if (exp < 100) return { level: 1, expToNext: 100 - exp };
+    if (exp < 300) return { level: 2, expToNext: 300 - exp };
+    if (exp < 600) return { level: 3, expToNext: 600 - exp };
+    if (exp < 1000) return { level: 4, expToNext: 1000 - exp };
+    if (exp < 1500) return { level: 5, expToNext: 1500 - exp };
+    if (exp < 2100) return { level: 6, expToNext: 2100 - exp };
+    if (exp < 2800) return { level: 7, expToNext: 2800 - exp };
+    if (exp < 3600) return { level: 8, expToNext: 3600 - exp };
+    if (exp < 4500) return { level: 9, expToNext: 4500 - exp };
+    return { level: 10, expToNext: 0 };
+  };
+
+  const levelInfo = userProgress ? calculateLevel(userProgress.experience_points) : { level: 1, expToNext: 100 };
+
+  // Update time left for weekly challenge
+  const updateTimeLeft = () => {
+    const now = new Date();
+    const endOfWeek = new Date();
+    endOfWeek.setDate(endOfWeek.getDate() + (7 - endOfWeek.getDay()));
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    const timeDiff = endOfWeek.getTime() - now.getTime();
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+    setTimeLeft(`${days}d ${hours}h ${minutes}m`);
+  };
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      fetchChallengeData();
-      setupRealtimeSubscription();
-    }
-  }, [isAuthenticated, user]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      updateTimeLeft();
-    }, 1000);
-
+    const interval = setInterval(updateTimeLeft, 1000);
     return () => clearInterval(interval);
-  }, [userChallenge]);
+  }, []);
 
-  // Track challenge progress changes and show notifications
-  useEffect(() => {
-    if (userChallenge && previousChallengeCount.current > 0) {
-      const currentCount = userChallenge.current_count;
-      const previousCount = previousChallengeCount.current;
-      
-      if (currentCount > previousCount) {
-        const progress = currentCount - previousCount;
-        toast.success(`🎉 +${progress} meal${progress > 1 ? 's' : ''} saved!`, {
-          description: `You're ${currentCount}/${challengeSettings?.goal_value || 10} meals closer to your weekly goal!`,
-          duration: 4000,
-        });
-      }
-      
-      // Check if challenge was completed
-      if (currentCount >= (challengeSettings?.goal_value || 10) && !userChallenge.completed) {
-        toast.success('🏆 Weekly Challenge Completed!', {
-          description: `Congratulations! You've earned the "${challengeSettings?.badge_name || 'Weekly Hero'}" badge!`,
-          duration: 6000,
-        });
-      }
-    }
-    
-    if (userChallenge) {
-      previousChallengeCount.current = userChallenge.current_count;
-    }
-  }, [userChallenge, challengeSettings]);
-
-  const fetchChallengeData = async () => {
-    if (!user) return;
+  // Mock function to simulate meal saved (for testing)
+  const simulateMealSaved = async () => {
+    if (!userProgress) return;
 
     try {
-      // Get challenge settings
-      const { data: settings } = await supabase
-        .from('challenge_settings')
-        .select('*')
-        .eq('challenge_type', 'weekly_rescue')
-        .single();
+      const newMealsSaved = userProgress.total_meals_saved + 1;
+      const newCo2Saved = userProgress.total_co2_saved + 2.5; // 2.5kg CO2 per meal
+      const newMoneySaved = userProgress.total_money_saved + 500; // KSh 500 per meal
+      const newExp = userProgress.experience_points + 10;
 
-      setChallengeSettings(settings);
+      // Update progress
+      await updateUserProgress({
+        total_meals_saved: newMealsSaved,
+        total_co2_saved: newCo2Saved,
+        total_money_saved: newMoneySaved,
+        experience_points: newExp
+      });
 
-      // Get current week's challenge
-      const currentWeekStart = new Date();
-      currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay() + 1);
-      currentWeekStart.setHours(0, 0, 0, 0);
+      // Update weekly challenge
+      await updateWeeklyChallenge('meals_saved', 1);
 
-      const { data: challenge } = await supabase
-        .from('user_challenges')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('challenge_type', 'weekly_rescue')
-        .eq('week_start_date', currentWeekStart.toISOString().split('T')[0])
-        .single();
+      // Check for badges
+      if (newMealsSaved === 1) {
+        setShowBadgeAnimation('First Saver');
+        setTimeout(() => setShowBadgeAnimation(null), 3000);
+      } else if (newMealsSaved === 25) {
+        setShowBadgeAnimation('Eco Warrior');
+        setTimeout(() => setShowBadgeAnimation(null), 3000);
+      } else if (newMealsSaved === 100) {
+        setShowBadgeAnimation('Century Club');
+        setTimeout(() => setShowBadgeAnimation(null), 3000);
+      }
 
-      setUserChallenge(challenge);
-
-      // Get user badges
-      const { data: badges } = await supabase
-        .from('user_badges')
-        .select(`
-          badge:badges(name, description, icon, color)
-        `)
-        .eq('user_id', user.id);
-
-      setUserBadges(badges || []);
-
+      toast.success('🥗 Meal saved!', {
+        description: `+10 XP | +2.5kg CO₂ saved | +KSh 500 saved`,
+        duration: 3000,
+      });
     } catch (error) {
-      console.error('Error fetching challenge data:', error);
+      console.error('Error simulating meal saved:', error);
+      toast.error('Failed to update progress');
     }
   };
 
-  const setupRealtimeSubscription = () => {
-    if (!user) return;
-
-    const channel = supabase
-      .channel('user-challenge-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'user_challenges',
-          filter: `user_id=eq.${user.id}`
-        },
-        (payload) => {
-          console.log('User challenge updated:', payload);
-          if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
-            setUserChallenge(payload.new as UserChallenge);
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'orders',
-          filter: `user_id=eq.${user.id}`
-        },
-        (payload) => {
-          console.log('Order updated:', payload);
-          // Refresh challenge data when order status changes
-          if (payload.new.status === 'collected' || payload.new.status === 'refunded') {
-            fetchChallengeData();
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'user_badges',
-          filter: `user_id=eq.${user.id}`
-        },
-        (payload) => {
-          console.log('New badge awarded:', payload);
-          fetchChallengeData(); // Refresh badges when new one is awarded
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+  const handleViewProgress = () => {
+    navigate('/impact');
   };
 
-  const updateTimeLeft = () => {
-    if (!userChallenge) return;
-
-    const endDate = new Date(userChallenge.week_end_date + 'T23:59:59');
-    const now = new Date();
-    const diff = endDate.getTime() - now.getTime();
-
-    if (diff <= 0) {
-      setTimeLeft('Challenge ended');
-      return;
-    }
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (days > 0) {
-      setTimeLeft(`${days} days`);
-    } else if (hours > 0) {
-      setTimeLeft(`${hours}h ${minutes}m`);
-    } else {
-      setTimeLeft(`${minutes}m`);
-    }
+  const handleViewLeaderboard = () => {
+    navigate('/leaderboard');
   };
 
-  const handleInviteFriends = () => {
-    if (!isAuthenticated) {
-      // Store redirect path to go to impact page after login
-      sessionStorage.setItem('redirectAfterAuth', '/impact');
-      navigate("/auth");
-      return;
-    }
-    navigate("/impact");
-  };
-  const userStats = {
-    rank: 3,
-    mealsSaved: 127,
-    co2Saved: 15.2,
-    streak: 12
-  };
+  if (!isAuthenticated) {
+    return (
+      <section className="py-16 bg-gradient-to-br from-green-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="flex justify-center mb-6">
+              <Logo size="lg" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Join the Food Waste Revolution
+            </h2>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              Track your impact, earn badges, and compete with others to save the most food. 
+              Every meal you save makes a difference for our planet.
+            </p>
+            <Button 
+              onClick={() => navigate('/auth')}
+              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+            >
+              Get Started
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-  const leaderboard = [
-    { rank: 1, name: "Sarah K.", mealsSaved: 234, avatar: "sparkles" },
-    { rank: 2, name: "Mike R.", mealsSaved: 189, avatar: "trophy" },
-    { rank: 3, name: "You", mealsSaved: 127, avatar: "logo" },
-    { rank: 4, name: "Emma L.", mealsSaved: 98, avatar: "leaf" },
-    { rank: 5, name: "David M.", mealsSaved: 76, avatar: "recycle" }
-  ];
-
-  const achievements = [
-    { id: 1, title: "First Rescue", description: "Saved your first meal", completed: true, icon: "target" },
-    { id: 2, title: "Eco Warrior", description: "Saved 50 meals", completed: true, icon: "globe" },
-    { id: 3, title: "Streak Master", description: "10-day saving streak", completed: true, icon: "flame" },
-    { id: 4, title: "Century Club", description: "Save 100 meals", completed: true, icon: "award" },
-    { id: 5, title: "Legendary Saver", description: "Save 500 meals", completed: false, icon: "crown" }
-  ];
-
-  const friends = [
-    { name: "Sarah K.", status: "Just saved 3 meals!", mealsSaved: 234, isOnline: true },
-    { name: "Mike R.", status: "On a 15-day streak!", mealsSaved: 189, isOnline: true },
-    { name: "Emma L.", status: "Discovered a new bakery", mealsSaved: 98, isOnline: false }
-  ];
+  if (isLoading) {
+    return (
+      <section className="py-16 bg-gradient-to-br from-green-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="py-12 lg:py-16 bg-brand-light-green overflow-x-hidden">
+    <section className="py-16 bg-gradient-to-br from-green-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Badge Animation Overlay */}
+        {showBadgeAnimation && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg p-8 text-center animate-bounce">
+              <div className="text-6xl mb-4">🏆</div>
+              <h3 className="text-2xl font-bold text-green-600 mb-2">
+                Badge Earned!
+              </h3>
+              <p className="text-lg text-gray-700">{showBadgeAnimation}</p>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold text-brand-green mb-4">
-            Food Saving Challenge
+          <div className="flex justify-center mb-6">
+            <Logo size="lg" />
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Your Food Waste Journey
           </h2>
-          <p className="text-lg text-brand-green/80 max-w-2xl mx-auto">
-            Compete with friends, earn achievements, and climb the leaderboard while making a difference!
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Track your progress, earn badges, and compete with the community to save the most food.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* User Stats Card */}
-          <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader className="text-center pb-4">
-              <div className="w-20 h-20 bg-brand-green rounded-full mx-auto flex items-center justify-center mb-4">
-                <Trophy className="w-10 h-10 text-white" />
-              </div>
-              <CardTitle className="text-2xl">Your Rank</CardTitle>
-              <p className="text-3xl font-bold text-brand-green">#{userStats.rank}</p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Meals Saved</span>
-                <span className="font-bold text-lg">{userStats.mealsSaved}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">CO₂ Saved</span>
-                <span className="font-bold text-lg">{userStats.co2Saved} kg</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Current Streak</span>
-                <span className="font-bold text-lg flex items-center">
-                  {userStats.streak} <Flame className="ml-1 w-4 h-4 text-orange-500" />
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Leaderboard */}
-          <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* User Progress Card */}
+          <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="w-5 h-5 text-brand-green" />
-                <span>Leaderboard</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {leaderboard.map((user) => (
-                  <div 
-                    key={user.rank} 
-                    className={`flex items-center justify-between p-3 rounded-lg ${
-                      user.name === 'You' ? 'bg-brand-light-green border-2 border-brand-green' : 'bg-muted'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      {user.avatar === "logo" ? (
-                        <Logo size="sm" />
-                      ) : user.avatar === "sparkles" ? (
-                        <Sparkles className="w-6 h-6 text-yellow-500" />
-                      ) : user.avatar === "trophy" ? (
-                        <Trophy className="w-6 h-6 text-yellow-600" />
-                      ) : user.avatar === "leaf" ? (
-                        <Leaf className="w-6 h-6 text-green-500" />
-                      ) : user.avatar === "recycle" ? (
-                        <Recycle className="w-6 h-6 text-blue-500" />
-                      ) : (
-                        <span className="text-2xl">{user.avatar}</span>
-                      )}
-                      <div>
-                        <p className="font-semibold">{user.name}</p>
-                        <p className="text-sm text-muted-foreground">{user.mealsSaved} meals</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-lg font-bold text-brand-green">#{user.rank}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Friends Activity */}
-          <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Users className="w-5 h-5 text-brand-green" />
-                <span>Friends</span>
+              <CardTitle className="flex items-center gap-2">
+                <Crown className="w-6 h-6 text-yellow-600" />
+                Level {levelInfo.level} Food Waste Warrior
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {friends.map((friend, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-muted rounded-lg">
-                    <div className="relative">
-                      <div className="w-10 h-10 bg-brand-green rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold">{friend.name.charAt(0)}</span>
-                      </div>
-                      {friend.isOnline && (
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm">{friend.name}</p>
-                      <p className="text-xs text-muted-foreground">{friend.status}</p>
-                      <p className="text-xs text-brand-green font-medium">{friend.mealsSaved} meals saved</p>
-                    </div>
+                {/* Experience Bar */}
+                <div>
+                  <div className="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Experience Points: {userProgress?.experience_points || 0}</span>
+                    <span>{levelInfo.expToNext} XP to next level</span>
                   </div>
-                ))}
+                  <Progress 
+                    value={((userProgress?.experience_points || 0) % 100) / 100 * 100} 
+                    className="h-3"
+                  />
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+                    <div className="text-2xl font-bold text-green-600">
+                      {userProgress?.total_meals_saved || 0}
+                    </div>
+                    <div className="text-sm text-gray-600">Meals Saved</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {userProgress?.total_co2_saved?.toFixed(1) || 0}kg
+                    </div>
+                    <div className="text-sm text-gray-600">CO₂ Saved</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+                    <div className="text-2xl font-bold text-yellow-600">
+                      KSh {(userProgress?.total_money_saved || 0).toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">Money Saved</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+                    <div className="text-2xl font-bold text-orange-600">
+                      {userProgress?.current_streak || 0}
+                    </div>
+                    <div className="text-sm text-gray-600">Day Streak</div>
+                  </div>
+                </div>
+
+                {/* Test Button */}
+                <Button 
+                  onClick={simulateMealSaved}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
+                  🥗 Simulate Meal Saved (Test)
+                </Button>
               </div>
-              <Button 
-                className="w-full mt-4 bg-brand-yellow text-brand-green font-semibold hover:bg-brand-yellow/90 shadow-lg hover:shadow-xl transition-all duration-300"
-                onClick={handleInviteFriends}
-              >
-                Invite Friends
-              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Weekly Challenges Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="w-6 h-6 text-blue-600" />
+                Weekly Challenges
+                <Badge variant="outline" className="ml-auto">
+                  {timeLeft} left
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {weeklyChallenges.length > 0 ? (
+                  weeklyChallenges.map((challenge) => (
+                    <div key={challenge.id} className="p-4 border rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-semibold capitalize">
+                          {challenge.challenge_type.replace('_', ' ')}
+                        </h4>
+                        <Badge variant={challenge.is_completed ? "default" : "secondary"}>
+                          {challenge.is_completed ? "Completed" : "In Progress"}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Progress: {challenge.current_value}/{challenge.goal_value}</span>
+                        <span>{Math.round((challenge.current_value / challenge.goal_value) * 100)}%</span>
+                      </div>
+                      <Progress 
+                        value={(challenge.current_value / challenge.goal_value) * 100} 
+                        className="h-2"
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <Target className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                    <p>No active challenges.</p>
+                    <p className="text-sm">Start saving meals to begin your weekly challenge!</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Badges Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Award className="w-6 h-6 text-yellow-600" />
+                Your Badges ({userBadges.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {userBadges.length > 0 ? (
+                <div className="grid grid-cols-2 gap-4">
+                  {userBadges.slice(0, 6).map((userBadge) => (
+                    <div 
+                      key={userBadge.id} 
+                      className="text-center p-3 border rounded-lg hover:shadow-md transition-shadow"
+                    >
+                      <div className="text-3xl mb-2">{userBadge.badge.icon}</div>
+                      <h4 className="font-semibold text-sm mb-1">{userBadge.badge.name}</h4>
+                      <Badge variant="outline" className="text-xs">
+                        {userBadge.badge.rarity}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <Award className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <p>No badges earned yet.</p>
+                  <p className="text-sm">Start saving meals to earn your first badge!</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Achievements Section */}
-        <div className="mt-12">
-          <h3 className="text-2xl font-bold text-center mb-8">Achievements</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-            {achievements.map((achievement) => (
-              <Card 
-                key={achievement.id} 
-                className={`text-center p-4 transition-all hover:scale-105 ${
-                  achievement.completed 
-                    ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-yellow-300' 
-                    : 'bg-muted border-border'
-                }`}
-              >
-                <div className="text-4xl mb-2">
-                  {achievement.icon === "target" ? (
-                    <Target className="w-8 h-8 text-blue-500 mx-auto" />
-                  ) : achievement.icon === "globe" ? (
-                    <Globe className="w-8 h-8 text-green-500 mx-auto" />
-                  ) : achievement.icon === "flame" ? (
-                    <Flame className="w-8 h-8 text-orange-500 mx-auto" />
-                  ) : achievement.icon === "award" ? (
-                    <Award className="w-8 h-8 text-purple-500 mx-auto" />
-                  ) : achievement.icon === "crown" ? (
-                    <Crown className="w-8 h-8 text-yellow-600 mx-auto" />
-                  ) : (
-                    <span className="text-4xl">{achievement.icon}</span>
-                  )}
-                </div>
-                <h4 className="font-semibold text-sm mb-1">{achievement.title}</h4>
-                <p className="text-xs text-gray-600">{achievement.description}</p>
-                {achievement.completed && (
-                  <div className="mt-2">
-                    <Award className="w-4 h-4 text-yellow-600 mx-auto" />
-                  </div>
-                )}
-              </Card>
-            ))}
-          </div>
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
+          <Button 
+            onClick={handleViewProgress}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <TrendingUp className="w-4 h-4" />
+            View Full Progress
+          </Button>
+          <Button 
+            onClick={handleViewLeaderboard}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Users className="w-4 h-4" />
+            View Leaderboard
+          </Button>
         </div>
 
-        {/* Challenge Section */}
-        <div className="mt-12 text-center">
-          <Card className={`bg-gradient-to-r from-purple-500 to-pink-500 text-white p-8 transition-all duration-500 ${
-            userChallenge?.completed ? 'animate-pulse shadow-2xl' : ''
-          }`}>
-            <h3 className="text-2xl font-bold mb-4">Weekly Challenge</h3>
-            <p className="text-lg mb-4">
-              Save {challengeSettings?.goal_value || 10} meals this week to earn the "{challengeSettings?.badge_name || 'Weekly Hero'}" badge!
-            </p>
-            <div className="flex justify-center items-center space-x-4 mb-6">
-              <div className="text-center">
-                <p className="text-3xl font-bold">{userChallenge?.current_count || 0}</p>
-                <p className="text-sm">Meals Saved</p>
+        {/* Community Impact */}
+        <div className="mt-16">
+          <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-center justify-center">
+                <Globe className="w-6 h-6 text-purple-600" />
+                Community Impact
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">12,000+</div>
+                  <div className="text-sm text-gray-600">Total Meals Saved</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">2.5T</div>
+                  <div className="text-sm text-gray-600">CO₂ Reduced</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-yellow-600">KSh 580K</div>
+                  <div className="text-sm text-gray-600">Money Saved</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">500+</div>
+                  <div className="text-sm text-gray-600">Partner Restaurants</div>
+                </div>
               </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold">
-                  {Math.max(0, (challengeSettings?.goal_value || 10) - (userChallenge?.current_count || 0))}
-                </p>
-                <p className="text-sm">To Go!</p>
-              </div>
-            </div>
-            <div className="w-full bg-white bg-opacity-20 rounded-full h-3 mb-6 overflow-hidden">
-              <div 
-                className="bg-white h-3 rounded-full transition-all duration-700 ease-out relative"
-                style={{ 
-                  width: `${Math.min(100, ((userChallenge?.current_count || 0) / (challengeSettings?.goal_value || 10)) * 100)}%` 
-                }}
-              >
-                {/* Animated shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
-              </div>
-            </div>
-            <p className="text-sm opacity-90">
-              {userChallenge?.completed ? 'Challenge completed!' : `Challenge ends in ${timeLeft}`}
-            </p>
-            {userChallenge?.badge_awarded && (
-              <div className="mt-4 p-3 bg-white bg-opacity-20 rounded-lg">
-                <p className="text-sm font-semibold flex items-center gap-1">
-                  <Trophy className="w-4 h-4 text-yellow-600" />
-                  Badge Earned!
-                </p>
-                <p className="text-xs opacity-90">You've earned the {challengeSettings?.badge_name} badge!</p>
-              </div>
-            )}
+            </CardContent>
           </Card>
         </div>
       </div>
