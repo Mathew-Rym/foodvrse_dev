@@ -1,5 +1,11 @@
 -- Functions and Data for Gamification System
 
+-- Add missing category column to badges table if it doesn't exist
+ALTER TABLE badges ADD COLUMN IF NOT EXISTS category VARCHAR(50) NOT NULL DEFAULT 'general';
+
+-- Update existing badges to have a category if they don't have one
+UPDATE badges SET category = 'general' WHERE category IS NULL OR category = '';
+
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -150,7 +156,15 @@ INSERT INTO badges (name, description, icon, color, category, requirement_type, 
 
 -- Special Badges
 ('Early Adopter', 'Joined FoodVrse in first month', '🚀', 'gold', 'special', 'join_date', 1, 'legendary'),
-('Food Waste Warrior', 'Saved 500 meals', '⚔️', 'red', 'special', 'meals_saved', 500, 'legendary');
+('Food Waste Warrior', 'Saved 500 meals', '⚔️', 'red', 'special', 'meals_saved', 500, 'legendary')
+ON CONFLICT (name) DO UPDATE SET
+    description = EXCLUDED.description,
+    icon = EXCLUDED.icon,
+    color = EXCLUDED.color,
+    category = EXCLUDED.category,
+    requirement_type = EXCLUDED.requirement_type,
+    requirement_value = EXCLUDED.requirement_value,
+    rarity = EXCLUDED.rarity;
 
 -- Insert default achievement milestones
 INSERT INTO achievement_milestones (name, description, milestone_type, milestone_value, reward_points, reward_badge_id) VALUES
@@ -167,46 +181,167 @@ INSERT INTO achievement_milestones (name, description, milestone_type, milestone
 
 -- Create RLS policies
 -- User Progress policies
-CREATE POLICY "Users can view their own progress" ON user_progress FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can update their own progress" ON user_progress FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert their own progress" ON user_progress FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+    CREATE POLICY "Users can view their own progress" ON user_progress FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can update their own progress" ON user_progress FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can insert their own progress" ON user_progress FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- Badges policies (public read, authenticated insert)
-CREATE POLICY "Anyone can view badges" ON badges FOR SELECT USING (true);
-CREATE POLICY "Authenticated users can insert badges" ON badges FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+DO $$ BEGIN
+    CREATE POLICY "Anyone can view badges" ON badges FOR SELECT USING (true);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Authenticated users can insert badges" ON badges FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- User Badges policies
-CREATE POLICY "Users can view their own badges" ON user_badges FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert their own badges" ON user_badges FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update their own badges" ON user_badges FOR UPDATE USING (auth.uid() = user_id);
+DO $$ BEGIN
+    CREATE POLICY "Users can view their own badges" ON user_badges FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can insert their own badges" ON user_badges FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can update their own badges" ON user_badges FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can delete their own badges" ON user_badges FOR DELETE USING (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- Weekly Challenges policies
-CREATE POLICY "Users can view their own challenges" ON weekly_challenges FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can update their own challenges" ON weekly_challenges FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert their own challenges" ON weekly_challenges FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+    CREATE POLICY "Users can view their own challenges" ON weekly_challenges FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can update their own challenges" ON weekly_challenges FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can insert their own challenges" ON weekly_challenges FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- Community Challenges policies (public read, authenticated write)
-CREATE POLICY "Anyone can view community challenges" ON community_challenges FOR SELECT USING (true);
-CREATE POLICY "Authenticated users can update community challenges" ON community_challenges FOR UPDATE USING (auth.role() = 'authenticated');
+DO $$ BEGIN
+    CREATE POLICY "Anyone can view community challenges" ON community_challenges FOR SELECT USING (true);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Authenticated users can update community challenges" ON community_challenges FOR UPDATE USING (auth.role() = 'authenticated');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- User Community Challenges policies
-CREATE POLICY "Users can view their own community participation" ON user_community_challenges FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can update their own community participation" ON user_community_challenges FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert their own community participation" ON user_community_challenges FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+    CREATE POLICY "Users can view their own community participation" ON user_community_challenges FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can update their own community participation" ON user_community_challenges FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can insert their own community participation" ON user_community_challenges FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- Leaderboard policies (public read, authenticated write)
-CREATE POLICY "Anyone can view leaderboard" ON leaderboard FOR SELECT USING (true);
-CREATE POLICY "Authenticated users can update leaderboard" ON leaderboard FOR UPDATE USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can insert leaderboard" ON leaderboard FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+DO $$ BEGIN
+    CREATE POLICY "Anyone can view leaderboard" ON leaderboard FOR SELECT USING (true);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Authenticated users can update leaderboard" ON leaderboard FOR UPDATE USING (auth.role() = 'authenticated');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Authenticated users can insert leaderboard" ON leaderboard FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- User Activity Log policies
-CREATE POLICY "Users can view their own activity" ON user_activity_log FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert their own activity" ON user_activity_log FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+    CREATE POLICY "Users can view their own activity" ON user_activity_log FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can insert their own activity" ON user_activity_log FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- Achievement Milestones policies (public read)
-CREATE POLICY "Anyone can view achievement milestones" ON achievement_milestones FOR SELECT USING (true);
+DO $$ BEGIN
+    CREATE POLICY "Anyone can view achievement milestones" ON achievement_milestones FOR SELECT USING (true);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- User Milestones policies
-CREATE POLICY "Users can view their own milestones" ON user_milestones FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can update their own milestones" ON user_milestones FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert their own milestones" ON user_milestones FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+    CREATE POLICY "Users can view their own milestones" ON user_milestones FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can update their own milestones" ON user_milestones FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can insert their own milestones" ON user_milestones FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;

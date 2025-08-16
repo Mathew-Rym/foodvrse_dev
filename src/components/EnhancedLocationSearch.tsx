@@ -173,71 +173,79 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
     }
 
     setIsLoading(true);
+    console.log('🔍 Searching for:', query);
     
     try {
-      // First try with Kenya restriction
-      let searchParams = new URLSearchParams({
-        input: query,
-        types: 'geocode|establishment', // Simplified types parameter
-        key: API_CONFIG.GOOGLE_MAPS_API_KEY
-      });
-
-      let response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?${searchParams.toString()}`
-      );
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      let data = await response.json();
-      
-      console.log('Google Places API response:', data);
-      
-      // If no results, try without any restrictions
-      if (data.status === 'ZERO_RESULTS' || (data.status === 'OK' && data.predictions.length === 0)) {
-        console.log('No results found, trying broader search...');
-        
-        searchParams = new URLSearchParams({
+      // Try multiple search strategies
+      const searchStrategies = [
+        // Strategy 1: Basic search with establishment types
+        {
+          input: query,
+          types: 'establishment',
+          key: API_CONFIG.GOOGLE_MAPS_API_KEY
+        },
+        // Strategy 2: Geocode search
+        {
+          input: query,
+          types: 'geocode',
+          key: API_CONFIG.GOOGLE_MAPS_API_KEY
+        },
+        // Strategy 3: No type restrictions
+        {
           input: query,
           key: API_CONFIG.GOOGLE_MAPS_API_KEY
-        });
-
-        response = await fetch(
-          `https://maps.googleapis.com/maps/api/place/autocomplete/json?${searchParams.toString()}`
-        );
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
-        data = await response.json();
-        console.log('Google Places API response (broader search):', data);
+      ];
+
+      let allPredictions: any[] = [];
+
+      for (const strategy of searchStrategies) {
+        try {
+          const searchParams = new URLSearchParams(strategy);
+          const response = await fetch(
+            `https://maps.googleapis.com/maps/api/place/autocomplete/json?${searchParams.toString()}`,
+            {
+              method: 'GET',
+              headers: {
+                'Accept': 'application/json',
+              }
+            }
+          );
+          
+          if (!response.ok) {
+            console.error(`HTTP error for strategy:`, strategy, `Status:`, response.status);
+            continue;
+          }
+          
+          const data = await response.json();
+          console.log(`Strategy result:`, strategy, data);
+          
+          if (data.status === 'OK' && data.predictions && data.predictions.length > 0) {
+            allPredictions = [...allPredictions, ...data.predictions];
+            console.log(`Found ${data.predictions.length} predictions with strategy:`, strategy);
+          }
+        } catch (strategyError) {
+          console.error('Error with search strategy:', strategy, strategyError);
+        }
+      }
+
+      // Remove duplicates based on place_id
+      const uniquePredictions = allPredictions.filter((prediction, index, self) => 
+        index === self.findIndex(p => p.place_id === prediction.place_id)
+      );
+
+      console.log('🎯 Final unique predictions:', uniquePredictions.length, uniquePredictions);
+      
+      if (uniquePredictions.length > 0) {
+        setPredictions(uniquePredictions);
+        console.log('✅ Successfully set predictions:', uniquePredictions.length);
+      } else {
+        setPredictions([]);
+        console.log('❌ No predictions found for:', query);
       }
       
-      if (data.status === 'OK') {
-        setPredictions(data.predictions);
-        console.log('Found predictions:', data.predictions.length);
-      } else if (data.status === 'ZERO_RESULTS') {
-        setPredictions([]);
-        console.log('No predictions found for:', query);
-      } else {
-        console.error('Google Places API error:', data.status, data.error_message);
-        setPredictions([]);
-        
-        // Show user-friendly error message
-        if (data.status === 'REQUEST_DENIED') {
-          toast.error('Location search is temporarily unavailable. Please try again later.');
-        } else if (data.status === 'OVER_QUERY_LIMIT') {
-          toast.error('Search limit reached. Please try again in a moment.');
-        } else if (data.status === 'INVALID_REQUEST') {
-          toast.error('Invalid search request. Please try a different search term.');
-        } else {
-          toast.error('Unable to search locations. Please check your connection and try again.');
-        }
-      }
     } catch (error) {
-      console.error('Error searching locations:', error);
+      console.error('❌ Error searching locations:', error);
       setPredictions([]);
       toast.error('Failed to search locations. Please try again.');
     } finally {
@@ -300,11 +308,14 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
 
   // Handle search input changes
   const handleSearchChange = (value: string) => {
+    console.log('🔍 Search input changed:', value);
     setSearchQuery(value);
     
     if (value.length > 1) { // Reduced from 2 to 1 character
+      console.log('🚀 Triggering search for:', value);
       searchLocations(value);
     } else {
+      console.log('⏹️ Clearing predictions (query too short)');
       setPredictions([]);
     }
   };
@@ -453,6 +464,7 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
               {/* Location Predictions */}
               {predictions.length > 0 && (
                 <div className="space-y-2 max-h-48 overflow-y-auto">
+                  <div className="text-xs text-gray-500 mb-2">Found {predictions.length} results:</div>
                   {predictions.map((prediction) => (
                     <button
                       key={prediction.place_id}
@@ -575,8 +587,11 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
                     </div>
                     <div className="p-2 bg-gray-50 rounded-lg">
                       <div className="font-medium text-gray-700">Full Names</div>
-                      <div className="text-gray-500">kilimani, westlands</div>
+                      <div className="text-gray-500">citam woodley, westlands</div>
                     </div>
+                  </div>
+                  <div className="mt-4 text-xs text-gray-400">
+                    Debug: Search query: "{searchQuery}", Predictions: {predictions.length}, Loading: {isLoading.toString()}
                   </div>
                 </div>
               )}
