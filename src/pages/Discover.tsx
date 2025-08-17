@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Filter, MapPin, Heart, Star, Clock, Map, List, Hand, Search } from "lucide-react";
 import InteractiveMap from "@/components/InteractiveMap";
@@ -13,7 +12,6 @@ import ListingsGrid from "@/components/ListingsGrid";
 import GoogleMapsSearch from "@/components/GoogleMapsSearch";
 import DonatePopup from "@/components/DonatePopup";
 import EnhancedLocationSearch from "@/components/EnhancedLocationSearch";
-import InteractiveMap from "@/components/InteractiveMap";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 
@@ -36,6 +34,9 @@ const Discover = () => {
   const [showDonatePopup, setShowDonatePopup] = useState(false);
   const [showEnhancedLocationSearch, setShowEnhancedLocationSearch] = useState(false);
   const [hasAnyListings, setHasAnyListings] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<FilterOptions | null>(null);
+  const [filterClickEvent, setFilterClickEvent] = useState<React.MouseEvent | null>(null);
+  const [donateClickEvent, setDonateClickEvent] = useState<React.MouseEvent | null>(null);
 
   // Mock data for demonstration
   const mockStores = [
@@ -48,116 +49,60 @@ const Discover = () => {
       rating: 4.5,
       savings: "Up to 70%",
       pickup: "5:00 PM - 8:00 PM",
-      image: "🍕",
-      address: "Westlands Road, Nairobi",
-      website: "https://javahouseafrica.com",
-      yearsActive: 2,
-      mealsWasted: 1200,
-      currentOffers: [
-        { id: "1", title: "Magic Bag", pickup: "Today: 17:30 - 18:00", price: 250, itemsLeft: 4 }
-      ],
-      pastOffers: [
-        { id: "2", title: "Lunch Special", price: 300 }
+      items: [
+        { id: "1", name: "Chicken Burger", originalPrice: 800, price: 240, quantity: 5 },
+        { id: "2", name: "Coffee & Cake", originalPrice: 600, price: 180, quantity: 3 }
       ]
     },
     {
-      id: "2", 
+      id: "2",
       name: "Artcaffe",
-      location: "Sarit",
-      type: "Cafe & Bakery",
+      location: "CBD",
+      type: "Cafe",
       distance: "1.2 km",
       rating: 4.3,
       savings: "Up to 60%",
       pickup: "6:00 PM - 9:00 PM",
-      image: "🥐",
-      address: "Sarit Centre, Nairobi",
-      website: "https://artcaffe.co.ke",
-      yearsActive: 3,
-      mealsWasted: 850,
-      currentOffers: [
-        { id: "3", title: "Pastry Bag", pickup: "Today: 18:00 - 19:00", price: 200, itemsLeft: 2 }
-      ],
-      pastOffers: []
+      items: [
+        { id: "3", name: "Pasta Carbonara", originalPrice: 1200, price: 480, quantity: 2 },
+        { id: "4", name: "Croissant", originalPrice: 200, price: 80, quantity: 8 }
+      ]
     }
   ];
 
-  const popularSearches = ["Pizza", "Burgers", "Bakery", "bread", "Healthy", "Desserts", "Coffee"];
+  const popularSearches = ["Pizza", "Coffee", "Burgers", "Desserts", "Healthy"];
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name');
-
-      if (error) throw error;
-
-      setCategories(data || []);
-      
-      // Initialize category data with mock items
-      const mockCategoryData: any = {};
-      data?.forEach(category => {
-        mockCategoryData[category.name] = mockStores;
-      });
-      setCategoryData(mockCategoryData);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      toast.error('Failed to load categories');
-    }
-  };
-
-  const toggleFavorite = (id: string) => {
+  const toggleFavorite = (storeId: string) => {
     setFavorites(prev => 
-      prev.includes(id) 
-        ? prev.filter(fav => fav !== id)
-        : [...prev, id]
+      prev.includes(storeId) 
+        ? prev.filter(id => id !== storeId)
+        : [...prev, storeId]
     );
   };
 
-  const handleSearch = () => {
-    console.log("Searching for:", searchQuery);
-    // TODO: Implement search functionality
+  const handleSearchLocationSelect = ({ lat, lng, address }: { lat: number; lng: number; address: string }) => {
+    setCurrentLocation({
+      address,
+      lat,
+      lng,
+      distance: 10
+    });
+    toast.success(`Location updated to ${address}`);
   };
 
-  const handleFilter = () => {
-    setShowFilter(true);
+  const handleLocationSelect = (location: any) => {
+    setCurrentLocation(location);
+    setShowLocationSelector(false);
   };
 
-  const [activeFilters, setActiveFilters] = useState<FilterOptions | null>(null);
-
-  const [activeFilters, setActiveFilters] = useState<FilterOptions | null>(null);
+  const handleStoreSelect = (store: any) => {
+    setSelectedStore(store);
+    setShowStoreProfile(true);
+  };
 
   const handleApplyFilters = (filters: FilterOptions) => {
-
-  const getActiveFilterCount = (filters: FilterOptions): number => {
-    let count = 0;
-    if (filters.showSoldOut) count++;
-    if (filters.pickupDay.length > 0) count++;
-    if (filters.pickupWindow[0] !== 0 || filters.pickupWindow[1] !== 23) count++;
-    if (filters.surpriseBagTypes.length > 0) count++;
-    if (filters.dietaryPreferences.length > 0) count++;
-    if (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 1000) count++;
-    if (filters.distanceRange[0] !== 0 || filters.distanceRange[1] !== 10) count++;
-    if (filters.ratingFilter > 0) count++;
-    return count;
-  };
-    console.log("Applied filters:", filters);
     setActiveFilters(filters);
-    
-    const filterCount = getActiveFilterCount(filters);
-    if (filterCount > 0) {
-      toast.success(`Applied ${filterCount} filter${filterCount !== 1 ? "s" : ""}`);
-    } else {
-      toast.success("All filters cleared");
-    }
-    setActiveFilters(filters);
-    
-    // Apply filters to listings
-    applyFiltersToListings(filters);
+    setShowFilter(false);
     
     // Show success message with filter count
     const filterCount = getActiveFilterCount(filters);
@@ -181,95 +126,30 @@ const Discover = () => {
     return count;
   };
 
-  const applyFiltersToListings = (filters: FilterOptions) => {
-    // This function would apply filters to the actual listings data
-    // For now, we'll just log the filter criteria
-    console.log("Filtering listings with criteria:", {
-      showSoldOut: filters.showSoldOut,
-      pickupDays: filters.pickupDay,
-      pickupWindow: `${filters.pickupWindow[0]}:00 - ${filters.pickupWindow[1]}:00`,
-      bagTypes: filters.surpriseBagTypes,
-      dietary: filters.dietaryPreferences,
-      priceRange: `KSh ${filters.priceRange[0]} - KSh ${filters.priceRange[1]}`,
-      distanceRange: `${filters.distanceRange[1]} km max`,
-      minRating: filters.ratingFilter > 0 ? `${filters.ratingFilter}+` : "Any"
-    });
-    
-    // TODO: Implement actual filtering logic for listings
-    // This would involve:
-    // 1. Fetching filtered listings from Supabase
-    // 2. Updating the ListingsGrid components
-    // 3. Refreshing the map markers
-    // 4. Updating the business list
-  };
-
-  const handleLocationSelect = (location: { lat: number; lng: number; address: string; distance: number }) => {
-    setCurrentLocation(location);
-    console.log("Location selected:", location);
-    toast.success("Location updated");
-  };
-
-  const handleSearchLocationSelect = (loc: { lat: number; lng: number; address: string }) => {
-    const updated = { ...currentLocation, ...loc };
-    setCurrentLocation(updated);
-    toast.success("Location updated");
-  };
-
-  const handleCategoryClick = (categoryName: string) => {
-    console.log("Selected category:", categoryName);
-    navigate(`/category/${encodeURIComponent(categoryName)}`);
-    // TODO: Navigate to category page or filter
-  };
-
-  const navigate = useNavigate();
-
-  const handleSeeAllCategory = (categoryName: string) => {
-    console.log("See all for category:", categoryName);
-    navigate(`/category/${encodeURIComponent(categoryName)}`);
-    // TODO: Navigate to category page
-  };
-
-  const handleItemClick = (itemId: string) => {
-    console.log("Item clicked:", itemId);
-    // TODO: Open item details
-  };
-
-  const handleStoreClick = (storeId: string) => {
-    const store = mockStores.find(s => s.id === storeId);
-    if (store) {
-      setSelectedStore(store);
-      setShowStoreProfile(true);
-    }
-  };
-
   const handlePopularSearchClick = (searchTerm: string) => {
     setSearchQuery(searchTerm);
-    handleSearch();
+    toast.success(`Searching for ${searchTerm}`);
   };
 
-  // Check if there are any listings available
-  const checkForListings = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('listings')
-        .select('id')
-        .limit(1);
+  const handleDonate = (event: React.MouseEvent) => {
+    setShowDonatePopup(true);
+    setDonateClickEvent(event);
+  };
 
-      if (error) throw error;
-      setHasAnyListings((data && data.length > 0) || false);
-    } catch (error) {
-      console.error('Error checking for listings:', error);
-      setHasAnyListings(false);
-    }
+  const handleFilter = (event: React.MouseEvent) => {
+    setShowFilter(true);
+    setFilterClickEvent(event);
+  };
+
+  const checkForListings = () => {
+    // Check if there are any listings available
+    const hasListings = mockStores.length > 0;
+    setHasAnyListings(hasListings);
   };
 
   useEffect(() => {
     checkForListings();
   }, []);
-
-  const handleDonate = () => {
-    setShowDonatePopup(true);
-  };
 
   return (
     <MobileLayout>
@@ -317,9 +197,14 @@ const Discover = () => {
             >
               <MapPin className="w-4 h-4" />
             </Button>
-            <Button variant="outline" size="sm" className={`shrink-0 relative ${activeFilters ? "border-green-500 bg-green-50" : ""}`} onClick={handleFilter}>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className={`shrink-0 relative ${activeFilters ? "border-green-500 bg-green-50" : ""}`} 
+              onClick={handleFilter}
+            >
               <Filter className="w-4 h-4" />
-              {activeFilters <Filter className="w-4 h-4" /><Filter className="w-4 h-4" /> (
+              {activeFilters && (
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
               )}
             </Button>
@@ -366,11 +251,11 @@ const Discover = () => {
               />
             </div>
 
-            {/* Pick Up Tomorrow */}
+            {/* Pick Up Later - Evening pickups */}
             <div className="space-y-3">
-              <h2 className="text-lg font-semibold text-gray-900">Pick Up Tomorrow</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Pick Up Later</h2>
               <ListingsGrid 
-                pickupTimeFilter="tomorrow"
+                pickupTimeFilter="later"
                 showSoldOut={false}
                 limit={4}
                 userLocation={{ lat: currentLocation.lat, lng: currentLocation.lng }}
@@ -379,91 +264,16 @@ const Discover = () => {
               />
             </div>
 
-            {/* Dynamic Categories */}
-            <div className="space-y-6">
-              <h2 className="text-lg font-semibold text-gray-900">Browse by Category</h2>
-              
-              {categories.map((category) => (
-                <div key={category.id} className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-md font-medium text-gray-800">{category.name}</h3>
-                    <button 
-                      onClick={() => handleSeeAllCategory(category.name)}
-                      className="text-sm text-brand-green hover:text-brand-green/80"
-                    >
-                      See all
-                    </button>
-                  </div>
-                  <ListingsGrid 
-                    categoryFilter={category.name}
-                    showSoldOut={false}
-                    limit={3}
-                    userLocation={{ lat: currentLocation.lat, lng: currentLocation.lng }}
-                    distanceFilter={currentLocation.distance}
-                    showNoItemsMessage={false}
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Near You Section */}
+            {/* Categories */}
             <div className="space-y-3">
-              <h2 className="text-lg font-semibold text-gray-900">Near You</h2>
-              <div className="space-y-3">
-                {mockStores.map((store) => (
-                  <div 
-                    key={store.id} 
-                    className="bg-white rounded-lg p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => handleStoreClick(store.id)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
-                        {store.image}
-                      </div>
-                      
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="font-semibold text-gray-900">{store.name}</h3>
-                            <p className="text-sm text-gray-600">{store.type}</p>
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleFavorite(store.id);
-                            }}
-                            className={`p-1 ${favorites.includes(store.id) ? 'text-red-500' : 'text-gray-400'}`}
-                          >
-                            <Heart className={`w-5 h-5 ${favorites.includes(store.id) ? 'fill-current' : ''}`} />
-                          </button>
-                        </div>
-                        
-                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                          <div className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            <span>{store.distance}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                            <span>{store.rating}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            <span>{store.pickup}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-between mt-3">
-                          <Badge className="bg-green-100 text-green-600">{store.savings}</Badge>
-                          <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
-                            View Deals
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <h2 className="text-lg font-semibold text-gray-900">Browse by Category</h2>
+              <CategoryCarousel 
+                onCategoryClick={(categoryName) => {
+                  console.log('Category clicked:', categoryName);
+                  // Navigate to category page
+                  window.location.href = `/category/${encodeURIComponent(categoryName)}`;
+                }}
+              />
             </div>
 
             {/* Popular Searches */}
@@ -521,6 +331,7 @@ const Discover = () => {
         isOpen={showFilter}
         onClose={() => setShowFilter(false)}
         onApplyFilters={handleApplyFilters}
+        clickEvent={filterClickEvent}
       />
 
       {/* Location Selector */}
@@ -544,6 +355,7 @@ const Discover = () => {
       <DonatePopup
         isOpen={showDonatePopup}
         onClose={() => setShowDonatePopup(false)}
+        clickEvent={donateClickEvent}
       />
 
       {/* Enhanced Location Search */}
