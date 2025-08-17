@@ -7,6 +7,9 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { MysteryBagDetailPopup } from "./MysteryBagDetailPopup";
+import MobileMoneyCheckout from "./MobileMoneyCheckout";
+import MobileMoneyCheckout from "./MobileMoneyCheckout";
+import MobileMoneyCheckout from "./MobileMoneyCheckout";
 
 const MysteryBoxSection = () => {
   const { addToCart } = useCart();
@@ -14,6 +17,7 @@ const MysteryBoxSection = () => {
   const navigate = useNavigate();
   const [selectedBag, setSelectedBag] = useState<any>(null);
   const [showDetailPopup, setShowDetailPopup] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const mysteryBoxes = [
     {
@@ -81,8 +85,20 @@ const MysteryBoxSection = () => {
       return;
     }
 
-    setSelectedBag(box);
-    setShowDetailPopup(true);
+    // Add the mystery box to cart
+    const cartItem = {
+      id: box.id,
+      title: box.title,
+      vendor: box.vendor,
+      price: box.price,
+      originalPrice: box.originalPrice,
+      pickup: box.pickup,
+    };
+
+    addToCart(cartItem);
+    
+    // Show checkout modal
+    setShowCheckout(true);
   };
 
   const handleViewAllMysteryBags = () => {
@@ -92,7 +108,6 @@ const MysteryBoxSection = () => {
     }
     
     navigate("/discover");
-    navigate("/mystery-boxes");
   };
 
   return (
@@ -169,7 +184,7 @@ const MysteryBoxSection = () => {
           <Button 
             size="lg"
             variant="outline"
-                          onClick={handleViewAllMysteryBags}
+            onClick={handleViewAllMysteryBags}
             className="border-brand-green text-brand-green hover:bg-brand-light-green"
           >
             <Sparkles className="w-4 h-4 mr-2" />
@@ -212,6 +227,14 @@ const MysteryBoxSection = () => {
           isOpen={showDetailPopup}
           onClose={() => setShowDetailPopup(false)}
           bag={selectedBag}
+        />
+      )}
+
+      {/* Mobile Money Checkout Popup */}
+      {showCheckout && (
+        <MobileMoneyCheckout
+          isOpen={showCheckout}
+          onClose={() => setShowCheckout(false)}
         />
       )}
     </section>
