@@ -3,11 +3,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Building, ShoppingBag, User } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface GoogleOAuthHandlerProps {
   onComplete: () => void;
@@ -17,12 +14,8 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
   const { user, refreshUserData } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [showProfileSetup, setShowProfileSetup] = useState(false);
-  const [profileData, setProfileData] = useState({
-    display_name: '',
-    user_type: 'consumer' as 'consumer' | 'business',
-    business_name: ''
-  });
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [message, setMessage] = useState('Processing your login...');
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
@@ -37,11 +30,15 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
 
       if (existingProfile) {
         // User already has a profile, redirect to appropriate dashboard
-        if (existingProfile.user_type === 'business') {
-          navigate('/business-dashboard');
-        } else {
-          navigate('/');
-        }
+        setStatus('success');
+        setMessage('Welcome back! Redirecting...');
+        setTimeout(() => {
+          if (existingProfile.user_type === 'business') {
+            navigate('/business-dashboard');
+          } else {
+            navigate('/');
+          }
+        }, 1500);
         return;
       }
 
@@ -56,6 +53,8 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
     if (!user) return;
 
     setIsLoading(true);
+    setMessage('Setting up your profile...');
+    
     try {
       // Extract first name from Google user data
       let firstName = 'User';
@@ -86,7 +85,10 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
           updated_at: new Date().toISOString()
         });
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile creation error:', profileError);
+        throw profileError;
+      }
 
       // Create user impact record
       const { error: impactError } = await supabase
@@ -131,179 +133,63 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
       // Refresh user data
       await refreshUserData();
 
+      setStatus('success');
+      setMessage(`Welcome to FoodVrse, ${firstName}! Your profile has been created.`);
+      
       toast.success(`Welcome ${firstName}! Your account has been set up successfully.`);
+      
+      setTimeout(() => {
+        if (isBusinessAuth) {
+          navigate('/business-dashboard');
+        } else {
+          navigate('/');
+        }
+        onComplete();
+      }, 2000);
 
-      // Redirect to appropriate dashboard
-      if (isBusinessAuth) {
-        navigate('/business-dashboard');
-      } else {
-        navigate('/');
-      }
-
-      onComplete();
     } catch (error) {
       console.error('Error creating profile:', error);
+      setStatus('error');
+      setMessage('Failed to create profile. Please try again.');
       toast.error('Failed to create profile. Please try again.');
-      // Fallback to manual profile setup
-      setShowProfileSetup(true);
     } finally {
       setIsLoading(false);
     }
   };
-
-  const handleProfileSetup = async () => {
-    if (!user) return;
-
-    setIsLoading(true);
-    try {
-      // Create user profile
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .insert({
-          user_id: user.id,
-          display_name: profileData.display_name,
-          user_type: profileData.user_type,
-          created_at: new Date().toISOString()
-        });
-
-      if (profileError) throw profileError;
-
-      // If business user, create business profile
-      if (profileData.user_type === 'business') {
-        const { error: businessError } = await supabase
-          .from('business_profiles')
-          .insert({
-            user_id: user.id,
-            business_name: profileData.business_name,
-            address: 'Address not provided',
-            location: 'Location not provided',
-            user_type: 'business',
-            created_at: new Date().toISOString()
-          });
-
-        if (businessError) throw businessError;
-      }
-
-      // Create user impact record
-      const { error: impactError } = await supabase
-        .from('user_impact')
-        .insert({
-          user_id: user.id,
-          total_meals_saved: 0,
-          total_co2_saved_kg: 0,
-          total_money_saved_ksh: 0,
-          created_at: new Date().toISOString()
-        });
-
-      if (impactError) throw impactError;
-
-      // Refresh user data
-      await refreshUserData();
-
-      toast.success(
-        profileData.user_type === 'business' 
-          ? 'Business account created successfully!' 
-          : 'Account created successfully!'
-      );
-
-      // Redirect to appropriate dashboard
-      if (profileData.user_type === 'business') {
-        navigate('/business-dashboard');
-      } else {
-        navigate('/');
-      }
-
-      onComplete();
-    } catch (error) {
-      console.error('Error setting up profile:', error);
-      toast.error('Failed to set up profile. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (!showProfileSetup) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Setting up your account...</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-center">
-            Complete Your Profile
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="text-center mb-4">
-            <p className="text-sm text-gray-600">
-              Welcome! Please complete your profile to continue.
-            </p>
-          </div>
+        <CardContent className="p-8 text-center">
+          {status === 'loading' && (
+            <>
+              <Loader2 className="w-12 h-12 text-green-600 animate-spin mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Setting up your account</h2>
+              <p className="text-gray-600">{message}</p>
+            </>
+          )}
 
-          <div className="space-y-3">
-            <div>
-              <Label htmlFor="display_name">
-                {profileData.user_type === 'business' ? 'Business Name' : 'Full Name'}
-              </Label>
-              <Input
-                id="display_name"
-                value={profileData.display_name}
-                onChange={(e) => setProfileData({
-                  ...profileData,
-                  display_name: e.target.value,
-                  business_name: profileData.user_type === 'business' ? e.target.value : profileData.business_name
-                })}
-                placeholder={profileData.user_type === 'business' ? 'Enter business name' : 'Enter your full name'}
-              />
-            </div>
+          {status === 'success' && (
+            <>
+              <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Success!</h2>
+              <p className="text-gray-600">{message}</p>
+            </>
+          )}
 
-            {profileData.user_type === 'consumer' && (
-              <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
-                <ShoppingBag className="w-5 h-5 text-green-600" />
-                <div>
-                  <p className="font-medium text-green-800">Consumer Account</p>
-                  <p className="text-sm text-green-600">Save money on food deals</p>
-                </div>
-              </div>
-            )}
-
-            {profileData.user_type === 'business' && (
-              <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
-                <Building className="w-5 h-5 text-blue-600" />
-                <div>
-                  <p className="font-medium text-blue-800">Business Account</p>
-                  <p className="text-sm text-blue-600">List and sell your food items</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <Button
-            onClick={handleProfileSetup}
-            disabled={isLoading || !profileData.display_name.trim()}
-            className="w-full"
-          >
-            {isLoading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Setting up account...
-              </>
-            ) : (
-              'Complete Setup'
-            )}
-          </Button>
+          {status === 'error' && (
+            <>
+              <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Oops!</h2>
+              <p className="text-gray-600 mb-4">{message}</p>
+              <button
+                onClick={() => navigate('/auth')}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors"
+              >
+                Try Again
+              </button>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

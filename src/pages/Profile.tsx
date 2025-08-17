@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -76,9 +77,33 @@ const Profile = () => {
   };
 
   const handleSaveProfile = async () => {
-    // Update profile in Supabase
-    toast.success('Profile updated successfully!');
-    setIsEditingProfile(false);
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          display_name: profileData.name,
+          phone: profileData.phone,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error updating profile:', error);
+        toast.error('Failed to update profile');
+        return;
+      }
+
+      // Refresh user data to get updated profile
+      await refreshUserData();
+      
+      toast.success('Profile updated successfully!');
+      setIsEditingProfile(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Failed to update profile');
+    }
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
