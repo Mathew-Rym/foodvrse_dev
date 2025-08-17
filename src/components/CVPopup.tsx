@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { X, Upload, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import emailjs from '@emailjs/browser';
 import { EMAILJS_CONFIG } from '@/config/emailjs';
+import ReCAPTCHA from 'react-google-recaptcha';
+import { RECAPTCHA_CONFIG } from '@/config/recaptcha';
 
 interface CVPopupProps {
   isOpen: boolean;
@@ -20,6 +22,8 @@ const CVPopup = ({ isOpen, onClose }: CVPopupProps) => {
   const [message, setMessage] = useState('');
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,6 +61,11 @@ const CVPopup = ({ isOpen, onClose }: CVPopupProps) => {
     
     if (!cvFile) {
       toast.error('Please upload your CV');
+      return;
+    }
+
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA verification");
       return;
     }
 
@@ -109,6 +118,8 @@ Please contact the applicant at: ${email}
             setSubject('');
             setMessage('');
             setCvFile(null);
+            setRecaptchaToken(null);
+            recaptchaRef.current?.reset();
             onClose();
           } else {
             throw new Error('Email sending failed');
@@ -256,6 +267,20 @@ Please contact the applicant at: ${email}
                   </Button>
                 </div>
               )}
+            </div>
+
+            {/* reCAPTCHA */}
+            <div className="flex justify-center">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={RECAPTCHA_CONFIG.SITE_KEY}
+                onChange={(token) => setRecaptchaToken(token)}
+                onExpired={() => setRecaptchaToken(null)}
+                onError={() => {
+                  setRecaptchaToken(null);
+                  toast.error("reCAPTCHA verification failed. Please try again.");
+                }}
+              />
             </div>
 
             <div className="flex gap-3 pt-4">

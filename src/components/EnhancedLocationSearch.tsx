@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { API_CONFIG } from '@/config/api';
 import { toast } from 'sonner';
 import emailjs from '@emailjs/browser';
 import { EMAILJS_CONFIG } from '@/config/emailjs';
+import ReCAPTCHA from 'react-google-recaptcha';
+import { RECAPTCHA_CONFIG } from '@/config/recaptcha';
 
 interface Location {
   place_id: string;
@@ -69,6 +71,8 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
     location: '',
     message: ''
   });
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   // Mock business deals data
   const mockBusinessDeals: BusinessDeal[] = [
@@ -320,11 +324,13 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
       if (placeDetails) {
         // Check if location is in Kenya
         if (placeDetails.country.toLowerCase() !== 'kenya') {
-          setShowExpansionForm(true);
+          // Automatically show the waitlist form for non-Kenya locations
+          setShowWaitlistForm(true);
           setExpansionFormData(prev => ({
             ...prev,
             location: placeDetails.address
           }));
+          setIsLoading(false);
           return;
         }
         
@@ -402,37 +408,8 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
       return;
     }
 
-    try {
-      const templateParams = {
-        from_name: expansionFormData.name,
-        from_email: expansionFormData.email,
-        location: expansionFormData.location,
-        message: expansionFormData.message || 'User wants FoodVrse in their area',
-        to_email: 'hello@foodvrse.com'
-      };
-
-      await emailjs.send(
-        EMAILJS_CONFIG.SERVICE_ID,
-        EMAILJS_CONFIG.TEMPLATE_ID,
-        templateParams,
-        EMAILJS_CONFIG.PUBLIC_KEY
-      );
-
-      toast.success('Thank you! We\'ll notify you when FoodVrse comes to your area.');
-      setShowWaitlistForm(false);
-      setExpansionFormData({ name: '', email: '', location: '', message: '' });
-      onClose();
-    } catch (error) {
-      console.error('Error sending email:', error);
-      toast.error('Failed to submit. Please try again.');
-    }
-  };
-
-  const handleWaitlistFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!expansionFormData.name || !expansionFormData.email) {
-      toast.error('Please fill in all required fields');
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA verification");
       return;
     }
 
@@ -455,6 +432,49 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
       toast.success('Thank you! We\'ll notify you when FoodVrse comes to your area.');
       setShowWaitlistForm(false);
       setExpansionFormData({ name: '', email: '', location: '', message: '' });
+      setRecaptchaToken(null);
+      recaptchaRef.current?.reset();
+      onClose();
+    } catch (error) {
+      console.error('Error sending email:', error);
+      toast.error('Failed to submit. Please try again.');
+    }
+  };
+
+  const handleWaitlistFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!expansionFormData.name || !expansionFormData.email) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA verification");
+      return;
+    }
+
+    try {
+      const templateParams = {
+        from_name: expansionFormData.name,
+        from_email: expansionFormData.email,
+        location: expansionFormData.location,
+        message: expansionFormData.message || 'User wants FoodVrse in their area',
+        to_email: 'hello@foodvrse.com'
+      };
+
+      await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        templateParams,
+        EMAILJS_CONFIG.PUBLIC_KEY
+      );
+
+      toast.success('Thank you! We\'ll notify you when FoodVrse comes to your area.');
+      setShowWaitlistForm(false);
+      setExpansionFormData({ name: '', email: '', location: '', message: '' });
+      setRecaptchaToken(null);
+      recaptchaRef.current?.reset();
       onClose();
     } catch (error) {
       console.error('Error sending email:', error);
@@ -784,6 +804,20 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
                     onChange={(e) => setExpansionFormData(prev => ({ ...prev, message: e.target.value }))}
                     className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none"
                     rows={3}
+                  />
+                </div>
+
+                {/* reCAPTCHA */}
+                <div className="flex justify-center">
+                  <ReCAPTCHA
+                    ref={recaptchaRef}
+                    sitekey={RECAPTCHA_CONFIG.SITE_KEY}
+                    onChange={(token) => setRecaptchaToken(token)}
+                    onExpired={() => setRecaptchaToken(null)}
+                    onError={() => {
+                      setRecaptchaToken(null);
+                      toast.error("reCAPTCHA verification failed. Please try again.");
+                    }}
                   />
                 </div>
 

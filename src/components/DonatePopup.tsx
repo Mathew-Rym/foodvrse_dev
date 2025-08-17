@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { X, Heart, Lightbulb, Mail } from "lucide-react";
 import { toast } from 'sonner';
 import emailjs from '@emailjs/browser';
 import { EMAILJS_CONFIG } from '@/config/emailjs';
+import ReCAPTCHA from 'react-google-recaptcha';
+import { RECAPTCHA_CONFIG } from '@/config/recaptcha';
 
 interface DonatePopupProps {
   isOpen: boolean;
@@ -21,6 +23,8 @@ const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose }) => {
     idea: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   // Initialize EmailJS
   React.useEffect(() => {
@@ -32,6 +36,11 @@ const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose }) => {
     
     if (!formData.name.trim() || !formData.email.trim() || !formData.idea.trim()) {
       toast.error('Please fill in all fields');
+      return;
+    }
+
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA verification");
       return;
     }
 
@@ -54,6 +63,8 @@ const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose }) => {
       if (result.status === 200) {
         toast.success('Thank you for sharing your idea! We\'ll get back to you soon.');
         setFormData({ name: '', email: '', idea: '' });
+        setRecaptchaToken(null);
+        recaptchaRef.current?.reset();
         onClose();
       } else {
         throw new Error('Email sending failed');
@@ -158,6 +169,19 @@ const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose }) => {
                   placeholder="Share your ideas for our donation feature, suggestions, or how you'd like to support our mission..."
                   className="mt-1 min-h-[100px] resize-none"
                   required
+                />
+              </div>
+
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={RECAPTCHA_CONFIG.SITE_KEY}
+                  onChange={(token) => setRecaptchaToken(token)}
+                  onExpired={() => setRecaptchaToken(null)}
+                  onError={() => {
+                    setRecaptchaToken(null);
+                    toast.error("reCAPTCHA verification failed. Please try again.");
+                  }}
                 />
               </div>
 
