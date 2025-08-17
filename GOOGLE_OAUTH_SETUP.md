@@ -27,7 +27,6 @@ To change the OAuth prompt from showing "vsvhkkalfziuyttwityc.supabase.co" to "F
 
 ### Authorized Redirect URIs
 Make sure these redirect URIs are configured:
-- `https://vsvhkkalfziuyttwityc.supabase.co/auth/v1/callback`
 - `https://www.foodvrse.com/oauth-callback`
 
 ### Authorized JavaScript Origins
