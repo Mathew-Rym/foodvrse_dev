@@ -45,12 +45,6 @@ const Profile = () => {
     number: ''
   });
 
-  // Mock data for favorites and payment methods
-  const [favorites, setFavorites] = useState([
-    { id: 1, name: "Mama's Kitchen", location: "Downtown", rating: 4.8 },
-    { id: 2, name: "Green Cafe", location: "Westlands", rating: 4.5 },
-    { id: 3, name: "Pizza Corner", location: "CBD", rating: 4.7 }
-  ]);
 
   const [paymentMethods, setPaymentMethods] = useState([
     { id: 1, type: "M-Pesa", number: "254712345678", default: true },
@@ -119,8 +113,62 @@ const Profile = () => {
     }
   };
 
-  const handleRemoveFavorite = (id: number) => {
-    setFavorites(prev => prev.filter(fav => fav.id !== id));
+  const fetchUserFavorites = async () => {
+    if (!user) return;
+    
+    setLoadingFavorites(true);
+    try {
+      const { data, error } = await supabase
+        .from("user_favorites")
+        .select(`
+          id,
+          business_id,
+          created_at,
+          business_profiles (
+            id,
+            business_name,
+            location,
+            address,
+            rating,
+            category
+          )
+        `)
+        .eq("user_id", user.id);
+
+      if (error) {
+        console.error("Error fetching favorites:", error);
+        toast.error("Failed to load favorites");
+        return;
+      }
+
+      setFavorites(data || []);
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+      toast.error("Failed to load favorites");
+    } finally {
+      setLoadingFavorites(false);
+    }
+  };
+
+  const handleRemoveFavorite = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("user_favorites")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error removing favorite:", error);
+        toast.error("Failed to remove favorite");
+        return;
+      }
+
+      setFavorites(prev => prev.filter(fav => fav.id !== id));
+      toast.success('Removed from favorites');
+    } catch (error) {
+      console.error('Error removing favorite:', error);
+      toast.error('Failed to remove favorite');
+    }
     toast.success('Removed from favorites');
   };
 
@@ -189,12 +237,8 @@ const Profile = () => {
         setShowPaymentMethods(true);
         break;
       case 'favorites':
+      fetchUserFavorites();
         setShowFavorites(true);
-        break;
-      case 'help':
-        // Open WhatsApp support
-        window.open('https://wa.me/1234567890?text=Hello, I need help with my FoodVrse account', '_blank');
-        toast.success('Opening WhatsApp support...');
         break;
       default:
         console.log('Unknown action:', action);
@@ -546,11 +590,11 @@ const Profile = () => {
               {favorites.map((favorite) => (
                 <div key={favorite.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
-                    <p className="font-medium">{favorite.name}</p>
-                    <p className="text-sm text-gray-600">{favorite.location}</p>
+                    <p className="font-medium">{favorite.business_profiles?.business_name || "Unknown Restaurant"}</p>
+                    <p className="text-sm text-gray-600">{favorite.business_profiles?.location || "Location not available"}</p>
                     <p className="text-sm text-yellow-600 flex items-center gap-1">
                       <Star className="w-4 h-4" />
-                      {favorite.rating}
+                      {favorite.business_profiles?.rating || "N/A"}
                     </p>
                   </div>
                   <Button

@@ -8,8 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { MysteryBagDetailPopup } from "./MysteryBagDetailPopup";
 import MobileMoneyCheckout from "./MobileMoneyCheckout";
-import MobileMoneyCheckout from "./MobileMoneyCheckout";
-import MobileMoneyCheckout from "./MobileMoneyCheckout";
 
 const MysteryBoxSection = () => {
   const { addToCart } = useCart();
