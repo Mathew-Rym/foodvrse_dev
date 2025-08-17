@@ -42,7 +42,9 @@ import Partners from "./pages/Partners";
 import PartnerApplication from "./pages/PartnerApplication";
 import ComingSoon from "./pages/ComingSoon";
 import CategoryPage from "./pages/CategoryPage";
+import GamificationPage from "./pages/GamificationPage";
 import CategoryPage from "./pages/CategoryPage";
+import GamificationPage from "./pages/GamificationPage";
 import GoogleOAuthHandler from "./components/GoogleOAuthHandler";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -161,6 +163,7 @@ const App = () => {
                     <Route path="/partner-application" element={<PartnerApplication />} />
                     <Route path="/coming-soon" element={<ComingSoon />} />
 <Route path="/category/:categoryName" element={<CategoryPage />} />
+<Route path="/gamification" element={<GamificationPage />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>

@@ -255,35 +255,6 @@ const EnhancedGamification: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Community Stats */}
-      <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-6 h-6 text-purple-600" />
-            Community Impact
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">12,000+</div>
-              <div className="text-sm text-gray-600">Total Meals Saved</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">2.5T</div>
-              <div className="text-sm text-gray-600">CO₂ Reduced</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">KSh 580K</div>
-              <div className="text-sm text-gray-600">Money Saved</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">500+</div>
-              <div className="text-sm text-gray-600">Partner Restaurants</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

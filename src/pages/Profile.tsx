@@ -64,6 +64,7 @@ const Profile = () => {
     { icon: Bell, label: "Notifications", action: "notifications" },
     { icon: CreditCard, label: "Payment Methods", action: "payment" },
     { icon: Heart, label: "Favorite Restaurants", action: "favorites" },
+{ icon: Trophy, label: "Gamification & Achievements", action: "gamification" },
     { icon: HelpCircle, label: "Help & Support", action: "help" },
   ];
 
