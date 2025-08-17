@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Filter, MapPin, Heart, Star, Clock, Map, List, Hand } from "lucide-react";
+import { Filter, MapPin, Heart, Star, Clock, Map, List, Hand, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MobileLayout from "@/components/MobileLayout";
@@ -33,6 +33,7 @@ const Discover = () => {
   const [categoryData, setCategoryData] = useState<any>({});
   const [showDonatePopup, setShowDonatePopup] = useState(false);
   const [showEnhancedLocationSearch, setShowEnhancedLocationSearch] = useState(false);
+  const [hasAnyListings, setHasAnyListings] = useState(false);
 
   // Mock data for demonstration
   const mockStores = [
@@ -170,6 +171,26 @@ const Discover = () => {
     handleSearch();
   };
 
+  // Check if there are any listings available
+  const checkForListings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('listings')
+        .select('id')
+        .limit(1);
+
+      if (error) throw error;
+      setHasAnyListings((data && data.length > 0) || false);
+    } catch (error) {
+      console.error('Error checking for listings:', error);
+      setHasAnyListings(false);
+    }
+  };
+
+  useEffect(() => {
+    checkForListings();
+  }, []);
+
   const handleDonate = () => {
     setShowDonatePopup(true);
   };
@@ -273,6 +294,7 @@ const Discover = () => {
                 limit={4}
                 userLocation={{ lat: currentLocation.lat, lng: currentLocation.lng }}
                 distanceFilter={currentLocation.distance}
+                showNoItemsMessage={false}
               />
             </div>
 
@@ -285,6 +307,7 @@ const Discover = () => {
                 limit={4}
                 userLocation={{ lat: currentLocation.lat, lng: currentLocation.lng }}
                 distanceFilter={currentLocation.distance}
+                showNoItemsMessage={false}
               />
             </div>
 
@@ -309,6 +332,7 @@ const Discover = () => {
                     limit={3}
                     userLocation={{ lat: currentLocation.lat, lng: currentLocation.lng }}
                     distanceFilter={currentLocation.distance}
+                    showNoItemsMessage={false}
                   />
                 </div>
               ))}
@@ -389,6 +413,37 @@ const Discover = () => {
                 ))}
               </div>
             </div>
+
+            {/* No Items Found - Show only when there are no listings */}
+            {!hasAnyListings && (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-brand-light-green rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No items found</h3>
+                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  Be an explorer! Try adjusting your filters or search in a different area.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                  <button 
+                    onClick={() => window.location.reload()}
+                    className="px-6 py-2 bg-gradient-to-r from-brand-green to-brand-yellow text-white rounded-lg hover:from-brand-green/90 hover:to-brand-yellow/90 transition-all duration-200 font-medium"
+                  >
+                    Discover More Bags!
+                  </button>
+                  <button 
+                    onClick={() => {
+                      // Open location search modal
+                      const event = new CustomEvent('openLocationSearch');
+                      window.dispatchEvent(event);
+                    }}
+                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium"
+                  >
+                    Change Location
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

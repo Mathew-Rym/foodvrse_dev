@@ -13,6 +13,7 @@ interface ListingsGridProps {
   limit?: number;
   distanceFilter?: number;
   userLocation?: { lat: number; lng: number };
+  showNoItemsMessage?: boolean;
 }
 
 export const ListingsGrid: React.FC<ListingsGridProps> = ({
@@ -22,7 +23,8 @@ export const ListingsGrid: React.FC<ListingsGridProps> = ({
   showSoldOut = false,
   limit,
   distanceFilter,
-  userLocation
+  userLocation,
+  showNoItemsMessage = true
 }) => {
   const { user } = useAuth();
   const [listings, setListings] = useState<any[]>([]);
@@ -230,25 +232,33 @@ export const ListingsGrid: React.FC<ListingsGridProps> = ({
   }
 
   if (listings.length === 0) {
+    if (!showNoItemsMessage) {
+      return null;
+    }
+    
     return (
-      <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-brand-light-green rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Search className="w-8 h-8 text-gray-400" />
+      <div className="text-center py-8">
+        <div className="w-16 h-16 bg-brand-light-green rounded-full flex items-center justify-center mx-auto mb-4">
+          <Search className="w-8 h-8 text-gray-400" />
         </div>
         <h3 className="text-lg font-semibold text-gray-900 mb-2">No items found</h3>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 mb-6 max-w-md mx-auto">
           Be an explorer! Try adjusting your filters or search in a different area.
         </p>
-        <div className="flex gap-3 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <button 
             onClick={() => window.location.reload()}
-                          className="px-4 py-2 bg-gradient-to-r from-brand-green to-brand-yellow text-white rounded-lg hover:from-brand-green/90 hover:to-brand-yellow/90"
+            className="px-6 py-2 bg-gradient-to-r from-brand-green to-brand-yellow text-white rounded-lg hover:from-brand-green/90 hover:to-brand-yellow/90 transition-all duration-200 font-medium"
           >
             Discover More Bags!
           </button>
           <button 
-            onClick={() => {/* TODO: Implement location change */}}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            onClick={() => {
+              // Open location search modal
+              const event = new CustomEvent('openLocationSearch');
+              window.dispatchEvent(event);
+            }}
+            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium"
           >
             Change Location
           </button>

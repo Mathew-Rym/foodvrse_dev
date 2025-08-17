@@ -84,6 +84,19 @@ const Header = () => {
     console.log('Selected location:', location);
   };
 
+  // Listen for location search events from other components
+  useEffect(() => {
+    const handleOpenLocationSearch = () => {
+      setIsLocationSearchOpen(true);
+    };
+
+    window.addEventListener('openLocationSearch', handleOpenLocationSearch);
+    
+    return () => {
+      window.removeEventListener('openLocationSearch', handleOpenLocationSearch);
+    };
+  }, []);
+
   return (
     <header className="bg-brand-green shadow-sm border-b border-brand-green">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
