@@ -16,6 +16,7 @@ interface AuthContextType {
   signInWithGoogle: (isBusinessAuth?: boolean) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refreshUserData: () => Promise<void>;
+updateUserImpactFromPurchase: (purchaseData: any) => Promise<void>;
   isAuthenticated: boolean;
   isBusinessUser: boolean;
 }
@@ -318,6 +319,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const refreshUserData = async () => {
+const updateUserImpactFromPurchase = async (purchaseData: any) => {
+    if (!user) return;
+    
+    try {
+      // Update impact using the service
+      const updatedProgress = await PurchaseImpactService.updateImpactFromPurchase(purchaseData);
+      
+      // Update local state
+      setUserImpact(updatedProgress);
+      
+      // Refresh user data to get latest info
+      await fetchUserData(user.id);
+    } catch (error) {
+      console.error("Error updating impact from purchase:", error);
+      toast.error("Failed to update impact");
+    }
+  };
+
+  
     if (user) {
       await fetchUserData(user.id);
     }
@@ -338,6 +358,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signInWithGoogle,
     signOut,
     refreshUserData,
+updateUserImpactFromPurchase,
     isAuthenticated,
     isBusinessUser,
   };

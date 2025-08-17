@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGamification } from '@/hooks/useGamification';
+import { useFriendsProgress } from "@/hooks/useFriendsProgress";
 import { GamificationService } from '@/services/gamificationService';
 import { toast } from "sonner";
 import { supabase } from '@/integrations/supabase/client';
@@ -42,8 +43,10 @@ interface LeaderboardEntry {
 
 const GamificationPage: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
+const { friendsProgress, isLoading: friendsLoading } = useFriendsProgress();
   const navigate = useNavigate();
   const {
+const { friendsProgress, isLoading: friendsLoading } = useFriendsProgress();
     userProgress,
     userBadges,
     weeklyChallenges,
@@ -101,6 +104,7 @@ const GamificationPage: React.FC = () => {
   const fetchCommunityStats = async () => {
     try {
       const { data: progressData, error: progressError } = await supabase
+const { friendsProgress, isLoading: friendsLoading } = useFriendsProgress();
         .from('user_progress')
         .select('total_meals_saved, total_co2_saved, total_money_saved');
 
@@ -418,6 +422,57 @@ const GamificationPage: React.FC = () => {
               </Button>
             </div>
           </CardContent>
+n        {/* Friends Progress */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-6 h-6 text-purple-600" />
+              Friends Progress
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {friendsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
+              </div>
+            ) : friendsProgress.length > 0 ? (
+              <div className="space-y-3">
+                {friendsProgress.map((friend, index) => (
+                  <div 
+                    key={friend.user_id} 
+                    className="flex items-center justify-between p-3 rounded-lg bg-purple-50 border border-purple-200"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-200 text-sm font-semibold">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <div className="font-semibold">{friend.display_name}</div>
+                        <div className="text-sm text-gray-600">
+                          Level {friend.level} • {friend.total_meals_saved} meals saved
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-purple-600">
+                        {friend.total_co2_saved?.toFixed(1) || 0}kg CO₂
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        KSh {(friend.total_money_saved || 0).toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No friends found.</p>
+                <p className="text-sm">Invite friends to see their progress!</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
         </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -464,6 +519,57 @@ const GamificationPage: React.FC = () => {
                 )}
               </div>
             </CardContent>
+n        {/* Friends Progress */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-6 h-6 text-purple-600" />
+              Friends Progress
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {friendsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
+              </div>
+            ) : friendsProgress.length > 0 ? (
+              <div className="space-y-3">
+                {friendsProgress.map((friend, index) => (
+                  <div 
+                    key={friend.user_id} 
+                    className="flex items-center justify-between p-3 rounded-lg bg-purple-50 border border-purple-200"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-200 text-sm font-semibold">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <div className="font-semibold">{friend.display_name}</div>
+                        <div className="text-sm text-gray-600">
+                          Level {friend.level} • {friend.total_meals_saved} meals saved
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-purple-600">
+                        {friend.total_co2_saved?.toFixed(1) || 0}kg CO₂
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        KSh {(friend.total_money_saved || 0).toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No friends found.</p>
+                <p className="text-sm">Invite friends to see their progress!</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
           </Card>
 
           {/* User Badges */}
@@ -499,6 +605,57 @@ const GamificationPage: React.FC = () => {
                 </div>
               )}
             </CardContent>
+n        {/* Friends Progress */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-6 h-6 text-purple-600" />
+              Friends Progress
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {friendsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
+              </div>
+            ) : friendsProgress.length > 0 ? (
+              <div className="space-y-3">
+                {friendsProgress.map((friend, index) => (
+                  <div 
+                    key={friend.user_id} 
+                    className="flex items-center justify-between p-3 rounded-lg bg-purple-50 border border-purple-200"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-200 text-sm font-semibold">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <div className="font-semibold">{friend.display_name}</div>
+                        <div className="text-sm text-gray-600">
+                          Level {friend.level} • {friend.total_meals_saved} meals saved
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-purple-600">
+                        {friend.total_co2_saved?.toFixed(1) || 0}kg CO₂
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        KSh {(friend.total_money_saved || 0).toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No friends found.</p>
+                <p className="text-sm">Invite friends to see their progress!</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
           </Card>
         </div>
 
@@ -556,6 +713,57 @@ const GamificationPage: React.FC = () => {
               </div>
             )}
           </CardContent>
+n        {/* Friends Progress */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-6 h-6 text-purple-600" />
+              Friends Progress
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {friendsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
+              </div>
+            ) : friendsProgress.length > 0 ? (
+              <div className="space-y-3">
+                {friendsProgress.map((friend, index) => (
+                  <div 
+                    key={friend.user_id} 
+                    className="flex items-center justify-between p-3 rounded-lg bg-purple-50 border border-purple-200"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-200 text-sm font-semibold">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <div className="font-semibold">{friend.display_name}</div>
+                        <div className="text-sm text-gray-600">
+                          Level {friend.level} • {friend.total_meals_saved} meals saved
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-purple-600">
+                        {friend.total_co2_saved?.toFixed(1) || 0}kg CO₂
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        KSh {(friend.total_money_saved || 0).toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No friends found.</p>
+                <p className="text-sm">Invite friends to see their progress!</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
         </Card>
 
         {/* Community Impact */}
@@ -594,6 +802,57 @@ const GamificationPage: React.FC = () => {
               </div>
             </div>
           </CardContent>
+n        {/* Friends Progress */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-6 h-6 text-purple-600" />
+              Friends Progress
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {friendsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
+              </div>
+            ) : friendsProgress.length > 0 ? (
+              <div className="space-y-3">
+                {friendsProgress.map((friend, index) => (
+                  <div 
+                    key={friend.user_id} 
+                    className="flex items-center justify-between p-3 rounded-lg bg-purple-50 border border-purple-200"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-200 text-sm font-semibold">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <div className="font-semibold">{friend.display_name}</div>
+                        <div className="text-sm text-gray-600">
+                          Level {friend.level} • {friend.total_meals_saved} meals saved
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-purple-600">
+                        {friend.total_co2_saved?.toFixed(1) || 0}kg CO₂
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        KSh {(friend.total_money_saved || 0).toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No friends found.</p>
+                <p className="text-sm">Invite friends to see their progress!</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
         </Card>
       </div>
     </div>

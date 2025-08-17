@@ -107,7 +107,8 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     );
   };
 
-  const completeOrder = () => {
+  const completeOrder = async () => {
+const { user } = useAuth();
     if (items.length === 0) return;
 
     const newOrder: Order = {
@@ -126,6 +127,27 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     setItems([]);
     setSelectedAddOns([]);
     setShowOrderCompletePopup(true);
+n    // Update user impact if user is authenticated
+    if (user) {
+      try {
+        const purchaseData = {
+          id: newOrder.id,
+          user_id: user.id,
+          total_amount: newOrder.total,
+          items: newOrder.items.map(item => ({
+            name: item.title,
+            quantity: item.quantity,
+            price: item.price,
+            original_price: item.originalPrice
+          })),
+          created_at: new Date().toISOString()
+        };
+        
+        await PurchaseImpactService.updateImpactFromPurchase(purchaseData);
+      } catch (error) {
+        console.error("Error updating impact from purchase:", error);
+      }
+    }
   };
 
   const updateOrderStatus = (orderId: string, status: 'preparing' | 'ready' | 'completed') => {
