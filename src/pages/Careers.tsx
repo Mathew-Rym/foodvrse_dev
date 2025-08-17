@@ -272,7 +272,10 @@ const Careers = () => {
                     
                     <Button 
                       className="w-full md:w-auto bg-brand-green hover:bg-brand-green/90 text-white font-semibold"
-                      onClick={() => setIsCVPopupOpen(true)}
+                      onClick={(e) => {
+        setIsCVPopupOpen(true);
+        setCvClickEvent(e);
+      }}
                     >
                       <Upload className="w-4 h-4 mr-2" />
                       Apply for this position
@@ -292,7 +295,10 @@ const Careers = () => {
                   We're not currently hiring, but we're always interested in connecting with talented individuals 
                   who are passionate about sustainability and making a positive impact.
                 </p>
-                <Button onClick={() => setIsCVPopupOpen(true)} className="bg-brand-green hover:bg-brand-green/90">
+                <Button onClick={(e) => {
+        setIsCVPopupOpen(true);
+        setCvClickEvent(e);
+      }} className="bg-brand-green hover:bg-brand-green/90">
                   <Send className="w-4 h-4 mr-2" />
                   Send Your CV for Future Opportunities
                 </Button>
@@ -405,7 +411,10 @@ const Careers = () => {
             sustainability and making a positive impact. Send us your CV and tell us how you'd like to contribute.
           </p>
           <Button 
-            onClick={() => setIsCVPopupOpen(true)} 
+            onClick={(e) => {
+        setIsCVPopupOpen(true);
+        setCvClickEvent(e);
+      }} 
             className="bg-brand-green hover:bg-brand-green/90"
           >
             <Send className="w-4 h-4 mr-2" />

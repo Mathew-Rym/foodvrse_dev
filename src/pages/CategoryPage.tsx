@@ -116,7 +116,9 @@ const CategoryPage: React.FC = () => {
     navigate('/discover');
   };
 
-  const handleFilter = () => {
+  const handleFilter = (event: React.MouseEvent) => {
+    setShowFilter(true);
+    setFilterClickEvent(event);
     setShowFilter(true);
   };
 

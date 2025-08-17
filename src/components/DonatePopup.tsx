@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import DynamicPopup from './DynamicPopup';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +15,19 @@ import { RECAPTCHA_CONFIG } from '@/config/recaptcha';
 interface DonatePopupProps {
   isOpen: boolean;
   onClose: () => void;
+  clickEvent?: React.MouseEvent | MouseEvent;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose }) => {
+const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose, clickEvent }) => {
+  const { position, calculatePosition } = useDynamicPosition({ popupWidth: 400, popupHeight: 600 });
+
+  React.useEffect(() => {
+    if (isOpen if (isOpen const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose }) => {const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose }) => { clickEvent) {if (isOpen const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose }) => {const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose }) => { clickEvent) { clickEvent) {
+      calculatePosition(clickEvent);
+    }
+  }, [isOpen, clickEvent, calculatePosition]);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -80,13 +91,21 @@ const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center p-4 pt-8">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
+      <div 
+        className="absolute bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto"
+        style={{
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+          width: `400px`,
+          maxWidth: `calc(100vw - 20px)`
+        }}
       <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <CardHeader className="text-center pb-4">
+        <div className="text-center pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-bold text-gray-900">
+            <h2 className="text-xl font-bold text-gray-900">
               💝 Donate to FoodVrse
-            </CardTitle>
+            </h2>
             <Button
               variant="ghost"
               size="sm"
@@ -96,9 +115,9 @@ const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose }) => {
               <X className="w-4 h-4" />
             </Button>
           </div>
-        </CardHeader>
+        </div>
         
-        <CardContent className="space-y-6">
+        <div className="space-y-6">
           {/* Coming Soon Message */}
           <div className="text-center space-y-3">
             <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-red-500 rounded-full flex items-center justify-center mx-auto">
@@ -211,8 +230,8 @@ const DonatePopup: React.FC<DonatePopupProps> = ({ isOpen, onClose }) => {
               </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

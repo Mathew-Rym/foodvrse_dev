@@ -233,7 +233,10 @@ const MeetTheTeam = () => {
             <Button onClick={() => navigate("/careers")}>
               View Open Positions
             </Button>
-            <Button variant="outline" onClick={() => setIsCVPopupOpen(true)}>
+            <Button variant="outline" onClick={(e) => {
+        setIsCVPopupOpen(true);
+        setCvClickEvent(e);
+      }}>
               Send Your CV
             </Button>
           </div>
