@@ -7,11 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { DynamicPopup } from "@/components/DynamicPopup";
 
 interface FilterPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onApplyFilters: (filters: FilterOptions) => void;
+  clickEvent?: React.MouseEvent;
 }
 
 export interface FilterOptions {
@@ -25,7 +27,7 @@ export interface FilterOptions {
   ratingFilter: number;
 }
 
-export const FilterPopup = ({ isOpen, onClose, onApplyFilters }: FilterPopupProps) => {
+export const FilterPopup = ({ isOpen, onClose, onApplyFilters, clickEvent }: FilterPopupProps) => {
   const [showSoldOut, setShowSoldOut] = useState(false);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [timeRange, setTimeRange] = useState<[number, number]>([0, 23]);
@@ -131,9 +133,8 @@ export const FilterPopup = ({ isOpen, onClose, onApplyFilters }: FilterPopupProp
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto p-0 max-h-[90vh] overflow-y-auto fixed top-4 left-1/2 transform -translate-x-1/2">
-        <DialogTitle className="sr-only">Filter Options</DialogTitle>
+    <DynamicPopup isOpen={isOpen} onClose={onClose} clickEvent={clickEvent}>
+      <div className="bg-white rounded-lg shadow-lg max-w-md max-h-[90vh] overflow-y-auto">
         
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
@@ -327,7 +328,7 @@ export const FilterPopup = ({ isOpen, onClose, onApplyFilters }: FilterPopupProp
             Apply Filters
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </DynamicPopup>
   );
 };

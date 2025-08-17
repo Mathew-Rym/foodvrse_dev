@@ -1,31 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useDynamicPosition } from '@/hooks/useDynamicPosition';
 
 interface DynamicPopupProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  clickEvent?: React.MouseEvent | MouseEvent;
-  popupWidth?: number;
-  popupHeight?: number;
-  className?: string;
+  clickEvent?: React.MouseEvent;
 }
 
-const DynamicPopup: React.FC<DynamicPopupProps> = ({
+export const DynamicPopup: React.FC<DynamicPopupProps> = ({
   isOpen,
   onClose,
   children,
-  clickEvent,
-  popupWidth = 400,
-  popupHeight = 500,
-  className = ""
+  clickEvent
 }) => {
-  const { position, calculatePosition } = useDynamicPosition({ 
-    popupWidth, 
-    popupHeight 
-  });
+  const { position, calculatePosition } = useDynamicPosition();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (isOpen && clickEvent) {
       calculatePosition(clickEvent);
     }
@@ -34,20 +25,25 @@ const DynamicPopup: React.FC<DynamicPopupProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-      <div 
-        className={`absolute bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto ${className}`}
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/50 z-40"
+        onClick={onClose}
+      />
+      
+      {/* Popup */}
+      <div
+        className="fixed z-50"
         style={{
-          left: `${position.x}px`,
-          top: `${position.y}px`,
-          width: `${popupWidth}px`,
-          maxWidth: `calc(100vw - 20px)`
+          left: position.x,
+          top: position.y,
+          transform: 'translate(-50%, -100%)',
+          marginTop: '-10px'
         }}
       >
         {children}
       </div>
-    </div>
+    </>
   );
 };
-
-export default DynamicPopup;

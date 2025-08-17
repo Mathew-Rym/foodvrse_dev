@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Filter, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-// import ListingsGrid from '@/components/ListingsGrid';
+import ListingsGrid from '@/components/ListingsGrid';
 import { FilterPopup, FilterOptions } from '@/components/FilterPopup';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -14,6 +14,7 @@ const CategoryPage: React.FC = () => {
   const [categoryData, setCategoryData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showFilter, setShowFilter] = useState(false);
+  const [filterClickEvent, setFilterClickEvent] = useState<React.MouseEvent | undefined>();
   const [activeFilters, setActiveFilters] = useState<FilterOptions | null>(null);
   const [currentLocation, setCurrentLocation] = useState({
     address: "Nairobi, Kenya",
@@ -215,7 +216,7 @@ const CategoryPage: React.FC = () => {
 
       {/* Products Grid */}
       <div className="p-4">
-        // <ListingsGrid
+        <ListingsGrid
           categoryFilter={categoryName}
           showSoldOut={activeFilters?.showSoldOut || false}
           userLocation={{ lat: currentLocation.lat, lng: currentLocation.lng }}
@@ -227,6 +228,7 @@ const CategoryPage: React.FC = () => {
 
       {/* Filter Popup */}
       <FilterPopup
+        clickEvent={filterClickEvent}
         isOpen={showFilter}
         onClose={() => setShowFilter(false)}
         onApplyFilters={handleApplyFilters}

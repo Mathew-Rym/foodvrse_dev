@@ -8,7 +8,7 @@ import { FilterPopup, FilterOptions } from "@/components/FilterPopup";
 import { LocationSelector } from "@/components/LocationSelector";
 import { CategoryCarousel } from "@/components/CategoryCarousel";
 import { StoreProfilePage } from "@/components/StoreProfilePage";
-// import ListingsGrid from "@/components/ListingsGrid";
+import ListingsGrid from "@/components/ListingsGrid";
 import GoogleMapsSearch from "@/components/GoogleMapsSearch";
 import DonatePopup from "@/components/DonatePopup";
 import EnhancedLocationSearch from "@/components/EnhancedLocationSearch";
@@ -241,7 +241,7 @@ const Discover = () => {
             {/* Pick Up Now - Dynamic time-based listings */}
             <div className="space-y-3">
               <h2 className="text-lg font-semibold text-gray-900">Pick Up Now</h2>
-              // <ListingsGrid 
+              <ListingsGrid 
                 pickupTimeFilter="now"
                 showSoldOut={false}
                 limit={4}
@@ -254,7 +254,7 @@ const Discover = () => {
             {/* Pick Up Later - Evening pickups */}
             <div className="space-y-3">
               <h2 className="text-lg font-semibold text-gray-900">Pick Up Later</h2>
-              // <ListingsGrid 
+              <ListingsGrid 
                 pickupTimeFilter="later"
                 showSoldOut={false}
                 limit={4}

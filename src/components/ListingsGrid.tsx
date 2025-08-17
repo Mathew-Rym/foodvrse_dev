@@ -1,283 +1,250 @@
-import { useState, useEffect } from "react";
-import { Search } from "lucide-react";
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from "@/contexts/AuthContext";
-import ListingCard from "./ListingCard";
-import { toast } from "sonner";
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Heart, Clock, MapPin, Star, ShoppingCart } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ListingsGridProps {
-  categoryFilter?: string;
-  searchQuery?: string;
-  pickupTimeFilter?: 'now' | 'tomorrow' | 'any';
+  pickupTimeFilter?: 'now' | 'later';
   showSoldOut?: boolean;
   limit?: number;
-  distanceFilter?: number;
   userLocation?: { lat: number; lng: number };
+  distanceFilter?: number;
   showNoItemsMessage?: boolean;
-showAllItems?: boolean;
+  showAllItems?: boolean;
 }
 
 export const ListingsGrid: React.FC<ListingsGridProps> = ({
-  categoryFilter = 'all',
-  searchQuery = '',
-  pickupTimeFilter = 'any',
-  showSoldOut = false,
+  pickupTimeFilter,
+  showSoldOut = true,
   limit,
-  distanceFilter,
   userLocation,
-  showNoItemsMessage = true
-showAllItems = false
+  distanceFilter,
+  showNoItemsMessage = true,
+  showAllItems = false
 }) => {
   const { user } = useAuth();
+  const { addToCart } = useCart();
   const [listings, setListings] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchListings();
-    
-    // Set up realtime subscription
-    const channel = supabase
-      .channel('listings-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'listings'
-        },
-        (payload) => {
-          console.log('Listing updated:', payload);
-          fetchListings(); // Refetch to get updated data with joins
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'business_profiles'
-        },
-        (payload) => {
-          console.log('Business updated:', payload);
-          fetchListings(); // Refetch for rating updates
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [categoryFilter, searchQuery, pickupTimeFilter, showSoldOut, distanceFilter, userLocation]);
-
-  const fetchListings = async () => {
-    try {
-      // Use the new distance-based function if location and distance filter are provided
-      if (userLocation && distanceFilter) {
-        const { data, error } = await supabase.rpc('get_listings_with_distance', {
-          user_lat: userLocation.lat,
-          user_lon: userLocation.lng,
-          max_distance: distanceFilter,
-          category_filter: categoryFilter === 'all' ? null : categoryFilter,
-          search_query: searchQuery || null
-        });
-
-        if (error) throw error;
-
-        let filteredData = data || [];
-
-        // Apply pickup time filter
-        if (pickupTimeFilter !== 'any') {
-          filteredData = filteredData.filter((listing: any) => {
-            const pickupStart = new Date(listing.pickup_start);
-            if (pickupTimeFilter === 'now') {
-              const now = new Date();
-              const threeHoursLater = new Date(now.getTime() + 3 * 60 * 60 * 1000);
-              return pickupStart <= threeHoursLater && new Date(listing.pickup_end) >= now;
-            } else if (pickupTimeFilter === 'tomorrow') {
-              const tomorrow = new Date();
-              tomorrow.setDate(tomorrow.getDate() + 1);
-              tomorrow.setHours(0, 0, 0, 0);
-              const endOfTomorrow = new Date(tomorrow);
-              endOfTomorrow.setHours(23, 59, 59, 999);
-              return pickupStart >= tomorrow && pickupStart <= endOfTomorrow;
-            }
-            return true;
-          });
-        }
-
-        // Filter sold out items
-        if (!showSoldOut) {
-          filteredData = filteredData.filter((listing: any) => listing.status !== 'sold-out');
-        }
-
-        // Apply limit
-        if (limit if (limit) {if (limit) { !showAllItems) {
-          filteredData = filteredData.slice(0, limit);
-        }
-
-        // Transform data to match expected format
-        const transformedData = filteredData.map((item: any) => ({
-          ...item,
-          business: {
-            id: item.business_id,
-            business_name: item.business_name,
-            business_logo_url: item.business_logo_url,
-            location: item.location,
-            average_rating: item.average_rating,
-            rating_count: item.rating_count
-          }
-        }));
-
-        setListings(transformedData);
-      } else {
-        // Fallback to original query for listings without distance filtering
-        let query = supabase
-          .from('listings')
-          .select(`
-            *,
-            business:business_profiles(
-              id,
-              business_name,
-              business_logo_url,
-              location,
-              average_rating,
-              rating_count
-            )
-          `)
-          .order('created_at', { ascending: false });
-
-        // Apply category filter
-        if (categoryFilter && categoryFilter !== 'all') {
-          query = query.eq('category', categoryFilter);
-        }
-
-        // Apply search filter
-        if (searchQuery) {
-          query = query.or(`item_name.ilike.%${searchQuery}%,business_profiles.business_name.ilike.%${searchQuery}%`);
-        }
-
-        // Apply pickup time filter
-        if (pickupTimeFilter === 'now') {
-          const now = new Date();
-          const threeHoursLater = new Date(now.getTime() + 3 * 60 * 60 * 1000);
-          query = query
-            .lte('pickup_start', threeHoursLater.toISOString())
-            .gte('pickup_end', now.toISOString());
-        } else if (pickupTimeFilter === 'tomorrow') {
-          const tomorrow = new Date();
-          tomorrow.setDate(tomorrow.getDate() + 1);
-          tomorrow.setHours(0, 0, 0, 0);
-          const endOfTomorrow = new Date(tomorrow);
-          endOfTomorrow.setHours(23, 59, 59, 999);
-          
-          query = query
-            .gte('pickup_start', tomorrow.toISOString())
-            .lte('pickup_start', endOfTomorrow.toISOString());
-        }
-
-        // Filter sold out items
-        if (!showSoldOut) {
-          query = query.neq('status', 'sold-out');
-        }
-
-        // Apply limit
-        if (limit if (limit) {if (limit) { !showAllItems) {
-          query = query.limit(limit);
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
-
-        setListings(data || []);
-      }
-    } catch (error) {
-      console.error('Error fetching listings:', error);
-      toast.error('Failed to load listings');
-    } finally {
-      setLoading(false);
+  // Mock data for demonstration
+  const mockListings = [
+    {
+      id: "1",
+      name: "Chicken Burger",
+      originalPrice: 800,
+      price: 240,
+      quantity: 5,
+      vendor: "Java House",
+      pickup: "5:00 PM - 8:00 PM",
+      location: "Westlands",
+      rating: 4.5,
+      distance: "0.5 km",
+      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop",
+      category: "Burgers"
+    },
+    {
+      id: "2",
+      name: "Coffee & Cake",
+      originalPrice: 600,
+      price: 180,
+      quantity: 3,
+      vendor: "Artcaffe",
+      pickup: "6:00 PM - 9:00 PM",
+      location: "CBD",
+      rating: 4.3,
+      distance: "1.2 km",
+      image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=300&fit=crop",
+      category: "Beverages"
+    },
+    {
+      id: "3",
+      name: "Pasta Carbonara",
+      originalPrice: 1200,
+      price: 480,
+      quantity: 2,
+      vendor: "Pizza Place",
+      pickup: "7:00 PM - 10:00 PM",
+      location: "Kilimani",
+      rating: 4.7,
+      distance: "2.1 km",
+      image: "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=400&h=300&fit=crop",
+      category: "Pasta"
+    },
+    {
+      id: "4",
+      name: "Croissant",
+      originalPrice: 200,
+      price: 80,
+      quantity: 8,
+      vendor: "Bakery Corner",
+      pickup: "4:00 PM - 7:00 PM",
+      location: "Lavington",
+      rating: 4.2,
+      distance: "1.8 km",
+      image: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&h=300&fit=crop",
+      category: "Bakery"
     }
-  };
+  ];
 
-  const handlePurchase = (listingId: string, quantity: number) => {
-    // Update local state immediately for better UX
-    setListings(prev => prev.map(listing => 
-      listing.id === listingId 
-        ? { ...listing, quantity: listing.quantity - quantity }
-        : listing
-    ));
-  };
+  useEffect(() => {
+    // Simulate API call
+    setTimeout(() => {
+      let filteredListings = [...mockListings];
 
-  const handleFavorite = (listingId: string, isFavorited: boolean) => {
-    if (!user) return;
-    
-    // Update local state immediately for better UX
-    setListings(prev => prev.map(listing => {
-      if (listing.id === listingId) {
-        const updatedFavorites = isFavorited
-          ? [...listing.favorited_by_user_ids, user.id]
-          : listing.favorited_by_user_ids.filter((id: string) => id !== user.id);
-        return { ...listing, favorited_by_user_ids: updatedFavorites };
+      // Apply pickup time filter
+      if (pickupTimeFilter === 'now') {
+        filteredListings = filteredListings.filter(item => 
+          item.pickup.includes('5:00') || item.pickup.includes('6:00')
+        );
+      } else if (pickupTimeFilter === 'later') {
+        filteredListings = filteredListings.filter(item => 
+          item.pickup.includes('7:00') || item.pickup.includes('8:00')
+        );
       }
-      return listing;
-    }));
+
+      // Apply sold out filter
+      if (!showSoldOut) {
+        filteredListings = filteredListings.filter(item => item.quantity > 0);
+      }
+
+      // Apply limit
+      if (limit && !showAllItems) {
+        filteredListings = filteredListings.slice(0, limit);
+      }
+
+      setListings(filteredListings);
+      setLoading(false);
+    }, 500);
+  }, [pickupTimeFilter, showSoldOut, limit, showAllItems]);
+
+  const toggleFavorite = (itemId: string) => {
+    setFavorites(prev => 
+      prev.includes(itemId) 
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const handleAddToCart = (item: any) => {
+    if (!user) {
+      toast.error('Please log in to add items to cart');
+      return;
+    }
+
+    if (item.quantity <= 0) {
+      toast.error('This item is sold out');
+      return;
+    }
+
+    addToCart({
+      ...item,
+      quantity: 1
+    });
+    toast.success(`${item.name} added to cart`);
   };
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <div key={index} className="bg-gray-100 rounded-2xl h-80 animate-pulse" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i} className="animate-pulse">
+            <div className="h-48 bg-gray-200 rounded-t-lg"></div>
+            <CardContent className="p-4">
+              <div className="h-4 bg-gray-200 rounded mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded mb-4"></div>
+              <div className="h-8 bg-gray-200 rounded"></div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     );
   }
 
-  if (listings.length === 0) {
-    if (!showNoItemsMessage) {
-      return null;
-    }
-    
+  if (listings.length === 0 && showNoItemsMessage) {
     return (
-      <div className="text-center py-8">
-        <div className="w-16 h-16 bg-brand-light-green rounded-full flex items-center justify-center mx-auto mb-4">
-          <Search className="w-8 h-8 text-gray-400" />
+      <div className="text-center py-12">
+        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <ShoppingCart className="w-8 h-8 text-gray-400" />
         </div>
         <h3 className="text-lg font-semibold text-gray-900 mb-2">No items found</h3>
-        <p className="text-gray-600 mb-6 max-w-md mx-auto">
-          Be an explorer! Try adjusting your filters or search in a different area.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-          <button 
-            onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-gradient-to-r from-brand-green to-brand-yellow text-white rounded-lg hover:from-brand-green/90 hover:to-brand-yellow/90 transition-all duration-200 font-medium"
-          >
-            Discover More Bags!
-          </button>
-          <button 
-            onClick={() => {
-              // Open location search modal
-              const event = new CustomEvent('openLocationSearch');
-              window.dispatchEvent(event);
-            }}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium"
-          >
-            Change Location
-          </button>
-        </div>
+        <p className="text-gray-600">Try adjusting your filters or check back later for new listings.</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {listings.map((listing) => (
-        <ListingCard
-          key={listing.id}
-          listing={listing}
-          onPurchase={handlePurchase}
-          onFavorite={handleFavorite}
-        />
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {listings.map((item) => (
+        <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+          <div className="relative">
+            <img 
+              src={item.image} 
+              alt={item.name}
+              className="w-full h-48 object-cover"
+            />
+            <button
+              onClick={() => toggleFavorite(item.id)}
+              className={`absolute top-2 right-2 p-2 rounded-full transition-colors ${
+                favorites.includes(item.id) 
+                  ? 'bg-red-500 text-white' 
+                  : 'bg-white/80 text-gray-600 hover:bg-red-500 hover:text-white'
+              }`}
+            >
+              <Heart className="w-4 h-4" fill={favorites.includes(item.id) ? 'currentColor' : 'none'} />
+            </button>
+            {item.quantity <= 0 && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <Badge variant="destructive">Sold Out</Badge>
+              </div>
+            )}
+          </div>
+          
+          <CardContent className="p-4">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="font-semibold text-sm line-clamp-2">{item.name}</h3>
+              <Badge variant="outline" className="text-xs">{item.category}</Badge>
+            </div>
+            
+            <div className="flex items-center gap-1 text-sm text-gray-600 mb-2">
+              <MapPin className="w-3 h-3" />
+              <span>{item.location}</span>
+              <span>•</span>
+              <span>{item.distance}</span>
+            </div>
+            
+            <div className="flex items-center gap-1 text-sm text-gray-600 mb-3">
+              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+              <span>{item.rating}</span>
+              <span>•</span>
+              <Clock className="w-3 h-3" />
+              <span>{item.pickup}</span>
+            </div>
+            
+            <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-green-600">KSh {item.price}</span>
+                <span className="text-sm text-gray-500 line-through">KSh {item.originalPrice}</span>
+              </div>
+              <span className="text-xs text-gray-500">{item.quantity} left</span>
+            </div>
+            
+            <Button 
+              onClick={() => handleAddToCart(item)}
+              disabled={item.quantity <= 0}
+              className="w-full"
+              size="sm"
+            >
+              <ShoppingCart className="w-4 h-4 mr-2" />
+              {item.quantity <= 0 ? 'Sold Out' : 'Add to Cart'}
+            </Button>
+          </CardContent>
+        </Card>
       ))}
     </div>
   );
