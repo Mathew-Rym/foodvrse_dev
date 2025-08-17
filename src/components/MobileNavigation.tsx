@@ -1,5 +1,5 @@
 
-import { Home, Search, Trophy, User, Heart } from "lucide-react";
+import { Home, Search, Award, User, Heart } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,7 +21,7 @@ const MobileNavigation = () => {
   const tabs = [
     { id: "home", label: t('nav.home'), icon: Home, path: "/" },
     { id: "discover", label: t('nav.discover'), icon: Search, path: "/discover" },
-    { id: "impact", label: t('nav.impact'), icon: Trophy, path: "/gamification" },
+    { id: "impact", label: t('nav.impact'), icon: Award, path: "/gamification" },
     { id: "favorites", label: t('nav.favorites'), icon: Heart, path: "/favorites" },
     { id: "profile", label: t('nav.profile'), icon: User, path: "/profile" },
   ];

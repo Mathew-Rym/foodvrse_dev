@@ -1,5 +1,5 @@
 
-import { Leaf, Trophy, Users, TrendingUp, Share2, UserPlus } from "lucide-react";
+import { Leaf, Award, Users, TrendingUp, Share2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MobileLayout from "@/components/MobileLayout";
@@ -8,7 +8,7 @@ const Impact = () => {
   const stats = [
     { icon: Leaf, label: "Meals Saved", value: "47", color: "text-green-600" },
     { icon: TrendingUp, label: "CO₂ Prevented", value: "28.2kg", color: "text-blue-600" },
-    { icon: Trophy, label: "Money Saved", value: "KSh 12,400", color: "text-yellow-600" },
+    { icon: Award, label: "Money Saved", value: "KSh 12,400", color: "text-yellow-600" },
     { icon: Users, label: "Rank", value: "#23", color: "text-purple-600" },
   ];
 
@@ -113,7 +113,7 @@ const Impact = () => {
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                                           achievement.earned ? "bg-yellow-100 dark:bg-yellow-900" : "bg-muted"
                   }`}>
-                    <Trophy className={`w-5 h-5 ${achievement.earned ? "text-yellow-600" : "text-gray-400"}`} />
+                    <Award className={`w-5 h-5 ${achievement.earned ? "text-yellow-600" : "text-gray-400"}`} />
                   </div>
                   <div className="flex-1">
                     <h3 className={`font-medium ${achievement.earned ? "text-gray-900" : "text-gray-500"}`}>
@@ -151,7 +151,7 @@ const Impact = () => {
                     </p>
                     <p className="text-sm text-gray-600">{friend.meals} meals saved</p>
                   </div>
-                  {friend.rank === 1 && <Trophy className="w-5 h-5 text-yellow-500" />}
+                  {friend.rank === 1 && <Award className="w-5 h-5 text-yellow-500" />}
                 </div>
               ))}
             </div>

@@ -1,4 +1,4 @@
-import { Trophy, Leaf, Users, TrendingUp, ArrowRight, ArrowLeft } from "lucide-react";
+import { Award, Leaf, Users, TrendingUp, ArrowRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,7 +23,7 @@ const ImpactTrackerPage = () => {
       color: "bg-green-100 text-green-600"
     },
     {
-      icon: Trophy,
+      icon: Award,
       title: "Personal Achievements",
       description: "Unlock badges, reach milestones, and see your progress as a food waste champion.",
       color: "bg-yellow-100 text-yellow-600"
@@ -59,7 +59,7 @@ const ImpactTrackerPage = () => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-              <Trophy className="w-8 h-8 text-white" />
+              <Award className="w-8 h-8 text-white" />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Impact Tracker</h1>
@@ -129,7 +129,7 @@ const ImpactTrackerPage = () => {
               className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3"
             >
               View My Impact Dashboard
-              <Trophy className="ml-2 w-4 h-4" />
+              <Award className="ml-2 w-4 h-4" />
             </Button>
           ) : (
             <>

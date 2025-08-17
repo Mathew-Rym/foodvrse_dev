@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Trophy, 
+  Award, 
   Users, 
   Award, 
   Star, 
@@ -661,7 +661,7 @@ n        {/* Friends Progress */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Trophy className="w-6 h-6 text-yellow-600" />
+              <Award className="w-6 h-6 text-yellow-600" />
               Weekly Leaderboard
             </CardTitle>
           </CardHeader>
@@ -705,7 +705,7 @@ n        {/* Friends Progress */}
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <Trophy className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <Award className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                 <p>No leaderboard data available.</p>
                 <p className="text-sm">Be the first to save meals and top the leaderboard!</p>
               </div>

@@ -35,7 +35,7 @@ const Index = () => {
           <MysteryBoxSection />
         </div>
         <div id="game-section">
-          <GameSection />
+          {/* <GameSection /> */}
         </div>
         <div id="partner-section">
           <ImpactTracker />

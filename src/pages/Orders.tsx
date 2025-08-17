@@ -1,5 +1,5 @@
 
-import { Clock, MapPin, Receipt, Trophy } from "lucide-react";
+import { Clock, MapPin, Receipt, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MobileLayout from "@/components/MobileLayout";
@@ -131,7 +131,7 @@ const Orders = () => {
                         <p className="text-sm text-muted-foreground">{pastOrders[0].restaurant}</p>
                       </div>
                       <Badge className="bg-purple-100 text-purple-600 flex items-center gap-1">
-                        <Trophy className="w-3 h-3" />
+                        <Award className="w-3 h-3" />
                         Saving Champion
                       </Badge>
                     </div>
@@ -169,7 +169,7 @@ const Orders = () => {
                             <p className="text-sm text-gray-600">{order.restaurant}</p>
                           </div>
                           <Badge className="bg-purple-100 text-purple-600 flex items-center gap-1">
-                            <Trophy className="w-3 h-3" />
+                            <Award className="w-3 h-3" />
                             Saving Champion
                           </Badge>
                         </div>
