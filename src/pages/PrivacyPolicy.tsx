@@ -88,7 +88,7 @@ const PrivacyPolicy = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Contact Us</h2>
             <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-gray-600">Email: hello@foodvrse.com</p>
+                              <p className="text-gray-600">Email: support@foodvrse.com</p>
             </div>
           </section>
         </div>

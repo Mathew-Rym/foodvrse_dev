@@ -183,10 +183,10 @@ const SafetyGuidelines = () => {
           <div className="space-y-2">
             <p className="font-semibold text-gray-900">Email Support</p>
             <button 
-              onClick={() => window.location.href = "mailto:hello@foodvrse.com"}
+                              onClick={() => window.location.href = "mailto:support@foodvrse.com"}
               className="text-lg font-bold text-red-600 hover:underline"
             >
-              hello@foodvrse.com
+                              support@foodvrse.com
             </button>
             <p className="text-sm text-gray-600">We respond to safety concerns promptly</p>
           </div>

@@ -80,8 +80,8 @@ const CookiePolicy = () => {
             <h2 className="text-2xl font-semibold mb-4">Contact us</h2>
             <p>
               If you have any questions about our Cookie Policy, please contact us at{" "}
-              <a href="mailto:privacy@foodvrse.com" className="text-primary hover:underline">
-                privacy@foodvrse.com
+                              <a href="mailto:support@foodvrse.com" className="text-primary hover:underline">
+                  support@foodvrse.com
               </a>
             </p>
           </section>

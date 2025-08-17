@@ -13,7 +13,7 @@ export const EMAILJS_CONFIG = {
   TEMPLATE_ID: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID',
   
   // Recipient email address
-  TO_EMAIL: 'hello@foodvrse.com'
+  TO_EMAIL: 'support@foodvrse.com'
 };
 
 // EmailJS template parameters structure

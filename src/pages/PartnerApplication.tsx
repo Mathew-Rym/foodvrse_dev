@@ -57,7 +57,7 @@ const PartnerApplication = () => {
     try {
       // Prepare email template parameters
       const templateParams = {
-        to_email: 'hello@foodvrse.com',
+        to_email: 'support@foodvrse.com',
         from_name: formData.name,
         from_email: formData.email,
         company: formData.company,
