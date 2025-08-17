@@ -39,7 +39,7 @@ enable_signup = true
 enabled = true
 client_id = "707536400304-6ogfei7hql85l4csjch467922du99hur.apps.googleusercontent.com"
 secret = ""
-redirect_uri = "https://www.foodvrse.com/oauth-callback"
+redirect_uri = "https://vsvhkkalfziuyttwityc.supabase.co/auth/v1/callback"
 
 [edge_runtime]
 enabled = true
