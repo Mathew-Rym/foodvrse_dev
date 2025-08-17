@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, ArrowRight, Building, MapPin, Users, Clock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building, MapPin, Users, Clock, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import emailjs from '@emailjs/browser';
@@ -32,6 +32,18 @@ const PartnerApplication = () => {
   const [consent, setConsent] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const [showESGCalculator, setShowESGCalculator] = useState(false);
+  const [esgData, setEsgData] = useState({
+    monthlyRevenue: 2000000,
+    foodWastePercent: 10,
+    foodWasteValue: 200000,
+    foodVrseRecoveryPercent: 40,
+    savingsViaFoodVrse: 80000,
+    avgCostPerMysteryBag: 100,
+    mysteryBagsSaved: 800,
+    foodWeightRecovered: 200,
+    co2Prevented: 500
+  });
 
   // Initialize EmailJS
   useEffect(() => {
@@ -139,6 +151,34 @@ This application was submitted through the FoodVrse website.
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  // ESG Calculator functions
+  const calculateESGImpact = (monthlyRevenue: number) => {
+    const foodWastePercent = 10; // Fixed default
+    const foodWasteValue = (monthlyRevenue * foodWastePercent) / 100;
+    const foodVrseRecoveryPercent = 40; // Fixed default
+    const savingsViaFoodVrse = (foodWasteValue * foodVrseRecoveryPercent) / 100;
+    const avgCostPerMysteryBag = 100; // Fixed default
+    const mysteryBagsSaved = Math.round(savingsViaFoodVrse / avgCostPerMysteryBag);
+    const foodWeightRecovered = Math.round(mysteryBagsSaved * 0.25); // 0.25 kg per bag
+    const co2Prevented = Math.round(foodWeightRecovered * 2.5); // 2.5 kg CO2eq per kg food
+
+    setEsgData({
+      monthlyRevenue,
+      foodWastePercent,
+      foodWasteValue,
+      foodVrseRecoveryPercent,
+      savingsViaFoodVrse,
+      avgCostPerMysteryBag,
+      mysteryBagsSaved,
+      foodWeightRecovered,
+      co2Prevented
+    });
+  };
+
+  const handleESGRevenueChange = (value: number) => {
+    calculateESGImpact(value);
   };
 
   const businessTypes = [
@@ -359,6 +399,18 @@ This application was submitted through the FoodVrse website.
                   placeholder="https://yourwebsite.com"
                 />
               </div>
+              
+              {/* ESG Impact Calculator Button */}
+              <div className="md:col-span-2 flex justify-center pt-4">
+                <Button
+                  type="button"
+                  onClick={() => setShowESGCalculator(true)}
+                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  <span className="mr-2">🌱</span>
+                  ESG Impact Calculator
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -501,6 +553,139 @@ This application was submitted through the FoodVrse website.
           </Button>
         </form>
       </div>
+
+      {/* ESG Impact Calculator Popup */}
+      {showESGCalculator && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-green-50 to-blue-50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-lg">🌱</span>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">ESG Impact Calculator</h2>
+                  <p className="text-sm text-gray-600">Calculate your potential impact with FoodVrse</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowESGCalculator(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* Calculator Content */}
+            <div className="p-6">
+              {/* Input Section */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Monthly Revenue (KSh)
+                </label>
+                <input
+                  type="number"
+                  value={esgData.monthlyRevenue}
+                  onChange={(e) => handleESGRevenueChange(Number(e.target.value))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-lg font-semibold"
+                  placeholder="Enter your monthly revenue"
+                />
+              </div>
+
+              {/* Results Table */}
+              <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Impact Calculation</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="text-sm text-gray-600 mb-1">Metric</div>
+                    <div className="text-lg font-bold text-gray-900">Example Value</div>
+                    <div className="text-xs text-gray-500 mt-1">Calculation / Assumptions</div>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="text-sm text-gray-600 mb-1">Monthly Revenue</div>
+                    <div className="text-lg font-bold text-green-600">KSh {esgData.monthlyRevenue.toLocaleString()}</div>
+                    <div className="text-xs text-gray-500 mt-1">Input from business</div>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="text-sm text-gray-600 mb-1">Food Waste %</div>
+                    <div className="text-lg font-bold text-orange-600">{esgData.foodWastePercent}%</div>
+                    <div className="text-xs text-gray-500 mt-1">Default average for Kenyan restaurants</div>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="text-sm text-gray-600 mb-1">Food Waste Value</div>
+                    <div className="text-lg font-bold text-red-600">KSh {esgData.foodWasteValue.toLocaleString()}</div>
+                    <div className="text-xs text-gray-500 mt-1">{esgData.monthlyRevenue.toLocaleString()} × {esgData.foodWastePercent}%</div>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="text-sm text-gray-600 mb-1">FoodVrse Recovery %</div>
+                    <div className="text-lg font-bold text-blue-600">{esgData.foodVrseRecoveryPercent}%</div>
+                    <div className="text-xs text-gray-500 mt-1">Estimated portion that can be sold</div>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="text-sm text-gray-600 mb-1">Savings via FoodVrse</div>
+                    <div className="text-lg font-bold text-green-600">KSh {esgData.savingsViaFoodVrse.toLocaleString()}</div>
+                    <div className="text-xs text-gray-500 mt-1">{esgData.foodWasteValue.toLocaleString()} × {esgData.foodVrseRecoveryPercent}%</div>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="text-sm text-gray-600 mb-1">Avg Cost per Mystery Bag</div>
+                    <div className="text-lg font-bold text-purple-600">KSh {esgData.avgCostPerMysteryBag}</div>
+                    <div className="text-xs text-gray-500 mt-1">Typical Nairobi meal/snack cost</div>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="text-sm text-gray-600 mb-1">Mystery bags Saved</div>
+                    <div className="text-lg font-bold text-indigo-600">{esgData.mysteryBagsSaved.toLocaleString()}</div>
+                    <div className="text-xs text-gray-500 mt-1">{esgData.savingsViaFoodVrse.toLocaleString()} ÷ {esgData.avgCostPerMysteryBag}</div>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="text-sm text-gray-600 mb-1">Food Weight Recovered</div>
+                    <div className="text-lg font-bold text-teal-600">{esgData.foodWeightRecovered} kg</div>
+                    <div className="text-xs text-gray-500 mt-1">{esgData.mysteryBagsSaved.toLocaleString()} × 0.25 kg per bag</div>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border">
+                    <div className="text-sm text-gray-600 mb-1">CO₂ Prevented</div>
+                    <div className="text-lg font-bold text-emerald-600">{esgData.co2Prevented} kg</div>
+                    <div className="text-xs text-gray-500 mt-1">{esgData.foodWeightRecovered} kg × 2.5 kg CO₂eq per kg</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Impact Summary */}
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-6 mb-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Your Impact Summary</h3>
+                <p className="text-lg text-gray-700 leading-relaxed">
+                  Partnering with FoodVrse helps you recover <span className="font-bold text-green-600">KSh {esgData.savingsViaFoodVrse.toLocaleString()}</span> monthly, 
+                  serve <span className="font-bold text-blue-600">{esgData.mysteryBagsSaved.toLocaleString()}</span> more meals to the community, 
+                  and cut <span className="font-bold text-emerald-600">{esgData.co2Prevented} kg</span> of CO₂ emissions, 
+                  all while boosting your ESG impact.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 justify-center">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowESGCalculator(false)}
+                  className="px-6 py-3"
+                >
+                  Close Calculator
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowESGCalculator(false);
+                    toast.success("ESG impact calculated! Ready to submit your application.");
+                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
+                >
+                  Continue Application
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
