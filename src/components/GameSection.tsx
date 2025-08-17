@@ -347,14 +347,6 @@ const GameSection = () => {
             <Users className="w-4 h-4" />
             View Full Gamification
           </Button>
-        </div>
-
-                  <div className="text-sm text-gray-600">Partner Restaurants</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </section>
   );

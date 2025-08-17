@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, Filter, Clock, Calendar, Package, Leaf, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import DynamicPopup from "./DynamicPopup";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -9,10 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 interface FilterPopupProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onApplyFilters: (filters: FilterOptions) => void;
-  clickEvent?: React.MouseEvent | MouseEvent;
   isOpen: boolean;
   onClose: () => void;
   onApplyFilters: (filters: FilterOptions) => void;
@@ -29,7 +25,7 @@ export interface FilterOptions {
   ratingFilter: number;
 }
 
-export const FilterPopup = ({ isOpen, onClose, onApplyFilters, clickEvent }: FilterPopupProps) => {
+export const FilterPopup = ({ isOpen, onClose, onApplyFilters }: FilterPopupProps) => {
   const [showSoldOut, setShowSoldOut] = useState(false);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [timeRange, setTimeRange] = useState<[number, number]>([0, 23]);
@@ -135,13 +131,7 @@ export const FilterPopup = ({ isOpen, onClose, onApplyFilters, clickEvent }: Fil
   };
 
   return (
-    <DynamicPopup
-      isOpen={isOpen}
-      onClose={onClose}
-      clickEvent={clickEvent}
-      popupWidth={400}
-      popupHeight={600}
-      className="p-0">
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md mx-auto p-0 max-h-[90vh] overflow-y-auto fixed top-4 left-1/2 transform -translate-x-1/2">
         <DialogTitle className="sr-only">Filter Options</DialogTitle>
         
@@ -337,7 +327,7 @@ export const FilterPopup = ({ isOpen, onClose, onApplyFilters, clickEvent }: Fil
             Apply Filters
           </Button>
         </div>
-      </div>
-    </DynamicPopup>
+      </DialogContent>
+    </Dialog>
   );
 };

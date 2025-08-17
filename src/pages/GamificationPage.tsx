@@ -43,10 +43,8 @@ interface LeaderboardEntry {
 
 const GamificationPage: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
-const { friendsProgress, isLoading: friendsLoading } = useFriendsProgress();
   const navigate = useNavigate();
   const {
-const { friendsProgress, isLoading: friendsLoading } = useFriendsProgress();
     userProgress,
     userBadges,
     weeklyChallenges,
@@ -104,7 +102,7 @@ const { friendsProgress, isLoading: friendsLoading } = useFriendsProgress();
   const fetchCommunityStats = async () => {
     try {
       const { data: progressData, error: progressError } = await supabase
-const { friendsProgress, isLoading: friendsLoading } = useFriendsProgress();
+
         .from('user_progress')
         .select('total_meals_saved, total_co2_saved, total_money_saved');
 

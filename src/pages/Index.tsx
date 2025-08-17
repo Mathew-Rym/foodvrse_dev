@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 
 import MysteryBoxSection from "@/components/MysteryBoxSection";
-import GameSection from "@/components/GameSection";
+// import GameSection from "@/components/GameSection";
 import ImpactTracker from "@/components/ImpactTracker";
 import Footer from "@/components/Footer";
 
@@ -35,7 +35,7 @@ const Index = () => {
           <MysteryBoxSection />
         </div>
         <div id="game-section">
-          <GameSection />
+          // <GameSection />
         </div>
         <div id="partner-section">
           <ImpactTracker />

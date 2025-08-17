@@ -26,7 +26,7 @@ export const ListingsGrid: React.FC<ListingsGridProps> = ({
   distanceFilter,
   userLocation,
   showNoItemsMessage = true
-showAllItems = false
+, showAllItems = false
 }) => {
   const { user } = useAuth();
   const [listings, setListings] = useState<any[]>([]);
@@ -111,7 +111,7 @@ showAllItems = false
         }
 
         // Apply limit
-        if (limit if (limit) {if (limit) { !showAllItems) {
+          if (limit         if (limit if (limit if (limit) {if (limit) { !showAllItems) {if (limit if (limit) {if (limit) { !showAllItems) { !showAllItems) {        if (limit if (limit if (limit) {if (limit) { !showAllItems) {if (limit if (limit) {if (limit) { !showAllItems) { !showAllItems) { !showAllItems) {
           filteredData = filteredData.slice(0, limit);
         }
 
@@ -181,7 +181,7 @@ showAllItems = false
         }
 
         // Apply limit
-        if (limit if (limit) {if (limit) { !showAllItems) {
+        if (limit if (limit if (limit) {if (limit) { !showAllItems) {if (limit if (limit) {if (limit) { !showAllItems) { !showAllItems) {
           query = query.limit(limit);
         }
 
