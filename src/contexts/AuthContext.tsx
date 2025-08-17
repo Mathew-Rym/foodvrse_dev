@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Handle OAuth callback
+    // Handle OAuth callback and profile creation
     const handleOAuthCallback = async () => {
       const { data, error } = await supabase.auth.getSession();
       if (data.session) {
@@ -46,9 +46,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .single();
 
         if (!profile) {
-          // User needs profile setup, redirect to OAuth handler
-          window.location.href = '/oauth-callback';
-          return;
+          // Create user profile automatically
+          await createUserProfile(data.session.user);
         }
 
         await fetchUserData(data.session.user.id);
@@ -97,6 +96,90 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const createUserProfile = async (user: any) => {
+    try {
+      // Extract first name from Google user data
+      let firstName = 'User';
+      if (user.user_metadata?.full_name) {
+        firstName = user.user_metadata.full_name.split(' ')[0];
+      } else if (user.user_metadata?.name) {
+        firstName = user.user_metadata.name.split(' ')[0];
+      } else if (user.email) {
+        firstName = user.email.split('@')[0];
+      }
+
+      // Check if this is a business auth
+      const isBusinessAuth = sessionStorage.getItem('google_business_auth') === 'true';
+      sessionStorage.removeItem('google_business_auth');
+
+      // Create user profile
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .insert({
+          user_id: user.id,
+          display_name: firstName,
+          avatar_url: user.user_metadata?.avatar_url || null,
+          user_type: isBusinessAuth ? 'business' : 'consumer',
+          email_notifications: true,
+          push_notifications: true,
+          notifications_enabled: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+
+      if (profileError) {
+        console.error('Profile creation error:', profileError);
+        toast.error('Failed to create profile. Please try again.');
+        return;
+      }
+
+      // Create user impact record
+      const { error: impactError } = await supabase
+        .from('user_impact')
+        .insert({
+          user_id: user.id,
+          total_orders: 0,
+          total_savings: 0,
+          total_co2_saved: 0,
+          total_food_waste_prevented: 0,
+          weekly_challenge_progress: 0,
+          community_achievements: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+
+      if (impactError) {
+        console.error('Impact creation error:', impactError);
+        // Don't fail the whole process for impact creation error
+      }
+
+              // If business auth, create business profile
+        if (isBusinessAuth) {
+          const { error: businessError } = await supabase
+            .from('business_profiles')
+            .insert({
+              user_id: user.id,
+              business_name: `${firstName}'s Business`,
+              address: 'To be updated',
+              location: 'To be updated',
+              user_type: 'business',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            });
+
+          if (businessError) {
+            console.error('Business profile creation error:', businessError);
+            // Don't fail the whole process for business profile error
+          }
+        }
+
+      toast.success(`Welcome ${firstName}! Your account has been set up successfully.`);
+    } catch (error) {
+      console.error('Profile creation error:', error);
+      toast.error('Failed to create profile. Please try again.');
+    }
+  };
 
   const fetchUserData = async (userId: string) => {
     try {
