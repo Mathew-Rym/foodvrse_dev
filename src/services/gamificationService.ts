@@ -178,6 +178,15 @@ export class GamificationService {
       if (badgesError) throw badgesError;
 
       for (const badge of badges) {
+        // Check if user already has this badge
+        const { data: existingBadge } = await supabase
+          .from('user_badges')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('badge_id', badge.id)
+          .single();
+
+        if (existingBadge) continue; // Skip if user already has this badge
         let shouldAward = false;
 
         switch (badge.requirement_type) {
@@ -194,6 +203,18 @@ export class GamificationService {
             shouldAward = userProgress.current_streak >= badge.requirement_value;
             break;
           case 'level':
+            const level = this.calculateLevel(userProgress.experience_points);
+            shouldAward = level >= badge.requirement_value;
+            break;
+          case 'longest_streak':
+            shouldAward = userProgress.longest_streak >= badge.requirement_value;
+            break;
+          case 'total_orders':
+            shouldAward = userProgress.total_meals_saved >= badge.requirement_value;
+            break;
+          case 'water_saved':
+            shouldAward = userProgress.total_water_saved >= badge.requirement_value;
+            break;
             const level = this.calculateLevel(userProgress.experience_points);
             shouldAward = level >= badge.requirement_value;
             break;

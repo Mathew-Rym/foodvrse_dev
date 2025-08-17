@@ -1,5 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
+import { GamificationService } from './gamificationService';
 import { toast } from 'sonner';
+import { GamificationService } from './gamificationService';
 
 export interface PurchaseData {
   id: string;
@@ -92,8 +94,32 @@ export class PurchaseImpactService {
 
       if (updateError) throw updateError;
 
+      // Check and award badges in real-time
+      await GamificationService.checkAndAwardBadges(purchaseData.user_id, updatedProgress);
+
+      // Update weekly challenge
+      await GamificationService.updateWeeklyChallenge(purchaseData.user_id, 'meals_saved', impact.mealsSaved);
+
+      // Record activity
+      await GamificationService.recordActivity(purchaseData.user_id, 'purchase_completed', {
+        purchase_id: purchaseData.id,
+        impact
+      }, impact.experiencePoints);
+
+      // Check and award badges in real-time
+      await GamificationService.checkAndAwardBadges(purchaseData.user_id, updatedProgress);
+
+      // Update weekly challenge
+      await GamificationService.updateWeeklyChallenge(purchaseData.user_id, 'meals_saved', impact.mealsSaved);
+
+      // Record activity
+      await GamificationService.recordActivity(purchaseData.user_id, 'purchase_completed', {
+        purchase_id: purchaseData.id,
+        impact
+      }, impact.experiencePoints);
+
       // Show success notification
-      toast.success('�� Purchase completed!', {
+      toast.success('🎉 Purchase completed!', {
         description: `+${impact.experiencePoints} XP | +${impact.co2Saved.toFixed(1)}kg CO₂ saved | +KSh ${impact.moneySaved.toFixed(0)} saved`,
         duration: 4000,
       });
