@@ -204,18 +204,18 @@ const Profile = () => {
     <MobileLayout>
       <div className="min-h-screen bg-gray-50 pb-20">
         {/* Profile Header */}
-        <div className="bg-gradient-to-br from-brand-green to-brand-yellow px-4 py-8 text-white">
-          <div className="flex items-center gap-4 mb-4">
+        <div className="bg-gradient-to-br from-brand-green to-brand-yellow px-4 py-8 text-white shadow-lg">
+          <div className="flex items-center gap-4 mb-6">
             <div className="relative">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
+              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center overflow-hidden border-4 border-white/30 shadow-lg">
                 {userProfile?.avatar_url ? (
                   <img src={userProfile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <User className="w-8 h-8" />
+                  <User className="w-10 h-10 text-white" />
                 )}
               </div>
-              <label className="absolute bottom-0 right-0 bg-white rounded-full p-1 cursor-pointer">
-                <Camera className="w-3 h-3 text-gray-600" />
+              <label className="absolute bottom-0 right-0 bg-white rounded-full p-2 cursor-pointer shadow-lg hover:bg-gray-100 transition-colors">
+                <Camera className="w-4 h-4 text-gray-600" />
                 <input
                   type="file"
                   accept="image/*"
@@ -224,60 +224,65 @@ const Profile = () => {
                 />
               </label>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-white">{userProfile?.display_name || user?.email}</h1>
-              <p className="text-white">{user?.email}</p>
-              <Badge className="bg-white/30 text-white mt-2 font-semibold">{userImpact?.level ? `Food Saver Level ${userImpact.level}` : 'Food Saver Level 1'}</Badge>
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold text-white mb-1">{userProfile?.display_name || user?.email}</h1>
+              <p className="text-white/90 text-sm mb-2">{user?.email}</p>
+              <Badge className="bg-white/30 text-white font-semibold text-sm px-3 py-1 border border-white/20">
+                {userImpact?.level ? `Food Saver Level ${userImpact.level}` : 'Food Saver Level 1'}
+              </Badge>
             </div>
           </div>
           
+          {/* Impact Stats */}
           <div className="grid grid-cols-3 gap-4 mt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-white">{userImpact?.total_meals_saved || 0}</p>
-              <p className="text-sm text-white font-medium">Meals Saved</p>
+            <div className="text-center bg-white/20 rounded-xl p-4 backdrop-blur-sm border-2 border-white/30 shadow-lg">
+              <p className="text-4xl font-black text-white mb-2">{userImpact?.total_meals_saved || 0}</p>
+              <p className="text-sm text-white font-bold uppercase tracking-wide">Meals Saved</p>
             </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-white">{userImpact?.total_co2_saved_kg || 0}kg</p>
-              <p className="text-sm text-white font-medium">CO₂ Saved</p>
+            <div className="text-center bg-white/20 rounded-xl p-4 backdrop-blur-sm border-2 border-white/30 shadow-lg">
+              <p className="text-4xl font-black text-white mb-2">{userImpact?.total_co2_saved_kg || 0}kg</p>
+              <p className="text-sm text-white font-bold uppercase tracking-wide">CO₂ Saved</p>
             </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-white">KSh {userImpact?.total_money_saved_ksh || 0}</p>
-              <p className="text-sm text-white font-medium">Money Saved</p>
+            <div className="text-center bg-white/20 rounded-xl p-4 backdrop-blur-sm border-2 border-white/30 shadow-lg">
+              <p className="text-4xl font-black text-white mb-2">KSh {userImpact?.total_money_saved_ksh || 0}</p>
+              <p className="text-sm text-white font-bold uppercase tracking-wide">Money Saved</p>
             </div>
           </div>
         </div>
 
         {/* Menu Items */}
-        <div className="p-4">
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
+        <div className="p-4 space-y-4">
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
             {menuItems.map((item, index) => {
               const Icon = item.icon;
               return (
                 <button
                   key={index}
                   onClick={() => handleMenuClick(item.action)}
-                  className={`w-full flex items-center gap-3 p-4 text-left hover:bg-gray-50 transition-colors ${
+                  className={`w-full flex items-center gap-4 p-5 text-left hover:bg-gray-50 transition-all duration-200 ${
                     index !== menuItems.length - 1 ? "border-b border-gray-100" : ""
                   }`}
                 >
-                  <Icon className="w-5 h-5 text-gray-700" />
-                  <span className="flex-1 text-gray-900 font-medium">{item.label}</span>
-                  <span className="text-gray-500">›</span>
+                  <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-gray-700" />
+                  </div>
+                  <span className="flex-1 text-gray-900 font-semibold text-base">{item.label}</span>
+                  <span className="text-gray-400 text-lg font-bold">›</span>
                 </button>
               );
             })}
           </div>
 
           {/* Become Partner */}
-          <div className="bg-gradient-to-r from-brand-green to-brand-yellow rounded-lg p-4 text-white mb-4">
-            <h3 className="font-semibold mb-2 text-white">Become a Partner</h3>
-            <p className="text-sm text-white mb-3">
+          <div className="bg-gradient-to-r from-brand-green to-brand-yellow rounded-xl p-6 text-white shadow-lg border border-brand-green/20">
+            <h3 className="font-bold text-lg mb-3 text-white">Become a Partner</h3>
+            <p className="text-white/90 mb-4 text-base leading-relaxed">
               Join our mission to reduce food waste. List your restaurant and start making an impact.
             </p>
             <Button 
               variant="secondary" 
-              size="sm" 
-              className="bg-white text-brand-green hover:bg-gray-100 font-semibold"
+              size="lg" 
+              className="bg-white text-brand-green hover:bg-gray-100 font-bold px-6 py-3 shadow-lg"
               onClick={handlePartnerClick}
             >
               Learn More
@@ -287,10 +292,11 @@ const Profile = () => {
           {/* Logout */}
           <Button 
             variant="outline" 
-            className="w-full text-red-600 border-red-200 hover:bg-red-50"
+            size="lg"
+            className="w-full text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400 font-semibold py-4 text-base shadow-sm"
             onClick={handleLogout}
           >
-            <LogOut className="w-4 h-4 mr-2" />
+            <LogOut className="w-5 h-5 mr-3" />
             Sign Out
           </Button>
         </div>
