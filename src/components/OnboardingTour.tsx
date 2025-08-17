@@ -28,8 +28,8 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
       content: "Discover amazing rescue meals and help reduce food waste while saving money and the planet",
       targetId: "hero-section",
       icon: <MapPin className="w-5 h-5" />,
-      mobilePosition: { top: "20%", left: "50%" },
-      desktopPosition: { top: "30%", left: "50%" }
+      mobilePosition: { top: "15%", left: "50%" },
+      desktopPosition: { top: "25%", left: "50%" }
     },
     {
       title: "Mystery Bags",
@@ -44,16 +44,16 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
       content: "When you sign in, you'll see a bottom navigation bar to explore all features and manage your orders",
       targetId: "mobile-navigation",
       icon: <Navigation className="w-5 h-5" />,
-      mobilePosition: { bottom: "100px", left: "50%" },
-      desktopPosition: { bottom: "120px", left: "50%" }
+      mobilePosition: { bottom: "120px", left: "50%" },
+      desktopPosition: { bottom: "140px", left: "50%" }
     },
     {
       title: "Share Feedback",
       content: "Look for the floating feedback button in the bottom right corner to share your ideas anytime!",
       targetId: "feedback-fab",
       icon: <MessageCircle className="w-5 h-5" />,
-      mobilePosition: { bottom: "80px", right: "20px" },
-      desktopPosition: { bottom: "100px", right: "80px" }
+      mobilePosition: { bottom: "100px", right: "24px" },
+      desktopPosition: { bottom: "120px", right: "96px" }
     },
     {
       title: "Become a Partner",
@@ -365,20 +365,20 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
     if (position.top && typeof position.top === 'string') {
       const topPercent = parseInt(position.top);
       // Ensure tooltip doesn't go off-screen
-      if (topPercent > 60) {
-        finalPosition.top = '50%';
-      } else if (topPercent < 15) {
-        finalPosition.top = '20%';
+      if (topPercent > 70) {
+        finalPosition.top = '60%';
+      } else if (topPercent < 10) {
+        finalPosition.top = '15%';
       }
     }
     
     if (position.bottom && typeof position.bottom === 'string') {
       const bottomPercent = parseInt(position.bottom);
       // Ensure tooltip doesn't overlap with bottom elements
-      if (bottomPercent < 150) {
+      if (bottomPercent < 200) {
+        finalPosition.bottom = '220px';
+      } else if (bottomPercent > 300) {
         finalPosition.bottom = '180px';
-      } else if (bottomPercent > 200) {
-        finalPosition.bottom = '120px';
       }
     }
     
@@ -388,15 +388,15 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
         finalPosition.left = '50%';
       } else if (position.right && typeof position.right === 'string') {
         const rightPercent = parseInt(position.right);
-        if (rightPercent < 15) {
-          finalPosition.right = '20px';
+        if (rightPercent < 20) {
+          finalPosition.right = '24px';
         }
       }
     }
     
     // Ensure tooltip is always visible
     if (!finalPosition.top && !finalPosition.bottom) {
-      finalPosition.top = '30%';
+      finalPosition.top = '25%';
     }
     
     return finalPosition;

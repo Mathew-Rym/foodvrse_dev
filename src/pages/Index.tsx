@@ -15,6 +15,7 @@ import CookieConsent from "@/components/CookieConsent";
 import WelcomeMessage from "@/components/WelcomeMessage";
 import BackToTop from "@/components/BackToTop";
 import FeedbackFAB from "@/components/FeedbackFAB";
+import MobileNavigation from "@/components/MobileNavigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOnboarding } from "@/hooks/useOnboarding";
 
@@ -48,6 +49,7 @@ const Index = () => {
       <CookieConsent />
       <BackToTop />
       <FeedbackFAB />
+{isAuthenticated && <MobileNavigation />}
       {showOnboarding && (
         <OnboardingTour 
           onComplete={completeOnboarding}

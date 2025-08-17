@@ -369,6 +369,7 @@ const Discover = () => {
         }}
       />
     </MobileLayout>
+
   );
 };
 

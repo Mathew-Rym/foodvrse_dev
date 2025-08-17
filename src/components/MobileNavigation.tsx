@@ -31,7 +31,7 @@ const MobileNavigation = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999]">
       <div className="flex items-center justify-around py-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
