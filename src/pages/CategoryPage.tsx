@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Filter, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import ListingsGrid from '@/components/ListingsGrid';
+// import ListingsGrid from '@/components/ListingsGrid';
 import { FilterPopup, FilterOptions } from '@/components/FilterPopup';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -215,7 +215,7 @@ const CategoryPage: React.FC = () => {
 
       {/* Products Grid */}
       <div className="p-4">
-        <ListingsGrid
+        // <ListingsGrid
           categoryFilter={categoryName}
           showSoldOut={activeFilters?.showSoldOut || false}
           userLocation={{ lat: currentLocation.lat, lng: currentLocation.lng }}

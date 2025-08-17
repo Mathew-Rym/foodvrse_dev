@@ -215,7 +215,6 @@ export class GamificationService {
           case 'water_saved':
             shouldAward = userProgress.total_water_saved >= badge.requirement_value;
             break;
-            const level = this.calculateLevel(userProgress.experience_points);
             shouldAward = level >= badge.requirement_value;
             break;
         }

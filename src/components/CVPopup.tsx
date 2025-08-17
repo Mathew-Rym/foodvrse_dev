@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import DynamicPopup from './DynamicPopup';
 import { X, Upload, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,12 +14,9 @@ import { RECAPTCHA_CONFIG } from '@/config/recaptcha';
 interface CVPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  clickEvent?: React.MouseEvent | MouseEvent;
-  isOpen: boolean;
-  onClose: () => void;
 }
 
-const CVPopup = ({ isOpen, onClose, clickEvent }: CVPopupProps) => {
+const CVPopup = ({ isOpen, onClose }: CVPopupProps) => {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
@@ -163,13 +159,7 @@ Please contact the applicant at: ${email}
   if (!isOpen) return null;
 
   return (
-    <DynamicPopup
-      isOpen={isOpen}
-      onClose={onClose}
-      clickEvent={clickEvent}
-      popupWidth={500}
-      popupHeight={700}
-      className="p-6">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center p-4 pt-8">
               <Card className="w-full max-w-lg bg-card shadow-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-xl font-bold text-foreground">
@@ -194,7 +184,7 @@ Please contact the applicant at: ${email}
                 required
                 disabled={isSubmitting}
               />
-            </DynamicPopup>
+            </div>
 
             <div>
               <Label htmlFor="subject" className="text-sm font-medium mb-2 block">
@@ -208,7 +198,7 @@ Please contact the applicant at: ${email}
                 required
                 disabled={isSubmitting}
               />
-            </DynamicPopup>
+            </div>
 
             <div>
               <Label htmlFor="message" className="text-sm font-medium mb-2 block">
@@ -222,7 +212,7 @@ Please contact the applicant at: ${email}
                 rows={4}
                 disabled={isSubmitting}
               />
-            </DynamicPopup>
+            </div>
 
             <div>
               <Label className="text-sm font-medium mb-2 block">
@@ -237,7 +227,7 @@ Please contact the applicant at: ${email}
                     <span className="text-xs text-gray-500">
                       ({(cvFile.size / 1024 / 1024).toFixed(1)}MB)
                     </span>
-                  </DynamicPopup>
+                  </div>
                   <Button
                     type="button"
                     variant="ghost"
@@ -247,7 +237,7 @@ Please contact the applicant at: ${email}
                   >
                     <X className="w-4 h-4" />
                   </Button>
-                </DynamicPopup>
+                </div>
               ) : (
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                   <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
@@ -275,9 +265,9 @@ Please contact the applicant at: ${email}
                   >
                     Choose File
                   </Button>
-                </DynamicPopup>
+                </div>
               )}
-            </DynamicPopup>
+            </div>
 
             {/* reCAPTCHA */}
             <div className="flex justify-center">
@@ -291,7 +281,7 @@ Please contact the applicant at: ${email}
                   toast.error("reCAPTCHA verification failed. Please try again.");
                 }}
               />
-            </DynamicPopup>
+            </div>
 
             <div className="flex gap-3 pt-4">
               <Button
@@ -310,7 +300,7 @@ Please contact the applicant at: ${email}
               >
                 {isSubmitting ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></DynamicPopup>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                     Sending...
                   </>
                 ) : (
@@ -320,11 +310,11 @@ Please contact the applicant at: ${email}
                   </>
                 )}
               </Button>
-            </DynamicPopup>
+            </div>
           </form>
         </CardContent>
       </Card>
-    </DynamicPopup>
+    </div>
   );
 };
 
