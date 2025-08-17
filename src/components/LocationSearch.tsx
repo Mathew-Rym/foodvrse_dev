@@ -312,7 +312,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     
     try {
       const templateParams = {
-        to_email: 'support@foodvrse.com',
+        to_email: 'hello@foodvrse.com',
         from_name: expansionFormData.name,
         from_email: expansionFormData.email,
         location: expansionFormData.location,
