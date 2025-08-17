@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { PurchaseImpactService } from "@/services/purchaseImpactService";
 
 interface AuthContextType {
   user: User | null;
@@ -319,7 +320,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const refreshUserData = async () => {
-const updateUserImpactFromPurchase = async (purchaseData: any) => {
+    if (user) {
+      await fetchUserData(user.id);
+    }
+  };
+
+  const updateUserImpactFromPurchase = async (purchaseData: any) => {
     if (!user) return;
     
     try {
@@ -334,12 +340,6 @@ const updateUserImpactFromPurchase = async (purchaseData: any) => {
     } catch (error) {
       console.error("Error updating impact from purchase:", error);
       toast.error("Failed to update impact");
-    }
-  };
-
-  
-    if (user) {
-      await fetchUserData(user.id);
     }
   };
 
