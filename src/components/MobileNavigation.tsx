@@ -21,7 +21,7 @@ const MobileNavigation = () => {
   const tabs = [
     { id: "home", label: t('nav.home'), icon: Home, path: "/" },
     { id: "discover", label: t('nav.discover'), icon: Search, path: "/discover" },
-    { id: "impact", label: t('nav.impact'), icon: Trophy, path: "/impact" },
+    { id: "impact", label: t('nav.impact'), icon: Trophy, path: "/gamification" },
     { id: "favorites", label: t('nav.favorites'), icon: Heart, path: "/favorites" },
     { id: "profile", label: t('nav.profile'), icon: User, path: "/profile" },
   ];

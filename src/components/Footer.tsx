@@ -214,7 +214,7 @@ const Footer = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => handleLinkClick("/impact-tracker")}
+                  onClick={() => handleLinkClick("/gamification")}
                   className="hover:text-white text-left"
                 >
                   Impact Tracker

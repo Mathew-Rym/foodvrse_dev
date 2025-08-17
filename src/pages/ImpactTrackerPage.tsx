@@ -125,7 +125,7 @@ const ImpactTrackerPage = () => {
         <div className="text-center space-y-4">
           {isAuthenticated ? (
             <Button 
-              onClick={() => navigate("/impact")}
+              onClick={() => navigate("/gamification")}
               className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3"
             >
               View My Impact Dashboard

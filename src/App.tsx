@@ -14,7 +14,6 @@ import Index from "./pages/Index";
 import Discover from "./pages/Discover";
 import Cart from "./pages/Cart";
 import Orders from "./pages/Orders";
-import Impact from "./pages/Impact";
 import Profile from "./pages/Profile";
 import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
@@ -24,7 +23,6 @@ import Auth from "./pages/Auth";
 import FoodWaste from "./pages/FoodWaste";
 import MysteryBags from "./pages/MysteryBoxes";
 import HowItWorks from "./pages/HowItWorks";
-import ImpactTrackerPage from "./pages/ImpactTrackerPage";
 import HelpCenter from "./pages/HelpCenter";
 import SafetyGuidelines from "./pages/SafetyGuidelines";
 import CommunityGuidelines from "./pages/CommunityGuidelines";
@@ -137,7 +135,7 @@ const App = () => {
                     <Route path="/discover" element={<Discover />} />
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/orders" element={<Orders />} />
-                    <Route path="/impact" element={<Impact />} />
+                    <Route path="/impact" element={<GamificationPage />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/favorites" element={<Favorites />} />
 

@@ -112,11 +112,11 @@ const GameSection = () => {
   };
 
   const handleViewProgress = () => {
-    navigate('/impact');
+    navigate('/gamification');
   };
 
   const handleViewLeaderboard = () => {
-    navigate('/leaderboard');
+    navigate('/gamification');
   };
 
   if (!isAuthenticated) {
@@ -345,7 +345,7 @@ const GameSection = () => {
             className="flex items-center gap-2"
           >
             <Users className="w-4 h-4" />
-            View Leaderboard
+            View Full Gamification
           </Button>
         </div>
 
