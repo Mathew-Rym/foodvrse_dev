@@ -1,5 +1,7 @@
 
 import { Facebook, Twitter, Instagram, Mail, MapPin, Linkedin, Youtube } from "lucide-react";
+import { useState } from "react";
+import VideoModal from "./VideoModal";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import LanguageToggle from "./LanguageToggle";
@@ -10,7 +12,7 @@ import Logo from "./Logo";
 const Footer = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   const handleLinkClick = (path: string, requiresAuth = false) => {
     if (requiresAuth && !isAuthenticated) {
@@ -70,15 +72,17 @@ const Footer = () => {
               >
                 <Linkedin className="w-5 h-5" />
               </a>
-              <a 
-                href="https://youtu.be/OYe3_kovTrY" 
-                target="_blank" 
-                rel="noopener noreferrer"
+              <button 
+                onClick={() => {
+                  console.log('YouTube button clicked');
+                  console.log('Opening video modal with URL: https://youtu.be/OYe3_kovTrY');
+                  setIsVideoModalOpen(true);
+                }}
                 className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Watch our FoodVrse video on YouTube"
+                aria-label="Watch our FoodVrse video"
               >
                 <Youtube className="w-5 h-5" />
-              </a>
+              </button>
               <a 
                 href="https://www.tiktok.com/@foodvrse" 
                 target="_blank" 
@@ -324,6 +328,13 @@ const Footer = () => {
           </div>
         </div>
       </div>
+      
+      {/* Video Modal */}
+      <VideoModal 
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        videoUrl="https://youtu.be/OYe3_kovTrY"
+      />
     </footer>
   );
 };
