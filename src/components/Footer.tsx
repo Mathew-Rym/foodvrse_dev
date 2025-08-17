@@ -206,7 +206,13 @@ const Footer = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => handleLinkClick("/mystery-boxes", true)}
+                  onClick={() => {
+      if (!isAuthenticated) {
+        navigate("/auth");
+      } else {
+        navigate("/discover");
+      }
+    }}
                   className="hover:text-white text-left"
                 >
                   Mystery Bags

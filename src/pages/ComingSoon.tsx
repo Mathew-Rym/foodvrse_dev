@@ -12,6 +12,12 @@ const ComingSoon = () => {
   };
 
   const handleGetMysteryBag = () => {
+    if (!isAuthenticated) {
+      navigate("/auth");
+      return;
+    }
+    
+    navigate("/discover");
     navigate("/mystery-boxes");
   };
 

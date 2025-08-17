@@ -21,7 +21,6 @@ import NotFound from "./pages/NotFound";
 import BusinessDashboard from "./pages/BusinessDashboard";
 import Auth from "./pages/Auth";
 import FoodWaste from "./pages/FoodWaste";
-import MysteryBags from "./pages/MysteryBoxes";
 import HowItWorks from "./pages/HowItWorks";
 import HelpCenter from "./pages/HelpCenter";
 import SafetyGuidelines from "./pages/SafetyGuidelines";
@@ -141,7 +140,7 @@ const App = () => {
 
                     <Route path="/business-dashboard" element={<BusinessDashboard />} />
                     <Route path="/food-waste" element={<FoodWaste />} />
-                    <Route path="/mystery-boxes" element={<MysteryBags />} />
+                    <Route path="/mystery-boxes" element={<Discover />} />
                     <Route path="/how-it-works" element={<HowItWorks />} />
                     <Route path="/impact-tracker" element={<ImpactTrackerPage />} />
                     <Route path="/help-center" element={<HelpCenter />} />

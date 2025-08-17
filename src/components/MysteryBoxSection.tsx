@@ -86,6 +86,12 @@ const MysteryBoxSection = () => {
   };
 
   const handleViewAllMysteryBags = () => {
+    if (!isAuthenticated) {
+      navigate("/auth");
+      return;
+    }
+    
+    navigate("/discover");
     navigate("/mystery-boxes");
   };
 
