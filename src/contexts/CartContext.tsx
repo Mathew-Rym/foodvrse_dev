@@ -1,5 +1,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { PurchaseImpactService } from '@/services/purchaseImpactService';
 
 interface CartItem {
   id: number;
@@ -65,6 +67,7 @@ interface CartProviderProps {
 }
 
 export const CartProvider = ({ children }: CartProviderProps) => {
+  const { user } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [showAddOnPopup, setShowAddOnPopup] = useState(false);
@@ -108,7 +111,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   };
 
   const completeOrder = async () => {
-const { user } = useAuth();
+
     if (items.length === 0) return;
 
     const newOrder: Order = {
@@ -127,7 +130,7 @@ const { user } = useAuth();
     setItems([]);
     setSelectedAddOns([]);
     setShowOrderCompletePopup(true);
-n    // Update user impact if user is authenticated
+    // Update user impact if user is authenticated
     if (user) {
       try {
         const purchaseData = {
