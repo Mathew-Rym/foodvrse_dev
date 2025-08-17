@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import emailjs from '@emailjs/browser';
+import { EMAILJS_CONFIG } from '@/config/emailjs';
 
 interface CVPopupProps {
   isOpen: boolean;
@@ -61,41 +63,75 @@ const CVPopup = ({ isOpen, onClose }: CVPopupProps) => {
     setIsSubmitting(true);
 
     try {
-      // Create form data for file upload
-      const formData = new FormData();
-      formData.append('email', email);
-      formData.append('subject', subject);
-      formData.append('message', message);
-      formData.append('cv', cvFile);
-
-      // Create mailto link with CV information
-      const emailSubject = encodeURIComponent(`CV Submission - ${subject}`);
-      const body = encodeURIComponent(`
+      // Convert file to base64 for email attachment
+      const fileReader = new FileReader();
+      fileReader.onload = async () => {
+        try {
+          // Prepare email template parameters
+          const templateParams = {
+            to_email: 'hello@foodvrse.com',
+            from_name: email.split('@')[0], // Use email prefix as name
+            from_email: email,
+            subject: `CV Submission - ${subject}`,
+            message: `
 CV Submission from FoodVrse Careers Page:
 
 Email: ${email}
 Subject: ${subject}
-Message: ${message}
+Message: ${message || 'No additional message provided'}
 
-CV File: ${cvFile.name} (${(cvFile.size / 1024 / 1024).toFixed(1)}MB)
+CV File Details:
+- File Name: ${cvFile.name}
+- File Size: ${(cvFile.size / 1024 / 1024).toFixed(1)}MB
+- File Type: ${cvFile.type}
 
 This CV was submitted through the FoodVrse careers page.
-      `);
+Please contact the applicant at: ${email}
+            `,
+            cv_file_name: cvFile.name,
+            cv_file_size: `${(cvFile.size / 1024 / 1024).toFixed(1)}MB`,
+            cv_file_type: cvFile.type
+          };
+
+          // Send email using EmailJS
+          const result = await emailjs.send(
+            EMAILJS_CONFIG.SERVICE_ID,
+            EMAILJS_CONFIG.TEMPLATE_ID,
+            templateParams,
+            EMAILJS_CONFIG.PUBLIC_KEY
+          );
+
+          if (result.status === 200) {
+            toast.success('CV sent successfully! We will get back to you soon.');
+            
+            // Reset form
+            setEmail('');
+            setSubject('');
+            setMessage('');
+            setCvFile(null);
+            onClose();
+          } else {
+            throw new Error('Email sending failed');
+          }
+        } catch (error) {
+          console.error('Email submission error:', error);
+          toast.error('Failed to send CV. Please try again.');
+        } finally {
+          setIsSubmitting(false);
+        }
+      };
+
+      fileReader.onerror = () => {
+        toast.error('Failed to read CV file. Please try again.');
+        setIsSubmitting(false);
+      };
+
+      // Read file as base64
+      fileReader.readAsDataURL(cvFile);
       
-      const mailtoLink = `mailto:support@foodvrse.com?subject=${emailSubject}&body=${body}`;
-      window.open(mailtoLink, '_blank');
-      
-      toast.success('CV sent successfully! We will get back to you soon.');
-      
-      // Reset form
-      setEmail('');
-      setSubject('');
-      setMessage('');
-      setCvFile(null);
-      onClose();
     } catch (error) {
+      console.error('CV submission error:', error);
       toast.error('Failed to send CV. Please try again.');
-    } finally {
       setIsSubmitting(false);
     }
   };
