@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Filter, MapPin, Heart, Star, Clock, Map, List, Hand, Search } from "lucide-react";
+import InteractiveMap from "@/components/InteractiveMap";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MobileLayout from "@/components/MobileLayout";
@@ -12,6 +13,7 @@ import ListingsGrid from "@/components/ListingsGrid";
 import GoogleMapsSearch from "@/components/GoogleMapsSearch";
 import DonatePopup from "@/components/DonatePopup";
 import EnhancedLocationSearch from "@/components/EnhancedLocationSearch";
+import InteractiveMap from "@/components/InteractiveMap";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 
@@ -257,30 +259,19 @@ const Discover = () => {
         </div>
 
         {viewMode === 'map' ? (
-          /* Map View */
-          <div className="h-96 bg-gray-100 relative">
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <MapPin className="w-8 h-8 mx-auto mb-2 text-gray-600" />
-                <p className="text-sm text-gray-600">Map View</p>
-                <p className="text-xs text-gray-500">Shows stores with mystery bags near you</p>
-              </div>
-            </div>
-            
-            {/* Store pins on map */}
-            {mockStores.map((store, index) => (
-              <button
-                key={store.id}
-                className="absolute w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border-2 border-brand-green cursor-pointer hover:scale-110 transition-transform"
-                style={{
-                  top: `${30 + index * 15}%`,
-                  left: `${25 + index * 20}%`
-                }}
-                onClick={() => handleStoreClick(store.id)}
-              >
-                <span className="text-lg">{store.image}</span>
-              </button>
-            ))}
+          /* Interactive Map View */
+          <div className="h-96 relative">
+            <InteractiveMap
+              userLocation={currentLocation}
+              onBusinessSelect={(business) => {
+                console.log('Selected business:', business);
+                toast.success(`Selected ${business.business_name}`);
+                // You can add navigation to business details here
+              }}
+              onLocationChange={(location) => {
+                setCurrentLocation(location);
+              }}
+            />
           </div>
         ) : (
           /* List View */
