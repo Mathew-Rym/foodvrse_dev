@@ -127,10 +127,80 @@ const Discover = () => {
     setShowFilter(true);
   };
 
+  const [activeFilters, setActiveFilters] = useState<FilterOptions | null>(null);
+
+  const [activeFilters, setActiveFilters] = useState<FilterOptions | null>(null);
+
   const handleApplyFilters = (filters: FilterOptions) => {
+
+  const getActiveFilterCount = (filters: FilterOptions): number => {
+    let count = 0;
+    if (filters.showSoldOut) count++;
+    if (filters.pickupDay.length > 0) count++;
+    if (filters.pickupWindow[0] !== 0 || filters.pickupWindow[1] !== 23) count++;
+    if (filters.surpriseBagTypes.length > 0) count++;
+    if (filters.dietaryPreferences.length > 0) count++;
+    if (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 1000) count++;
+    if (filters.distanceRange[0] !== 0 || filters.distanceRange[1] !== 10) count++;
+    if (filters.ratingFilter > 0) count++;
+    return count;
+  };
     console.log("Applied filters:", filters);
-    // TODO: Implement filter logic
-    toast.success("Filters applied");
+    setActiveFilters(filters);
+    
+    const filterCount = getActiveFilterCount(filters);
+    if (filterCount > 0) {
+      toast.success(`Applied ${filterCount} filter${filterCount !== 1 ? "s" : ""}`);
+    } else {
+      toast.success("All filters cleared");
+    }
+    setActiveFilters(filters);
+    
+    // Apply filters to listings
+    applyFiltersToListings(filters);
+    
+    // Show success message with filter count
+    const filterCount = getActiveFilterCount(filters);
+    if (filterCount > 0) {
+      toast.success(`Applied ${filterCount} filter${filterCount !== 1 ? 's' : ''}`);
+    } else {
+      toast.success("All filters cleared");
+    }
+  };
+
+  const getActiveFilterCount = (filters: FilterOptions): number => {
+    let count = 0;
+    if (filters.showSoldOut) count++;
+    if (filters.pickupDay.length > 0) count++;
+    if (filters.pickupWindow[0] !== 0 || filters.pickupWindow[1] !== 23) count++;
+    if (filters.surpriseBagTypes.length > 0) count++;
+    if (filters.dietaryPreferences.length > 0) count++;
+    if (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 1000) count++;
+    if (filters.distanceRange[0] !== 0 || filters.distanceRange[1] !== 10) count++;
+    if (filters.ratingFilter > 0) count++;
+    return count;
+  };
+
+  const applyFiltersToListings = (filters: FilterOptions) => {
+    // This function would apply filters to the actual listings data
+    // For now, we'll just log the filter criteria
+    console.log("Filtering listings with criteria:", {
+      showSoldOut: filters.showSoldOut,
+      pickupDays: filters.pickupDay,
+      pickupWindow: `${filters.pickupWindow[0]}:00 - ${filters.pickupWindow[1]}:00`,
+      bagTypes: filters.surpriseBagTypes,
+      dietary: filters.dietaryPreferences,
+      priceRange: `KSh ${filters.priceRange[0]} - KSh ${filters.priceRange[1]}`,
+      distanceRange: `${filters.distanceRange[1]} km max`,
+      minRating: filters.ratingFilter > 0 ? `${filters.ratingFilter}+` : "Any"
+    });
+    
+    // TODO: Implement actual filtering logic for listings
+    // This would involve:
+    // 1. Fetching filtered listings from Supabase
+    // 2. Updating the ListingsGrid components
+    // 3. Refreshing the map markers
+    // 4. Updating the business list
   };
 
   const handleLocationSelect = (location: { lat: number; lng: number; address: string; distance: number }) => {
@@ -243,8 +313,11 @@ const Discover = () => {
             >
               <MapPin className="w-4 h-4" />
             </Button>
-            <Button variant="outline" size="sm" className="shrink-0" onClick={handleFilter}>
+            <Button variant="outline" size="sm" className={`shrink-0 relative ${activeFilters ? "border-green-500 bg-green-50" : ""}`} onClick={handleFilter}>
               <Filter className="w-4 h-4" />
+              {activeFilters <Filter className="w-4 h-4" /><Filter className="w-4 h-4" /> (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+              )}
             </Button>
             <Button
               variant="outline"
