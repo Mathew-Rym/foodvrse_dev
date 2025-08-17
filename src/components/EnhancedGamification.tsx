@@ -114,7 +114,7 @@ const EnhancedGamification: React.FC = () => {
     <div className="space-y-6 p-4">
       {/* Badge Animation Overlay */}
       {showBadgeAnimation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 pt-8">
           <div className="bg-white rounded-lg p-8 text-center animate-bounce">
             <div className="text-6xl mb-4">🏆</div>
             <h3 className="text-2xl font-bold text-green-600 mb-2">

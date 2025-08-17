@@ -707,9 +707,9 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
         </div>
       </div>
 
-      {/* Waitlist Form Popup */}
-      {showWaitlistForm && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+              {/* Waitlist Form Popup */}
+        {showWaitlistForm && (
+          <div className="fixed inset-0 z-[60] flex items-start justify-center p-4 pt-8">
           <div 
             className="absolute inset-0 bg-black bg-opacity-50"
             onClick={() => setShowWaitlistForm(false)}

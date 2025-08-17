@@ -159,7 +159,7 @@ const GameSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Badge Animation Overlay */}
         {showBadgeAnimation && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 pt-8">
             <div className="bg-white rounded-lg p-8 text-center animate-bounce">
               <div className="text-6xl mb-4">🏆</div>
               <h3 className="text-2xl font-bold text-green-600 mb-2">

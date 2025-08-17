@@ -42,7 +42,7 @@ const WelcomeMessage = ({ isFirstTime = false }: WelcomeMessageProps) => {
   const isWelcomeBack = isAuthenticated && user;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center p-4 pt-8">
               <div className="bg-card rounded-2xl p-6 max-w-sm mx-auto shadow-2xl animate-scale-in">
         <div className="text-center">
           <button
