@@ -41,6 +41,8 @@ import ESG from "./pages/ESG";
 import Partners from "./pages/Partners";
 import PartnerApplication from "./pages/PartnerApplication";
 import ComingSoon from "./pages/ComingSoon";
+import CategoryPage from "./pages/CategoryPage";
+import CategoryPage from "./pages/CategoryPage";
 import GoogleOAuthHandler from "./components/GoogleOAuthHandler";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -158,6 +160,7 @@ const App = () => {
                     <Route path="/partners" element={<Partners />} />
                     <Route path="/partner-application" element={<PartnerApplication />} />
                     <Route path="/coming-soon" element={<ComingSoon />} />
+<Route path="/category/:categoryName" element={<CategoryPage />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>

@@ -217,11 +217,15 @@ const Discover = () => {
 
   const handleCategoryClick = (categoryName: string) => {
     console.log("Selected category:", categoryName);
+    navigate(`/category/${encodeURIComponent(categoryName)}`);
     // TODO: Navigate to category page or filter
   };
 
+  const navigate = useNavigate();
+
   const handleSeeAllCategory = (categoryName: string) => {
     console.log("See all for category:", categoryName);
+    navigate(`/category/${encodeURIComponent(categoryName)}`);
     // TODO: Navigate to category page
   };
 
