@@ -10,6 +10,7 @@ import emailjs from '@emailjs/browser';
 import { EMAILJS_CONFIG } from '@/config/emailjs';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { RECAPTCHA_CONFIG } from '@/config/recaptcha';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Location {
   place_id: string;
@@ -74,7 +75,7 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
 
-  // Mock business deals data
+  // Mock business deals data (fallback)
   const mockBusinessDeals: BusinessDeal[] = [
     {
       id: '1',
@@ -117,6 +118,104 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
       category: 'Restaurant',
       location: 'Kilimani, Nairobi',
       coordinates: { lat: -1.3000, lng: 36.8000 }
+    },
+    {
+      id: '4',
+      businessName: 'KFC CBD',
+      dealTitle: 'Chicken & Sides Mystery Box',
+      price: 300,
+      originalPrice: 900,
+      pickupTime: 'Today: 18:30 - 19:30',
+      distance: '0.8 km',
+      rating: 4.1,
+      image: '🍗',
+      category: 'Fast Food',
+      location: 'CBD, Nairobi',
+      coordinates: { lat: -1.2833, lng: 36.8172 }
+    },
+    {
+      id: '5',
+      businessName: 'Subway Westlands',
+      dealTitle: 'Sandwich & Drink Combo',
+      price: 180,
+      originalPrice: 450,
+      pickupTime: 'Today: 17:00 - 18:00',
+      distance: '1.5 km',
+      rating: 4.0,
+      image: '🥪',
+      category: 'Fast Food',
+      location: 'Westlands, Nairobi',
+      coordinates: { lat: -1.2650, lng: 36.8200 }
+    },
+    {
+      id: '6',
+      businessName: 'Dormans Coffee',
+      dealTitle: 'Coffee & Pastry Bundle',
+      price: 150,
+      originalPrice: 400,
+      pickupTime: 'Today: 19:00 - 20:00',
+      distance: '2.3 km',
+      rating: 4.4,
+      image: '☕',
+      category: 'Cafe',
+      location: 'Kilimani, Nairobi',
+      coordinates: { lat: -1.3050, lng: 36.8050 }
+    },
+    {
+      id: '7',
+      businessName: 'Chicken Inn CBD',
+      dealTitle: 'Chicken & Chips Mystery Pack',
+      price: 280,
+      originalPrice: 750,
+      pickupTime: 'Today: 18:00 - 19:00',
+      distance: '1.0 km',
+      rating: 4.0,
+      image: '🍗',
+      category: 'Fast Food',
+      location: 'CBD, Nairobi',
+      coordinates: { lat: -1.2850, lng: 36.8150 }
+    },
+    {
+      id: '8',
+      businessName: 'Cafe Deli Westlands',
+      dealTitle: 'Gourmet Sandwich & Salad',
+      price: 220,
+      originalPrice: 550,
+      pickupTime: 'Today: 17:30 - 18:30',
+      distance: '0.7 km',
+      rating: 4.6,
+      image: '🥪',
+      category: 'Cafe',
+      location: 'Westlands, Nairobi',
+      coordinates: { lat: -1.2620, lng: 36.8180 }
+    },
+    {
+      id: '9',
+      businessName: 'Pizza Hut Kilimani',
+      dealTitle: 'Pizza & Wings Combo',
+      price: 400,
+      originalPrice: 1100,
+      pickupTime: 'Today: 19:30 - 20:30',
+      distance: '2.5 km',
+      rating: 4.3,
+      image: '🍕',
+      category: 'Restaurant',
+      location: 'Kilimani, Nairobi',
+      coordinates: { lat: -1.3080, lng: 36.8020 }
+    },
+    {
+      id: '10',
+      businessName: 'Bakers Inn CBD',
+      dealTitle: 'Fresh Bread & Pastries',
+      price: 120,
+      originalPrice: 300,
+      pickupTime: 'Today: 18:00 - 19:00',
+      distance: '0.9 km',
+      rating: 4.2,
+      image: '🥐',
+      category: 'Bakery',
+      location: 'CBD, Nairobi',
+      coordinates: { lat: -1.2840, lng: 36.8160 }
     }
   ];
 
@@ -300,14 +399,22 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
     }
   };
 
-  // Handle search input changes
+  // Handle search input changes with debouncing
   const handleSearchChange = (value: string) => {
     console.log('🔍 Search input changed:', value);
     setSearchQuery(value);
     
-    if (value.length > 1) { // Reduced from 2 to 1 character
-      console.log('🚀 Triggering search for:', value);
-      searchLocations(value);
+    // Clear previous timeout
+    if ((window as any).searchTimeout) {
+      clearTimeout((window as any).searchTimeout);
+    }
+    
+    if (value.length > 1) {
+      // Debounce search to avoid too many API calls
+      (window as any).searchTimeout = setTimeout(() => {
+        console.log('🚀 Triggering search for:', value);
+        searchLocations(value);
+      }, 300); // 300ms delay
     } else {
       console.log('⏹️ Clearing predictions (query too short)');
       setPredictions([]);
@@ -357,7 +464,12 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
           onDealsFound(deals);
         }
         
-        toast.success(`Found ${deals.length} deals near ${placeDetails.address}`);
+        // Show success message with deal count
+        if (deals.length > 0) {
+          toast.success(`Found ${deals.length} deals near ${placeDetails.address}!`);
+        } else {
+          toast.info(`No deals available in ${placeDetails.address} yet. Check back later!`);
+        }
       }
     } catch (error) {
       console.error('Error handling location selection:', error);
@@ -529,13 +641,13 @@ const EnhancedLocationSearch: React.FC<EnhancedLocationSearchProps> = ({
             {/* Search Input */}
             <div className="relative">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                🔍 Search for any location worldwide
+                🔍 Search for locations to find available businesses and deals
               </label>
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input
                   type="text"
-                  placeholder="Enter any location, city, or landmark..."
+                  placeholder="Search location (e.g., Kenyatta Market, Nairobi, Westlands)"
                   value={searchQuery}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-12 pr-4 py-4 text-base border-2 border-gray-200 bg-white shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:ring-opacity-50 hover:border-gray-300 transition-all duration-200 rounded-xl"
