@@ -24,7 +24,10 @@ jobs:
           cache: 'npm'
 
       - name: Install Supabase CLI
-        run: npm install -g supabase@latest
+        run: |
+          curl -sL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar -xz
+          sudo mv supabase /usr/local/bin/supabase
+          supabase --version
 
       - name: Deploy to Supabase
         env:
@@ -34,6 +37,6 @@ jobs:
           echo $SUPABASE_ACCESS_TOKEN | supabase login
           
           # Deploy migrations
-          supabase db push --project-ref vsvhkkalfziuyttwityc
+          supabase db push --project-ref vsvhkkalfziuyttwityc || exit 1
           
-          echo "✅ Supabase deployment completed!" 
+          echo "✅ Supabase deployment completed!"
