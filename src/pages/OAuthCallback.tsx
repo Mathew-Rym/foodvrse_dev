@@ -67,7 +67,15 @@ const OAuthCallback = () => {
         const { error: profileError } = await supabase
           .from('user_profiles')
           .insert({
-            id: user.id,
+            user_id: user.id,
+level: 1,
+experience_points: 0,
+current_streak: 0,
+longest_streak: 0,
+total_co2_saved_kg: 0,
+total_meals_saved: 0,
+total_money_saved_ksh: 0,
+badges_earned: [],
             display_name: firstName,
             avatar_url: user.user_metadata?.avatar_url || null,
             user_type: isBusinessAuth ? 'business' : 'consumer',
@@ -89,13 +97,15 @@ const OAuthCallback = () => {
         const { error: impactError } = await supabase
           .from('user_impact')
           .insert({
-            id: user.id,
-            total_orders: 0,
-            total_savings: 0,
-            total_co2_saved: 0,
-            total_food_waste_prevented: 0,
-            weekly_challenge_progress: 0,
-            community_achievements: 0,
+            user_id: user.id,
+level: 1,
+experience_points: 0,
+current_streak: 0,
+longest_streak: 0,
+total_co2_saved_kg: 0,
+total_meals_saved: 0,
+total_money_saved_ksh: 0,
+badges_earned: [],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           });
@@ -110,14 +120,19 @@ const OAuthCallback = () => {
           const { error: businessError } = await supabase
             .from('business_profiles')
             .insert({
-              id: user.id,
+              user_id: user.id,
+level: 1,
+experience_points: 0,
+current_streak: 0,
+longest_streak: 0,
+total_co2_saved_kg: 0,
+total_meals_saved: 0,
+total_money_saved_ksh: 0,
+badges_earned: [],
               business_name: `${firstName}'s Business`,
 address: 'Address to be updated',
 location: 'Location to be updated',
               user_type: 'business',
-              address: 'Address to be updated',
-location: 'Location to be updated',
-              location: 'Location to be updated',
               status: 'pending',
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
