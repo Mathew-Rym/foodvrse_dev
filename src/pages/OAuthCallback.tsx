@@ -67,10 +67,10 @@ const OAuthCallback = () => {
         const { error: profileError } = await supabase
           .from('user_profiles')
           .insert({
-            user_id: user.id,
+            id: user.id,
             display_name: firstName,
             avatar_url: user.user_metadata?.avatar_url || null,
-            user_type: isBusinessAuth ? 'business' : 'customer',
+            user_type: isBusinessAuth ? 'business' : 'consumer',
             email_notifications: true,
             push_notifications: true,
             notifications_enabled: true,
@@ -89,7 +89,7 @@ const OAuthCallback = () => {
         const { error: impactError } = await supabase
           .from('user_impact')
           .insert({
-            user_id: user.id,
+            id: user.id,
             total_orders: 0,
             total_savings: 0,
             total_co2_saved: 0,
@@ -110,9 +110,14 @@ const OAuthCallback = () => {
           const { error: businessError } = await supabase
             .from('business_profiles')
             .insert({
-              user_id: user.id,
+              id: user.id,
               business_name: `${firstName}'s Business`,
-              business_type: 'restaurant',
+address: 'Address to be updated',
+location: 'Location to be updated',
+              user_type: 'business',
+              address: 'Address to be updated',
+location: 'Location to be updated',
+              location: 'Location to be updated',
               status: 'pending',
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
