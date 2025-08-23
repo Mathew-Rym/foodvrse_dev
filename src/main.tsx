@@ -1,7 +1,9 @@
+import { Analytics } from '@vercel/analytics/react';
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { initializeEmailJS } from './config/emailjs'
+import { Analytics } from '@vercel/analytics/react'
 
 // Performance optimization: Initialize critical features
 const initializeApp = async () => {
@@ -81,7 +83,10 @@ if (rootElement) {
     
     // Wrap the app in a try-catch to handle any initialization errors
     try {
-      root.render(<App />);
+      root.render(<>
+        <App />
+        <Analytics />
+      </>);
     } catch (error) {
       console.error('Failed to render main app:', error);
       root.render(<FallbackApp />);
