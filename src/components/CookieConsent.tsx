@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -44,14 +43,18 @@ const CookieConsent = () => {
     navigate('/profile?tab=preferences');
   };
 
+  const handlePrivacyPolicy = () => {
+    navigate('/privacy-policy');
+  };
+
   // Don't show banner if user is not authenticated, loading, or shouldn't show consent
   if (!isAuthenticated || loading || !shouldShowCookieConsent) {
     return null;
   }
 
   return (
-    <div className="fixed left-0 right-0 z-50 p-4 bottom-20">
-      <Card className="bg-card shadow-lg border border-brand-green max-w-4xl mx-auto">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <Card className="bg-white shadow-2xl border border-brand-green max-w-2xl mx-auto animate-in fade-in-0 zoom-in-95 duration-300">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
             <div className="flex gap-2">
@@ -59,7 +62,7 @@ const CookieConsent = () => {
               <BarChart3 className="w-6 h-6 text-brand-green mt-1 flex-shrink-0" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-lg mb-2">Welcome to FoodVrse! 🎉</h3>
+              <h3 className="font-semibold text-lg mb-2 text-gray-900">Welcome to FoodVrse! ��</h3>
               <p className="text-sm text-gray-700 mb-4 leading-relaxed">
                 We use cookies and analytics to enhance your experience, provide personalized content, 
                 and help us improve our service. This helps us understand how you use our platform 
@@ -67,8 +70,8 @@ const CookieConsent = () => {
               </p>
               <p className="text-sm text-gray-600 mb-4">
                 <button 
-                  onClick={() => navigate('/privacy-policy')}
-                  className="text-brand-green hover:text-brand-green/80 underline bg-transparent border-none cursor-pointer"
+                  onClick={handlePrivacyPolicy}
+                  className="text-brand-green hover:text-brand-green/80 underline bg-transparent border-none cursor-pointer font-medium"
                 >
                   Learn more in our Privacy Policy
                 </button>
@@ -76,7 +79,7 @@ const CookieConsent = () => {
               <div className="flex flex-wrap gap-3">
                 <Button 
                   onClick={handleAccept}
-                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600"
+                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 font-medium"
                   size="sm"
                 >
                   Accept All
@@ -85,7 +88,7 @@ const CookieConsent = () => {
                   onClick={handleCustomize}
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   <Settings className="w-4 h-4" />
                   Customize
@@ -94,7 +97,7 @@ const CookieConsent = () => {
                   onClick={handleDecline}
                   variant="ghost"
                   size="sm"
-                  className="text-gray-600 hover:text-gray-800"
+                  className="text-gray-600 hover:text-gray-800 font-medium"
                 >
                   Decline
                 </Button>
@@ -108,4 +111,3 @@ const CookieConsent = () => {
 };
 
 export default CookieConsent;
-

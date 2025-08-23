@@ -31,7 +31,7 @@ export const QuantitySelector = ({ isOpen, onClose, onConfirm, bag }: QuantitySe
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-auto p-6">
+      <DialogContent className="max-w-sm mx-auto p-6 max-h-[90vh] overflow-y-auto w-[95vw] sm:w-[400px] fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
         {/* Header */}
         <div className="text-center mb-6">
           <h2 className="font-bold text-lg">{bag.vendor} - {bag.location}</h2>

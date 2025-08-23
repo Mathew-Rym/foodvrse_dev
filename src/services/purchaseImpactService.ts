@@ -1,7 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { GamificationService } from './gamificationService';
 import { toast } from 'sonner';
-import { GamificationService } from './gamificationService';
 
 export interface PurchaseData {
   id: string;

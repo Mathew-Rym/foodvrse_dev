@@ -1,4 +1,4 @@
-import { User, Settings, Heart, HelpCircle, LogOut, MapPin, Bell, CreditCard, Camera, Receipt, Trash2, Edit3, Star } from "lucide-react";
+import { User, Settings, Heart, HelpCircle, LogOut, MapPin, Bell, CreditCard, Camera, Receipt, Trash2, Edit3, Star, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -9,13 +9,13 @@ import LocationsDialog from "@/components/LocationsDialog";
 import MobileLayout from "@/components/MobileLayout";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, signOut, userProfile, userImpact, refreshUserData } = useAuth();
+  const { user, signOut, userProfile, userImpact, refreshUserData, ensureUserProfile } = useAuth();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showPaymentMethods, setShowPaymentMethods] = useState(false);
@@ -25,14 +25,16 @@ const Profile = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
   const [showLocations, setShowLocations] = useState(false);
+  const [favorites, setFavorites] = useState<any[]>([]);
+  const [loadingFavorites, setLoadingFavorites] = useState(false);
   const [profileData, setProfileData] = useState({
     name: userProfile?.display_name || user?.email || '',
     email: user?.email || '',
     phone: userProfile?.phone || '',
-    country: '',
-    birthday: '',
-    gender: '',
-    dietaryPreferences: ''
+    country: userProfile?.country || '',
+    birthday: userProfile?.birthday || '',
+    gender: userProfile?.gender || '',
+    dietaryPreferences: userProfile?.dietary_preferences || ''
   });
 
   const [locations, setLocations] = useState({
@@ -50,6 +52,33 @@ const Profile = () => {
     { id: 1, type: "M-Pesa", number: "254712345678", default: true },
     { id: 2, type: "Credit Card", number: "**** **** **** 1234", default: false }
   ]);
+
+  // Ensure user profile exists and sync profileData when it loads
+  useEffect(() => {
+    const initializeProfile = async () => {
+      if (user && !userProfile) {
+        // Create profile if it doesn't exist
+        await ensureUserProfile();
+      }
+    };
+    
+    initializeProfile();
+  }, [user, userProfile, ensureUserProfile]);
+
+  // Sync profileData with userProfile when it loads
+  useEffect(() => {
+    if (userProfile) {
+      setProfileData({
+        name: userProfile.display_name || user?.email || '',
+        email: user?.email || '',
+        phone: userProfile.phone || '',
+        country: userProfile.country || '',
+        birthday: userProfile.birthday || '',
+        gender: userProfile.gender || '',
+        dietaryPreferences: userProfile.dietary_preferences || ''
+      });
+    }
+  }, [userProfile, user]);
 
   const menuItems = [
     { icon: Receipt, label: "My Orders", action: "orders" },
@@ -82,7 +111,7 @@ const Profile = () => {
           phone: profileData.phone,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', user.id);
+        .eq('id', user.id);
 
       if (error) {
         console.error('Error updating profile:', error);
@@ -101,15 +130,86 @@ const Profile = () => {
     }
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        // In a real app, you'd upload to Supabase storage
-        toast.success('Profile photo updated!');
-      };
-      reader.readAsDataURL(file);
+    if (!file || !user) {
+      toast.error('Please select a valid image file');
+      return;
+    }
+
+    // Validate file type and size
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      toast.error('Please select a valid image file (JPG, PNG, or WebP)');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      toast.error(`Image size (${sizeMB}MB) should be less than 10MB`);
+      return;
+    }
+
+    try {
+      const toastId = toast.loading('Uploading profile photo...', {
+        description: 'This may take a moment'
+      });
+      
+      // Create unique filename with better extension handling
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const fileName = `${user.id}/avatar_${Date.now()}.${fileExt}`;
+      
+      // Upload to Supabase Storage with progress
+      const { data, error: uploadError } = await supabase.storage
+        .from('user-avatars')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error(uploadError.message || 'Upload failed');
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('user-avatars')
+        .getPublicUrl(fileName);
+      
+      // Verify the URL is accessible
+      if (!publicUrl) {
+        throw new Error('Failed to generate public URL for uploaded image');
+      }
+      
+      // Update user profile with new avatar URL
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({ 
+          avatar_url: publicUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('Database update error:', updateError);
+        throw new Error('Failed to update profile in database');
+      }
+
+      // Refresh user data to get updated profile
+      await refreshUserData();
+      
+      toast.dismiss(toastId);
+      toast.success('Profile photo updated successfully!', {
+        description: 'Your new photo is now visible'
+      });
+    } catch (error: any) {
+      console.error('Error uploading profile photo:', error);
+      toast.dismiss();
+      toast.error('Failed to upload profile photo', {
+        description: error.message || 'Please try again with a different image'
+      });
     }
   };
 
@@ -237,17 +337,37 @@ const Profile = () => {
         setShowPaymentMethods(true);
         break;
       case 'favorites':
-      fetchUserFavorites();
+        fetchUserFavorites();
         setShowFavorites(true);
+        break;
+      case 'gamification':
+        navigate('/impact');
+        break;
+      case 'help':
+        navigate('/help-center');
         break;
       default:
         console.log('Unknown action:', action);
     }
   };
 
+  const handlePersonalInfoSave = async (data: any) => {
+    // Update local state immediately for real-time UI update
+    setProfileData(data);
+    
+    // Refresh user data from Supabase to ensure consistency
+    await refreshUserData();
+    
+    // Show success message
+    toast.success('Personal information updated successfully!');
+    
+    // Close the dialog
+    setShowPersonalInfo(false);
+  };
+
   return (
     <MobileLayout>
-      <div className="min-h-screen bg-gray-50 pb-20">
+      <div className="min-h-screen bg-gray-50 pb-20 text-gray-900">
         {/* Profile Header */}
         <div className="bg-gradient-to-br from-brand-green to-brand-yellow px-4 py-8 text-white shadow-lg">
           <div className="flex items-center gap-4 mb-6">
@@ -271,8 +391,8 @@ const Profile = () => {
             </div>
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-white mb-1">{userProfile?.display_name || user?.email}</h1>
-              <p className="text-white/90 text-sm mb-2">{user?.email}</p>
-              <Badge className="bg-white/30 text-white font-semibold text-sm px-3 py-1 border border-white/20">
+              <p className="text-white text-sm mb-2">{user?.email}</p>
+              <Badge className="bg-white/30 text-white font-semibold text-sm px-3 py-1 border border-white/20 drop-shadow-lg">
                 {userImpact?.level ? `Food Saver Level ${userImpact.level}` : 'Food Saver Level 1'}
               </Badge>
             </div>
@@ -281,16 +401,16 @@ const Profile = () => {
           {/* Impact Stats */}
           <div className="grid grid-cols-3 gap-4 mt-6">
             <div className="text-center bg-white/20 rounded-xl p-4 backdrop-blur-sm border-2 border-white/30 shadow-lg">
-              <p className="text-4xl font-black text-white mb-2">{userImpact?.total_meals_saved || 0}</p>
-              <p className="text-sm text-white font-bold uppercase tracking-wide">Meals Saved</p>
+              <p className="text-4xl font-black text-white mb-2 drop-shadow-lg">{userImpact?.total_meals_saved || 0}</p>
+              <p className="text-sm text-white font-bold uppercase tracking-wide drop-shadow-lg">Meals Saved</p>
             </div>
             <div className="text-center bg-white/20 rounded-xl p-4 backdrop-blur-sm border-2 border-white/30 shadow-lg">
-              <p className="text-4xl font-black text-white mb-2">{userImpact?.total_co2_saved_kg || 0}kg</p>
-              <p className="text-sm text-white font-bold uppercase tracking-wide">CO₂ Saved</p>
+              <p className="text-4xl font-black text-white mb-2 drop-shadow-lg">{userImpact?.total_co2_saved_kg || 0}kg</p>
+              <p className="text-sm text-white font-bold uppercase tracking-wide drop-shadow-lg">CO₂ Saved</p>
             </div>
             <div className="text-center bg-white/20 rounded-xl p-4 backdrop-blur-sm border-2 border-white/30 shadow-lg">
-              <p className="text-4xl font-black text-white mb-2">KSh {userImpact?.total_money_saved_ksh || 0}</p>
-              <p className="text-sm text-white font-bold uppercase tracking-wide">Money Saved</p>
+              <p className="text-4xl font-black text-white mb-2 drop-shadow-lg">KSh {userImpact?.total_money_saved_ksh || 0}</p>
+              <p className="text-sm text-white font-bold uppercase tracking-wide drop-shadow-lg">Money Saved</p>
             </div>
           </div>
         </div>
@@ -304,7 +424,7 @@ const Profile = () => {
                 <button
                   key={index}
                   onClick={() => handleMenuClick(item.action)}
-                  className={`w-full flex items-center gap-4 p-5 text-left hover:bg-gray-50 transition-all duration-200 ${
+                  className={`w-full flex items-center gap-4 p-5 text-left hover:bg-gray-50 transition-all duration-200 text-gray-900 font-medium ${
                     index !== menuItems.length - 1 ? "border-b border-gray-100" : ""
                   }`}
                 >
@@ -312,7 +432,7 @@ const Profile = () => {
                     <Icon className="w-5 h-5 text-gray-700" />
                   </div>
                   <span className="flex-1 text-gray-900 font-semibold text-base">{item.label}</span>
-                  <span className="text-gray-400 text-lg font-bold">›</span>
+                  <span className="text-gray-600 text-lg font-bold">›</span>
                 </button>
               );
             })}
@@ -320,8 +440,8 @@ const Profile = () => {
 
           {/* Become Partner */}
           <div className="bg-gradient-to-r from-brand-green to-brand-yellow rounded-xl p-6 text-white shadow-lg border border-brand-green/20">
-            <h3 className="font-bold text-lg mb-3 text-white">Become a Partner</h3>
-            <p className="text-white/90 mb-4 text-base leading-relaxed">
+            <h3 className="font-bold text-lg mb-3 text-white drop-shadow-lg">Become a Partner</h3>
+            <p className="text-white/90 mb-4 text-base leading-relaxed drop-shadow-lg">
               Join our mission to reduce food waste. List your restaurant and start making an impact.
             </p>
             <Button 
@@ -622,11 +742,7 @@ const Profile = () => {
           open={showPersonalInfo}
           onOpenChange={setShowPersonalInfo}
           profileData={profileData}
-          onSave={(data) => {
-            setProfileData(data);
-            // Update profile in Supabase here
-            toast.success('Personal information updated!');
-          }}
+          onSave={handlePersonalInfoSave}
         />
 
         {/* Locations Dialog */}

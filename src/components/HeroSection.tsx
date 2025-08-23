@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const HeroSection = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isBusinessUser } = useAuth();
   const metrics = useRealTimeMetrics();
   const { t } = useTranslation();
 
@@ -35,9 +35,14 @@ const HeroSection = () => {
   };
 
   const handleForBusinesses = () => {
-    // For now, open business dashboard for any logged in user
     if (user) {
-      navigate("/business-dashboard");
+      // Check if user is a business user
+      if (isBusinessUser) {
+        navigate("/business-dashboard");
+      } else {
+        // Regular user - redirect to partner application or business signup
+        navigate("/partner-application");
+      }
     } else {
       navigate("/auth");
     }

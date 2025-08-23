@@ -22,7 +22,7 @@ const ComingSoon = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-green to-brand-yellow flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-brand-green to-brand-yellow flex items-start justify-center p-4 pt-8">
       <div className="max-w-2xl mx-auto text-center">
         {/* Logo */}
         <div className="mb-8">

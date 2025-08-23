@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Globe, MapPin, Search, X, Loader2, AlertCircle, Store, Clock, Star } from "lucide-react";
+import { loadGoogleMaps } from '@/services/googleMapsLoader';
 import { API_CONFIG } from '@/config/api';
 import { toast } from 'sonner';
 import emailjs from '@emailjs/browser';
@@ -192,22 +193,35 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     setIsLoading(true);
     
     try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&types=geocode|establishment&key=${API_CONFIG.GOOGLE_MAPS_API_KEY}`
+      // Load Google Maps API first
+      await loadGoogleMaps({ libraries: ['places'] });
+      
+      const autocompleteService = new google.maps.places.AutocompleteService();
+      
+      autocompleteService.getPlacePredictions(
+        {
+          input: query,
+          types: ['geocode', 'establishment'],
+          // Remove country restrictions to allow searching all places
+        },
+        (predictions, status) => {
+          setIsLoading(false);
+          
+          if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+            setPredictions(predictions.map(prediction => ({
+              place_id: prediction.place_id,
+              description: prediction.description,
+              structured_formatting: prediction.structured_formatting
+            })));
+          } else {
+            setPredictions([]);
+            console.log('No predictions found for:', query);
+          }
+        }
       );
-      
-      const data = await response.json();
-      
-      if (data.status === 'OK') {
-        setPredictions(data.predictions);
-      } else {
-        setPredictions([]);
-        console.log('No predictions found for:', query);
-      }
     } catch (error) {
       console.error('Error searching locations:', error);
       setPredictions([]);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -215,33 +229,48 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   // Get place details including coordinates
   const getPlaceDetails = async (placeId: string): Promise<{ lat: number; lng: number; address: string; country: string } | null> => {
     try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry,formatted_address,address_components&key=${API_CONFIG.GOOGLE_MAPS_API_KEY}`
-      );
+      // Load Google Maps API first
+      await loadGoogleMaps({ libraries: ['places'] });
       
-      const data = await response.json();
+      const placesService = new google.maps.places.PlacesService(document.createElement('div'));
       
-      if (data.status === 'OK' && data.result) {
-        const { geometry, formatted_address, address_components } = data.result;
-        
-        // Extract country from address components
-        const countryComponent = address_components?.find((component: any) => 
-          component.types.includes('country')
+      return new Promise((resolve) => {
+        placesService.getDetails(
+          {
+            placeId: placeId,
+            fields: ['geometry', 'formatted_address', 'address_components']
+          },
+          (place, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+              const location = place.geometry?.location;
+              if (!location) {
+                resolve(null);
+                return;
+              }
+              
+              const addressComponents = place.address_components || [];
+              
+              // Find country from address components
+              const countryComponent = addressComponents.find(comp => 
+                comp.types.includes('country')
+              );
+              
+              resolve({
+                lat: location.lat(),
+                lng: location.lng(),
+                address: place.formatted_address || '',
+                country: countryComponent?.long_name || 'Unknown'
+              });
+            } else {
+              resolve(null);
+            }
+          }
         );
-        const country = countryComponent?.long_name || '';
-        
-        return {
-          lat: geometry.location.lat,
-          lng: geometry.location.lng,
-          address: formatted_address,
-          country
-        };
-      }
+      });
     } catch (error) {
       console.error('Error getting place details:', error);
+      return null;
     }
-    
-    return null;
   };
 
   // Handle search input changes

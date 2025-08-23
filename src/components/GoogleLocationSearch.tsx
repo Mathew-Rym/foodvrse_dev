@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Globe, MapPin, Search, X, Loader2 } from "lucide-react";
-import { API_CONFIG } from '@/config/api';
+import { loadGoogleMaps } from '@/services/googleMapsLoader';
 
 interface Location {
   place_id: string;
@@ -58,37 +58,37 @@ const GoogleLocationSearch: React.FC<GoogleLocationSearchProps> = ({
 
   // Initialize Google Maps API
   useEffect(() => {
-    if (isOpen && !window.google) {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${API_CONFIG.GOOGLE_MAPS_API_KEY}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = initializeGoogleMaps;
-      document.head.appendChild(script);
-    } else if (isOpen && window.google) {
+    if (isOpen) {
       initializeGoogleMaps();
     }
   }, [isOpen]);
 
-  const initializeGoogleMaps = () => {
-    if (!window.google || !mapRef.current) return;
+  const initializeGoogleMaps = async () => {
+    if (!mapRef.current) return;
 
-    // Initialize services
-    autocompleteService.current = new window.google.maps.places.AutocompleteService();
-    
-    // Initialize map
-    const mapInstance = new window.google.maps.Map(mapRef.current, {
-      center: { lat: -1.2921, lng: 36.8219 }, // Nairobi
-      zoom: 10,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: false,
-    });
+    try {
+      // Load Google Maps API using centralized loader
+      await loadGoogleMaps({ libraries: ['places'] });
 
-    // Initialize places service
-    placesService.current = new window.google.maps.places.PlacesService(mapInstance);
-    
-    setMap(mapInstance);
+      // Initialize services
+      autocompleteService.current = new window.google.maps.places.AutocompleteService();
+      
+      // Initialize map
+      const mapInstance = new window.google.maps.Map(mapRef.current, {
+        center: { lat: -1.2921, lng: 36.8219 }, // Nairobi
+        zoom: 10,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+      });
+
+      // Initialize places service
+      placesService.current = new window.google.maps.places.PlacesService(mapInstance);
+      
+      setMap(mapInstance);
+    } catch (error) {
+      console.error('Failed to load Google Maps in location search:', error);
+    }
   };
 
   // Search for locations
@@ -105,7 +105,7 @@ const GoogleLocationSearch: React.FC<GoogleLocationSearchProps> = ({
         {
           input: query,
           types: ['geocode', 'establishment'],
-          componentRestrictions: { country: ['ke', 'us', 'gb', 'ca', 'au'] }, // Allow multiple countries
+          // Removed country restrictions to allow searching all places worldwide
         },
         (predictions, status) => {
           setIsLoading(false);

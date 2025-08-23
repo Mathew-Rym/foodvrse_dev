@@ -94,7 +94,7 @@ export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetail
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-md mx-auto p-0 max-h-[90vh] overflow-y-auto" aria-describedby="mystery-bag-details">
+        <DialogContent className="max-w-md mx-auto p-0 max-h-[90vh] overflow-y-auto w-[95vw] sm:w-[425px] fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]" aria-describedby="mystery-bag-details">
           <div className="sr-only" id="mystery-bag-details">
             Mystery bag details for {bag.vendor}
           </div>
@@ -256,7 +256,7 @@ export const MysteryBagDetailPopup = ({ isOpen, onClose, bag }: MysteryBagDetail
 
       {/* Surprise popup */}
       <Dialog open={showSurprisePopup} onOpenChange={setShowSurprisePopup}>
-        <DialogContent className="max-w-sm mx-auto p-6 text-center">
+        <DialogContent className="max-w-sm mx-auto p-6 text-center max-h-[90vh] overflow-y-auto w-[95vw] sm:w-[400px] fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
           <div className="mb-4">
             <div className="w-16 h-16 mx-auto mb-4 bg-yellow-100 rounded-full flex items-center justify-center">
                               <Star className="w-8 h-8 text-yellow-500" />

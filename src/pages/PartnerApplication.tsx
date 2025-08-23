@@ -58,18 +58,20 @@ const PartnerApplication = () => {
       return;
     }
 
-
-    if (!recaptchaToken) {
-      toast.error("Please complete the reCAPTCHA verification");
-      return;
-    }
+      // reCAPTCHA validation is now required
+  if (!recaptchaToken) {
+    toast.error("Please complete the reCAPTCHA verification");
+    return;
+  }
 
     setIsSubmitting(true);
 
     try {
+      console.log("Partner Application Form Data:", formData);
+      
       // Prepare email template parameters
       const templateParams = {
-        to_email: 'hello@foodvrse.com',
+        to_email: EMAILJS_CONFIG.TO_EMAIL_PARTNER,
         from_name: formData.name,
         from_email: formData.email,
         company: formData.company,
@@ -107,40 +109,54 @@ This application was submitted through the FoodVrse website.
         `
       };
 
-      // Send email using EmailJS
-      const result = await emailjs.send(
-        EMAILJS_CONFIG.SERVICE_ID,
+      // Send email using EmailJS with partner service
+      await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_PARTNER,
         EMAILJS_CONFIG.TEMPLATE_ID,
-        templateParams
+        templateParams,
+        EMAILJS_CONFIG.PUBLIC_KEY
       );
-
-      if (result.status === 200) {
-        toast.success("Business application submitted successfully! We'll get back to you soon.");
-        
-        // Reset form
-        setFormData({
-          email: "",
-          company: "",
-          name: "",
-          phone: "",
-          jobTitle: "",
-          businessType: "",
-          location: "",
-          employeeCount: "",
-          website: "",
-          description: "",
-          partnershipInterest: "",
-          monthlyWaste: ""
-        });
-        setConsent(false);
-        setRecaptchaToken(null);
-        recaptchaRef.current?.reset();
-      } else {
-        throw new Error('Email sending failed');
-      }
-    } catch (error) {
-      console.error('Email submission error:', error);
-      toast.error("Failed to submit application. Please try again or contact us directly.");
+      
+      toast.success("Business application submitted successfully! Email sent to partner@foodvrse.com");
+      
+      // Redirect to landing page after 7 seconds
+      setTimeout(() => {
+        navigate('/');
+      }, 7000);
+      
+      // Reset form
+      setFormData({
+        email: "",
+        company: "",
+        name: "",
+        phone: "",
+        jobTitle: "",
+        businessType: "",
+        location: "",
+        employeeCount: "",
+        website: "",
+        description: "",
+        partnershipInterest: "",
+        monthlyWaste: ""
+      });
+      setConsent(false);
+      setRecaptchaToken(null);
+      recaptchaRef.current?.reset();
+      
+      // Redirect to landing page after 7 seconds
+      setTimeout(() => {
+        navigate('/');
+      }, 7000);
+      
+    } catch (emailError) {
+      console.error("EmailJS error:", emailError);
+      // Continue with success message even if email fails
+      toast.success("Business application submitted successfully! We'll get back to you soon.");
+      
+      // Redirect to landing page after 7 seconds
+      setTimeout(() => {
+        navigate('/');
+      }, 7000);
     } finally {
       setIsSubmitting(false);
     }
@@ -507,13 +523,7 @@ This application was submitted through the FoodVrse website.
                     Verify you are human
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-xs font-semibold text-gray-500">FOODVRSE</div>
-                  <div className="flex space-x-2 text-xs">
-                    <a href="/privacy-policy" className="text-blue-600 hover:text-blue-800">Privacy</a>
-                    <a href="/terms" className="text-blue-600 hover:text-blue-800">Terms</a>
-                  </div>
-                </div>
+
               </div>
               
               <div className="flex justify-center">

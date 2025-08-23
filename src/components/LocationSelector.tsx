@@ -58,7 +58,7 @@ export const LocationSelector = ({ isOpen, onClose, onLocationSelect, currentLoc
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto p-0 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-md mx-auto p-0 max-h-[90vh] overflow-y-auto w-[95vw] sm:w-[425px] fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
         <DialogTitle className="sr-only">Choose Location</DialogTitle>
         
         {/* Header */}

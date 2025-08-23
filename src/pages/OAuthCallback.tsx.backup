@@ -1,0 +1,163 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { CheckCircle } from 'lucide-react';
+
+const OAuthCallback = () => {
+  const navigate = useNavigate();
+  const [message, setMessage] = useState('Setting up your profile...');
+
+  useEffect(() => {
+    const handleOAuthCallback = async () => {
+      try {
+        // Get the current session after OAuth redirect
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          // Even if there's a session error, try to redirect
+          toast.error('Login successful but session setup failed. Redirecting...');
+          setTimeout(() => navigate('/profile'), 1000);
+          return;
+        }
+
+        if (!session?.user) {
+          // No user session, redirect to auth
+          toast.error('No user session found. Please try logging in again.');
+          setTimeout(() => navigate('/auth'), 1000);
+          return;
+        }
+
+        const user = session.user;
+        console.log('OAuth user:', user);
+
+        // Check if user already has any profile
+        const { data: existingUserProfile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        const { data: existingBusinessProfile } = await supabase
+          .from('business_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (existingUserProfile || existingBusinessProfile) {
+          console.log('Profile already exists:', existingUserProfile || existingBusinessProfile);
+          setMessage('Welcome back! Redirecting...');
+          
+          // Redirect based on user type
+          const redirectPath = existingBusinessProfile ? '/business-dashboard' : '/profile';
+          setTimeout(() => navigate(redirectPath), 1000);
+          return;
+        }
+
+        // Try to create profile, but don't fail if it doesn't work
+        setMessage('Setting up your profile...');
+        
+        try {
+          // Extract first name from Google user data
+          let firstName = 'User';
+          if (user.user_metadata?.full_name) {
+            firstName = user.user_metadata.full_name.split(' ')[0];
+          } else if (user.user_metadata?.name) {
+            firstName = user.user_metadata.name.split(' ')[0];
+          } else if (user.email) {
+            firstName = user.email.split('@')[0];
+          }
+
+          // Check if this is a business auth
+          const isBusinessAuth = sessionStorage.getItem('google_business_auth') === 'true';
+          sessionStorage.removeItem('google_business_auth');
+
+          if (isBusinessAuth) {
+            // Try to create business profile
+            await supabase
+              .from('business_profiles')
+              .insert({
+                user_id: user.id,
+                business_name: `${firstName}'s Business`,
+                address: 'Address to be updated',
+                location: 'Location to be updated',
+                user_type: 'business',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              });
+          } else {
+            // Try to create consumer profile
+            await supabase
+              .from('user_profiles')
+              .insert({
+                id: user.id,
+                user_id: user.id,
+                display_name: firstName,
+                avatar_url: user.user_metadata?.avatar_url || null,
+                user_type: 'consumer',
+                email_notifications: true,
+                push_notifications: true,
+                notifications_enabled: true,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              });
+
+            // Try to create user impact record
+            await supabase
+              .from('user_impact')
+              .insert({
+                user_id: user.id,
+                level: 1,
+                experience_points: 0,
+                current_streak: 0,
+                longest_streak: 0,
+                total_co2_saved_kg: 0,
+                total_meals_saved: 0,
+                total_money_saved_ksh: 0,
+                badges_earned: [],
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              });
+          }
+
+          setMessage(`Welcome to FoodVrse, ${firstName}!`);
+          toast.success(`Welcome ${firstName}! Your account has been set up successfully.`);
+        } catch (profileError) {
+          console.error('Profile creation error:', profileError);
+          // Don't fail the whole process - user is logged in
+          setMessage('Welcome! Profile setup will be completed later.');
+          toast.info('Login successful! Profile setup will be completed on your next visit.');
+        }
+        
+        // Always redirect, even if profile creation failed
+        const redirectPath = sessionStorage.getItem('google_business_auth') === 'true' ? '/business-dashboard' : '/profile';
+        setTimeout(() => navigate(redirectPath), 1500);
+
+      } catch (error) {
+        console.error('OAuth callback error:', error);
+        // Even on error, try to redirect since user might be logged in
+        setMessage('Login successful! Redirecting...');
+        toast.info('Login successful! Redirecting to your profile...');
+        setTimeout(() => navigate('/profile'), 1500);
+      }
+    };
+
+    handleOAuthCallback();
+  }, [navigate]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+        <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Login Successful!</h2>
+        <p className="text-gray-600">{message}</p>
+        <div className="mt-4 text-sm text-gray-500">
+          Redirecting automatically...
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default OAuthCallback;

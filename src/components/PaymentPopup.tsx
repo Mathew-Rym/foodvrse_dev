@@ -1,9 +1,11 @@
-import { useState } from "react";
-import { CreditCard, Smartphone } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Smartphone, Loader2, CheckCircle, CreditCard, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PaymentPopupProps {
   isOpen: boolean;
@@ -18,18 +20,58 @@ interface PaymentPopupProps {
   quantity: number;
 }
 
+interface PaymentMethod {
+  id: number;
+  type: string;
+  number: string;
+  default: boolean;
+}
+
 export const PaymentPopup = ({ isOpen, onClose, bag, quantity }: PaymentPopupProps) => {
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'mpesa' | 'airtel' | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'mpesa' | null>(null);
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [cardDetails, setCardDetails] = useState({
-    number: "",
-    expiry: "",
-    cvv: "",
-    name: ""
-  });
+  const [paymentStep, setPaymentStep] = useState<'form' | 'processing' | 'success'>('form');
+  const [savedPaymentMethods, setSavedPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
+
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const totalAmount = bag.price * quantity;
+
+  // Load saved payment methods
+  useEffect(() => {
+    const loadPaymentMethods = () => {
+      try {
+        const saved = localStorage.getItem('foodvrse_payment_methods');
+        if (saved) {
+          const methods = JSON.parse(saved);
+          setSavedPaymentMethods(methods);
+          
+          // Auto-select default M-Pesa method
+          const defaultMpesa = methods.find((m: PaymentMethod) => m.type === 'M-Pesa' && m.default);
+          if (defaultMpesa) {
+            setSelectedPaymentMethod(defaultMpesa);
+            setPhoneNumber(defaultMpesa.number);
+            setPaymentMethod('mpesa');
+          }
+        } else {
+          // Set default payment methods if none exist
+          const defaultMethods = [
+            { id: 1, type: "M-Pesa", number: "", default: true },
+          ];
+          setSavedPaymentMethods(defaultMethods);
+          localStorage.setItem('foodvrse_payment_methods', JSON.stringify(defaultMethods));
+        }
+      } catch (error) {
+        console.error('Error loading payment methods:', error);
+      }
+    };
+
+    if (isOpen) {
+      loadPaymentMethods();
+    }
+  }, [isOpen]);
 
   const validatePhoneNumber = (phone: string): boolean => {
     // Kenyan phone number validation (254xxxxxxxxx or 07xxxxxxxx format)
@@ -37,62 +79,83 @@ export const PaymentPopup = ({ isOpen, onClose, bag, quantity }: PaymentPopupPro
     return phoneRegex.test(phone.replace(/\s+/g, ''));
   };
 
-  const validateCardNumber = (number: string): boolean => {
-    // Basic Luhn algorithm for card validation
-    const cleanNumber = number.replace(/\s+/g, '');
-    if (!/^\d{13,19}$/.test(cleanNumber)) return false;
-    
-    let sum = 0;
-    let isEven = false;
-    for (let i = cleanNumber.length - 1; i >= 0; i--) {
-      let digit = parseInt(cleanNumber[i]);
-      if (isEven) {
-        digit *= 2;
-        if (digit > 9) digit -= 9;
-      }
-      sum += digit;
-      isEven = !isEven;
-    }
-    return sum % 10 === 0;
-  };
-
-  const validateExpiryDate = (expiry: string): boolean => {
-    const match = expiry.match(/^(\d{2})\/(\d{2})$/);
-    if (!match) return false;
-    
-    const month = parseInt(match[1]);
-    const year = parseInt(match[2]) + 2000;
-    const now = new Date();
-    const expiryDate = new Date(year, month - 1);
-    
-    return month >= 1 && month <= 12 && expiryDate > now;
-  };
-
-  const validateCVV = (cvv: string): boolean => {
-    return /^\d{3,4}$/.test(cvv);
-  };
-
   const sanitizeInput = (input: string): string => {
     return input.replace(/[<>\"'&]/g, '').trim();
+  };
+
+  const formatPhoneNumber = (phone: string): string => {
+    // Format phone number for display
+    const clean = phone.replace(/\s+/g, '');
+    if (clean.startsWith('254')) {
+      return `+${clean}`;
+    } else if (clean.startsWith('0')) {
+      return `+254${clean.slice(1)}`;
+    }
+    return clean;
+  };
+
+  const storeOrder = async () => {
+    if (!user) return;
+
+    try {
+      // Generate pickup code
+      const pickupCode = `FV${Date.now().toString().slice(-6)}`;
+      
+      // Create order record
+      const orderData = {
+        user_id: user.id,
+        quantity: quantity,
+        total_amount: totalAmount,
+        original_total: totalAmount,
+        status: 'paid',
+        payment_method: 'mpesa',
+        pickup_code: pickupCode,
+        notes: `${bag.vendor} - ${bag.title}`,
+        created_at: new Date().toISOString()
+      };
+
+      // Store in localStorage
+      const existingOrders = JSON.parse(localStorage.getItem('foodvrse_orders') || '[]');
+      const newOrder = {
+        id: `ord_${Date.now()}`,
+        ...orderData,
+        bag_details: bag
+      };
+      
+      existingOrders.unshift(newOrder);
+      localStorage.setItem('foodvrse_orders', JSON.stringify(existingOrders));
+      
+      console.log('Order stored:', newOrder);
+    } catch (error) {
+      console.error('Error storing order:', error);
+    }
+  };
+
+  const handlePaymentMethodSelect = (method: PaymentMethod) => {
+    setSelectedPaymentMethod(method);
+    if (method.type === 'M-Pesa') {
+      setPhoneNumber(method.number);
+      setPaymentMethod('mpesa');
+    }
   };
 
   const handlePayment = async () => {
     if (!paymentMethod) {
       toast({
         title: "Select Payment Method",
-        description: "Please select a payment method to continue",
+        description: "Please select M-Pesa to continue",
         variant: "destructive"
       });
       return;
     }
 
-    if (paymentMethod === 'mpesa' || paymentMethod === 'airtel') {
+    if (paymentMethod === 'mpesa') {
       const cleanPhone = sanitizeInput(phoneNumber);
       
       if (!cleanPhone) {
         toast({
           title: "Phone Number Required",
-          description: "Please enter your phone number",
+          description: "Please enter your M-Pesa phone number",
           variant: "destructive"
         });
         return;
@@ -107,169 +170,182 @@ export const PaymentPopup = ({ isOpen, onClose, bag, quantity }: PaymentPopupPro
         return;
       }
       
+      // Start payment processing
+      setPaymentStep('processing');
+      
       // Simulate STK push
       toast({
-        title: "Payment Request Sent",
-        description: `Please check your phone for the ${paymentMethod.toUpperCase()} payment prompt`,
+        title: "STK Push Sent",
+        description: "Please check your phone and enter your M-Pesa PIN",
       });
       
-      // Simulate payment success after 3 seconds
-      setTimeout(() => {
-        toast({
-          title: "Payment Successful!",
-          description: `Your ${bag.title} has been reserved. Please collect between ${bag.pickup}`,
-        });
-        onClose();
+      // Simulate payment processing and success
+      setTimeout(async () => {
+        // Store the order
+        await storeOrder();
+        
+        setPaymentStep('success');
+        
+        // Show success after a short delay
+        setTimeout(() => {
+          toast({
+            title: "🎉 You're a FoodVrse Champion!",
+            description: "Payment successful! Remember to collect your order during pickup time.",
+          });
+          
+          // Close popup after showing success message
+          setTimeout(() => {
+            onClose();
+            setPaymentStep('form'); // Reset for next time
+          }, 2000);
+        }, 1000);
       }, 3000);
-    } else if (paymentMethod === 'card') {
-      const cleanCardNumber = sanitizeInput(cardDetails.number);
-      const cleanExpiry = sanitizeInput(cardDetails.expiry);
-      const cleanCVV = sanitizeInput(cardDetails.cvv);
-      const cleanName = sanitizeInput(cardDetails.name);
-
-      if (!cleanCardNumber || !cleanExpiry || !cleanCVV || !cleanName) {
-        toast({
-          title: "Card Details Required",
-          description: "Please fill in all card details",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (!validateCardNumber(cleanCardNumber)) {
-        toast({
-          title: "Invalid Card Number",
-          description: "Please enter a valid card number",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (!validateExpiryDate(cleanExpiry)) {
-        toast({
-          title: "Invalid Expiry Date",
-          description: "Please enter a valid expiry date (MM/YY) in the future",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (!validateCVV(cleanCVV)) {
-        toast({
-          title: "Invalid CVV",
-          description: "Please enter a valid 3 or 4 digit CVV",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (cleanName.length < 2) {
-        toast({
-          title: "Invalid Cardholder Name",
-          description: "Please enter the full name on the card",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      toast({
-        title: "Payment Successful!",
-        description: `Your ${bag.title} has been reserved. Please collect between ${bag.pickup}`,
-      });
-      onClose();
     }
   };
 
+  const handleClose = () => {
+    if (paymentStep !== 'processing') {
+      onClose();
+      setPaymentStep('form');
+    }
+  };
+
+  const handleManagePaymentMethods = () => {
+    // Navigate to profile payment methods section
+    window.location.href = '/profile?section=payment';
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-auto p-6">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h2 className="font-bold text-lg">{bag.vendor} - {bag.location}</h2>
-          <p className="text-gray-600 text-sm mt-1">Today: {bag.pickup}</p>
-          <p className="font-bold text-lg mt-2">Total: KSh {totalAmount.toLocaleString()}</p>
-        </div>
-
-        {/* Payment Methods */}
-        <div className="space-y-4">
-          <h3 className="font-medium text-center">Select Payment Method</h3>
-          
-          <div className="grid grid-cols-3 gap-3">
-            <Button
-              variant={paymentMethod === 'card' ? 'default' : 'outline'}
-              className="flex flex-col items-center p-4 h-auto"
-              onClick={() => setPaymentMethod('card')}
-            >
-              <CreditCard className="w-6 h-6 mb-2" />
-              <span className="text-xs">Card</span>
-            </Button>
-            
-            <Button
-              variant={paymentMethod === 'mpesa' ? 'default' : 'outline'}
-              className="flex flex-col items-center p-4 h-auto"
-              onClick={() => setPaymentMethod('mpesa')}
-            >
-              <Smartphone className="w-6 h-6 mb-2" />
-              <span className="text-xs">M-Pesa</span>
-            </Button>
-            
-            <Button
-              variant={paymentMethod === 'airtel' ? 'default' : 'outline'}
-              className="flex flex-col items-center p-4 h-auto"
-              onClick={() => setPaymentMethod('airtel')}
-            >
-              <Smartphone className="w-6 h-6 mb-2" />
-              <span className="text-xs">Airtel</span>
-            </Button>
-          </div>
-
-          {/* Payment Forms */}
-          {(paymentMethod === 'mpesa' || paymentMethod === 'airtel') && (
-            <div className="space-y-3">
-              <Input
-                placeholder={`Enter ${paymentMethod.toUpperCase()} number`}
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                type="tel"
-              />
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-sm mx-auto p-6 max-h-[90vh] overflow-y-auto w-[95vw] sm:w-[400px] fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+        
+        {paymentStep === 'form' && (
+          <>
+            {/* Header */}
+            <div className="text-center mb-6">
+              <h2 className="font-bold text-lg">{bag.vendor} - {bag.location}</h2>
+              <p className="text-gray-600 text-sm mt-1">Today: {bag.pickup}</p>
+              <p className="font-bold text-lg mt-2">Total: KSh {totalAmount.toLocaleString()}</p>
             </div>
-          )}
 
-          {paymentMethod === 'card' && (
-            <div className="space-y-3">
-              <Input
-                placeholder="Card Number"
-                value={cardDetails.number}
-                onChange={(e) => setCardDetails({...cardDetails, number: e.target.value})}
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <Input
-                  placeholder="MM/YY"
-                  value={cardDetails.expiry}
-                  onChange={(e) => setCardDetails({...cardDetails, expiry: e.target.value})}
-                />
-                <Input
-                  placeholder="CVV"
-                  value={cardDetails.cvv}
-                  onChange={(e) => setCardDetails({...cardDetails, cvv: e.target.value})}
-                />
+            {/* Payment Methods */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium">Payment Method</h3>
+                <button
+                  onClick={handleManagePaymentMethods}
+                  className="text-sm text-green-600 hover:text-green-700 underline"
+                >
+                  Manage Payment Methods
+                </button>
               </div>
-              <Input
-                placeholder="Cardholder Name"
-                value={cardDetails.name}
-                onChange={(e) => setCardDetails({...cardDetails, name: e.target.value})}
-              />
-            </div>
-          )}
+              
+              {/* Saved Payment Methods */}
+              {savedPaymentMethods.length > 0 && (
+                <div className="space-y-2">
+                  {savedPaymentMethods.map((method) => (
+                    <div
+                      key={method.id}
+                      className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                        selectedPaymentMethod?.id === method.id
+                          ? 'border-green-500 bg-green-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => handlePaymentMethodSelect(method)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          {method.type === 'M-Pesa' ? (
+                            <Smartphone className="w-5 h-5 text-green-600" />
+                          ) : (
+                            <CreditCard className="w-5 h-5 text-blue-600" />
+                          )}
+                          <div>
+                            <p className="font-medium">{method.type}</p>
+                            <p className="text-sm text-gray-600">
+                              {method.type === 'M-Pesa' 
+                                ? formatPhoneNumber(method.number) || 'No number saved'
+                                : method.number
+                              }
+                            </p>
+                          </div>
+                        </div>
+                        {method.default && (
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                            Default
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-          {/* Pay button */}
-          <Button 
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3"
-            onClick={handlePayment}
-          >
-            {paymentMethod === 'card' ? 'PAY NOW' : 'SEND PAYMENT REQUEST'}
-          </Button>
-        </div>
+              {/* M-Pesa Phone Number Form */}
+              {paymentMethod === 'mpesa' && (
+                <div className="space-y-3">
+                  <Input
+                    placeholder="Enter M-Pesa phone number (e.g., 0712345678)"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    type="tel"
+                    className="text-center text-lg"
+                  />
+                  <p className="text-xs text-gray-500 text-center">
+                    You will receive an STK push to complete payment
+                  </p>
+                </div>
+              )}
+
+              {/* Pay button */}
+              <Button 
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3"
+                onClick={handlePayment}
+                disabled={!paymentMethod || (paymentMethod === 'mpesa' && !phoneNumber.trim())}
+              >
+                SEND PAYMENT REQUEST
+              </Button>
+            </div>
+          </>
+        )}
+
+        {paymentStep === 'processing' && (
+          <div className="text-center py-8">
+            <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-green-600" />
+            <p className="text-lg font-medium mb-2">Processing Payment...</p>
+            <p className="text-sm text-gray-600 mb-4">
+              Please check your phone for the M-Pesa prompt and enter your PIN
+            </p>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <p className="text-xs text-yellow-800">
+                💡 Enter your M-Pesa PIN on your phone to complete the payment
+              </p>
+            </div>
+          </div>
+        )}
+
+        {paymentStep === 'success' && (
+          <div className="text-center py-8">
+            <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500" />
+            <h3 className="text-xl font-bold mb-2 text-green-600">🎉 You're a FoodVrse Champion!</h3>
+            <p className="text-lg font-medium mb-2">Payment Successful!</p>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+              <p className="text-sm text-green-800 mb-2">
+                <strong>Order Details:</strong>
+              </p>
+              <p className="text-sm text-green-700">
+                {quantity}x {bag.title} - KSh {totalAmount.toLocaleString()}
+              </p>
+              <p className="text-sm text-green-700">
+                Pickup: {bag.pickup} at {bag.location}
+              </p>
+            </div>
+            <p className="text-sm text-gray-600">
+              Remember to collect your order during pickup time. Thank you for reducing food waste! 🌱
+            </p>
+          </div>
+        )}
+
       </DialogContent>
     </Dialog>
   );

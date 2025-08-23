@@ -1,13 +1,12 @@
 /// <reference types="@types/google.maps" />
 import { useState, useEffect, useRef } from 'react';
-import { Loader } from '@googlemaps/js-api-loader';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MapPin, Search, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
-import { API_CONFIG } from "@/config/api";
+import { loadGoogleMaps } from '@/services/googleMapsLoader';
 
 interface GoogleMapsLocationPickerProps {
   businessId: string;
@@ -31,9 +30,9 @@ const GoogleMapsLocationPicker = ({
   useEffect(() => {
     const initializeMap = async () => {
       try {
-        // Use the centralized API configuration
-        const apiKey = API_CONFIG.GOOGLE_MAPS_API_KEY;
-        await loadMap(apiKey);
+        // Load Google Maps using centralized loader
+        await loadGoogleMaps({ libraries: ['places'] });
+        await loadMap();
       } catch (error) {
         console.error('Error loading Google Maps:', error);
         toast.error('Failed to load Google Maps. Please check your API key.');
@@ -41,18 +40,10 @@ const GoogleMapsLocationPicker = ({
       }
     };
 
-    const loadMap = async (apiKey: string) => {
+    const loadMap = async () => {
       if (!mapRef.current) return;
 
-      const loader = new Loader({
-        apiKey,
-        version: 'weekly',
-        libraries: ['places']
-      });
-
       try {
-        await loader.load();
-        
         // Default location or current location
         const defaultLocation = currentLocation || { lat: -1.2921, lng: 36.8219 }; // Nairobi, Kenya
         

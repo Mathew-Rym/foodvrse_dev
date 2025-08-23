@@ -6,16 +6,22 @@ import { Badge } from "@/components/ui/badge";
 import MobileLayout from "@/components/MobileLayout";
 import { FilterPopup, FilterOptions } from "@/components/FilterPopup";
 import { LocationSelector } from "@/components/LocationSelector";
-import { CategoryCarousel } from "@/components/CategoryCarousel";
+
 import { StoreProfilePage } from "@/components/StoreProfilePage";
 import ListingsGrid from "@/components/ListingsGrid";
 import GoogleMapsSearch from "@/components/GoogleMapsSearch";
 import DonatePopup from "@/components/DonatePopup";
 import EnhancedLocationSearch from "@/components/EnhancedLocationSearch";
+import { DiscoverCheckoutPopup } from "@/components/DiscoverCheckoutPopup";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
+import { checkIfBusinessPartner } from "@/services/businessPartnerService";
 
 const Discover = () => {
+  const { user } = useAuth();
+  const { addFavorite, removeFavorite, isFavorited } = useFavorites();
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>([]);
   const [currentLocation, setCurrentLocation] = useState({
@@ -37,8 +43,88 @@ const Discover = () => {
   const [activeFilters, setActiveFilters] = useState<FilterOptions | null>(null);
   const [filterClickEvent, setFilterClickEvent] = useState<React.MouseEvent | null>(null);
   const [donateClickEvent, setDonateClickEvent] = useState<React.MouseEvent | null>(null);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [mysteryBags, setMysteryBags] = useState<any[]>([]);
+  const [partnerBusinesses, setPartnerBusinesses] = useState<any[]>([]);
+  const [loadingMysteryBags, setLoadingMysteryBags] = useState(false);
 
-  // Mock data for demonstration
+  // Mock data for demonstration - Dummy products with working favorites
+  const dummyProducts = [
+    {
+      id: "dummy-1",
+      name: "Chicken Burger Combo",
+      storeName: "Java House",
+      location: "Westlands",
+      pickup: "5:00 PM - 8:00 PM",
+      price: 240,
+      originalPrice: 800,
+      quantity: 5,
+      rating: 4.5,
+      image: "🍔"
+    },
+    {
+      id: "dummy-2", 
+      name: "Coffee & Pastry Bundle",
+      storeName: "Java House",
+      location: "Westlands", 
+      pickup: "5:00 PM - 8:00 PM",
+      price: 180,
+      originalPrice: 600,
+      quantity: 3,
+      rating: 4.5,
+      image: "☕"
+    },
+    {
+      id: "dummy-3",
+      name: "Pasta Carbonara", 
+      storeName: "Artcaffe",
+      location: "CBD",
+      pickup: "6:00 PM - 9:00 PM",
+      price: 480,
+      originalPrice: 1200,
+      quantity: 2,
+      rating: 4.3,
+      image: "🍝"
+    },
+    {
+      id: "dummy-4",
+      name: "Fresh Croissant Pack",
+      storeName: "Artcaffe", 
+      location: "CBD",
+      pickup: "6:00 PM - 9:00 PM",
+      price: 80,
+      originalPrice: 200,
+      quantity: 8,
+      rating: 4.3,
+      image: "🥐"
+    },
+    {
+      id: "dummy-5",
+      name: "Mystery Pizza Box",
+      storeName: "Debonairs Pizza",
+      location: "Karen",
+      pickup: "7:00 PM - 10:00 PM", 
+      price: 350,
+      originalPrice: 900,
+      quantity: 3,
+      rating: 4.6,
+      image: "🍕"
+    },
+    {
+      id: "dummy-6",
+      name: "Healthy Salad Bowl",
+      storeName: "Healthy U",
+      location: "Kilimani",
+      pickup: "12:00 PM - 3:00 PM",
+      price: 120,
+      originalPrice: 400,
+      quantity: 6,
+      rating: 4.2,
+      image: "🥗"
+    }
+  ];
+
   const mockStores = [
     {
       id: "1",
@@ -72,12 +158,59 @@ const Discover = () => {
 
   const popularSearches = ["Pizza", "Coffee", "Burgers", "Desserts", "Healthy"];
 
-  const toggleFavorite = (storeId: string) => {
-    setFavorites(prev => 
-      prev.includes(storeId) 
-        ? prev.filter(id => id !== storeId)
-        : [...prev, storeId]
-    );
+  // Fetch mystery bags when location changes
+  useEffect(() => {
+    fetchMysteryBags();
+    fetchPartnerBusinesses();
+  }, [currentLocation]);
+
+  // Auto-detect user location on first load
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setCurrentLocation({
+            lat: latitude,
+            lng: longitude,
+            address: "Your current location",
+            distance: 10
+          });
+        },
+        (error) => {
+          console.log("Location access denied, using default location");
+          // Default to Nairobi
+        }
+      );
+    }
+  }, []);
+
+  const toggleFavorite = async (itemId: string) => {
+    if (!user) {
+      toast.error("Please sign in to save favorites");
+      return;
+    }
+
+    try {
+      if (isFavorited(itemId)) {
+        await removeFavorite(itemId);
+        toast.success("Removed from favorites");
+      } else {
+        await addFavorite(itemId);
+        toast.success("Added to favorites");
+      }
+    } catch (error) {
+      toast.error("Failed to update favorite");
+    }
+  };
+
+  const handleReserveItem = (item: any) => {
+    if (!user) {
+      toast.error("Please sign in to reserve items");
+      return;
+    }
+    setSelectedItem(item);
+    setShowCheckout(true);
   };
 
   const handleSearchLocationSelect = ({ lat, lng, address }: { lat: number; lng: number; address: string }) => {
@@ -91,8 +224,124 @@ const Discover = () => {
   };
 
   const handleLocationSelect = (location: any) => {
-    setCurrentLocation(location);
+    setCurrentLocation({...location, distance: 10});
     setShowLocationSelector(false);
+  };
+
+  // Fetch mystery bags from partner businesses
+  const fetchMysteryBags = async () => {
+    setLoadingMysteryBags(true);
+    try {
+      // Fetch mystery bags from verified partner businesses within radius
+      const { data: mysteryBagsData, error } = await supabase
+        .from('mystery_bags')
+        .select(`
+          *,
+          business_profiles!inner (
+            id,
+            business_name,
+            location,
+            latitude,
+            longitude,
+            address,
+            business_logo_url,
+            description
+          )
+        `)
+        .eq('is_active', true)
+        .gt('items_available', 0)
+        .gte('pickup_date', new Date().toISOString().split('T')[0]); // Today or future
+
+      if (error) {
+        console.error('Error fetching mystery bags:', error);
+        return;
+      }
+
+      if (mysteryBagsData && mysteryBagsData.length > 0) {
+        // Calculate distances and filter by location
+        const bagsWithDistance = mysteryBagsData
+          .map((bag: any) => {
+            const business = bag.business_profiles;
+            if (!business?.latitude || !business?.longitude) return null;
+            
+            const distance = calculateDistance(
+              currentLocation.lat,
+              currentLocation.lng,
+              business.latitude as number,
+              business.longitude as number
+            );
+            
+            return {
+              ...bag,
+              business: business,
+              distance: distance
+            };
+          })
+          .filter((bag: any) => bag !== null)
+          .sort((a: any, b: any) => a.distance - b.distance);
+
+        setMysteryBags(bagsWithDistance);
+      }
+    } catch (error) {
+      console.error('Error in fetchMysteryBags:', error);
+    } finally {
+      setLoadingMysteryBags(false);
+    }
+  };
+
+  // Fetch partner businesses
+  const fetchPartnerBusinesses = async () => {
+    try {
+      const { data: businessData, error } = await supabase
+        .from('business_profiles')
+        .select('*')
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null);
+
+      if (error) {
+        console.error('Error fetching partner businesses:', error);
+        return;
+      }
+
+      if (businessData) {
+        // Filter verified partners using checkIfBusinessPartner
+        const verifiedPartners: any[] = [];
+        for (const business of businessData) {
+          if (business.email && business.latitude && business.longitude) {
+            const partnerCheck = await checkIfBusinessPartner(business.email);
+            if (partnerCheck.isBusinessPartner) {
+              const distance = calculateDistance(
+                currentLocation.lat,
+                currentLocation.lng,
+                business.latitude,
+                business.longitude
+              );
+              verifiedPartners.push({
+                ...business,
+                distance: distance
+              });
+            }
+          }
+        }
+        
+        setPartnerBusinesses(verifiedPartners.sort((a, b) => a.distance - b.distance));
+      }
+    } catch (error) {
+      console.error('Error in fetchPartnerBusinesses:', error);
+    }
+  };
+
+  // Calculate distance between two coordinates
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
   };
 
   const handleStoreSelect = (store: any) => {
@@ -231,16 +480,318 @@ const Discover = () => {
                 // You can add navigation to business details here
               }}
               onLocationChange={(location) => {
-                setCurrentLocation(location);
+                setCurrentLocation({...location, distance: 10});
               }}
             />
           </div>
         ) : (
           /* List View */
           <div className="space-y-6 p-4">
+            {/* Mystery Bags from Partner Businesses */}
+            {mysteryBags.length > 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-gray-900">🎒 Partner Mystery Bags</h2>
+                  <Badge variant="secondary" className="bg-green-100 text-green-700">
+                    {mysteryBags.length} available
+                  </Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-3">
+                  {mysteryBags.slice(0, 6).map((bag) => (
+                    <div key={bag.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                      <div className="flex">
+                        {/* Business Logo/Image */}
+                        <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-blue-100 flex items-center justify-center">
+                          {bag.business.business_logo_url ? (
+                            <img 
+                              src={bag.business.business_logo_url} 
+                              alt={bag.business.business_name}
+                              className="w-12 h-12 rounded-lg object-cover"
+                            />
+                          ) : (
+                            <span className="text-2xl">🏪</span>
+                          )}
+                        </div>
+
+                        {/* Mystery Bag Details */}
+                        <div className="flex-1 p-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-sm text-gray-900 mb-1">{bag.title}</h3>
+                              <p className="text-xs text-gray-600 mb-1">{bag.business.business_name}</p>
+                              <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
+                                <MapPin className="w-3 h-3" />
+                                <span>{(bag.distance).toFixed(1)} km away</span>
+                                <Clock className="w-3 h-3 ml-2" />
+                                <span>{bag.pickup_start_time} - {bag.pickup_end_time}</span>
+                              </div>
+                            </div>
+                            
+                            {/* Favorite Button */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorite(bag.id);
+                              }}
+                              className={`p-1 rounded-full ${
+                                isFavorited(bag.id)
+                                  ? "text-red-500"
+                                  : "text-gray-400 hover:text-red-500"
+                              } transition-colors`}
+                            >
+                              <Heart className={`w-4 h-4 ${isFavorited(bag.id) ? "fill-current" : ""}`} />
+                            </button>
+                          </div>
+
+                          {/* Price and Reserve */}
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg font-bold text-green-600">KSh {bag.price}</span>
+                                <span className="text-sm text-gray-500 line-through">KSh {bag.original_price}</span>
+                              </div>
+                              <div className="text-xs text-gray-500">{bag.items_available} items left</div>
+                            </div>
+                            <Button
+                              onClick={() => handleReserveItem({
+                                id: bag.id,
+                                name: bag.title,
+                                storeName: bag.business.business_name,
+                                location: bag.business.location,
+                                pickup: `${bag.pickup_start_time} - ${bag.pickup_end_time}`,
+                                price: bag.price,
+                                originalPrice: bag.original_price,
+                                quantity: bag.items_available
+                              })}
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 text-xs rounded-lg"
+                            >
+                              Reserve
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {mysteryBags.length > 6 && (
+                  <Button variant="outline" className="w-full">
+                    View All {mysteryBags.length} Mystery Bags
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {/* Loading State for Mystery Bags */}
+            {loadingMysteryBags && (
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold text-gray-900">🎒 Partner Mystery Bags</h2>
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                  <span className="ml-3 text-gray-600">Loading mystery bags...</span>
+                </div>
+              </div>
+            )}
+
+            {/* No Mystery Bags Found */}
+            {!loadingMysteryBags && mysteryBags.length === 0 && (
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold text-gray-900">🎒 Partner Mystery Bags</h2>
+                <div className="bg-gray-50 rounded-xl p-6 text-center">
+                  <div className="text-4xl mb-3">🔍</div>
+                  <h3 className="font-semibold text-gray-900 mb-2">No mystery bags found nearby</h3>
+                  <p className="text-gray-600 text-sm mb-4">
+                    We couldn't find any mystery bags from partner businesses in your area.
+                  </p>
+                  <Button
+                    onClick={() => setShowLocationSelector(true)}
+                    variant="outline"
+                    className="mr-3"
+                  >
+                    Change Location
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      fetchMysteryBags();
+                      fetchPartnerBusinesses();
+                    }}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    Refresh
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Dummy Products for Testing - Available Now */}
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold text-gray-900">Available Now - Test Items</h2>
+              <div className="grid grid-cols-1 gap-4">
+                {dummyProducts.slice(0, 3).map((product) => (
+                  <div key={product.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    {/* Product Card */}
+                    <div className="relative">
+                      {/* Favorite Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(product.id);
+                        }}
+                        className={`absolute top-3 right-3 z-10 p-2 rounded-full ${
+                          isFavorited(product.id)
+                            ? "bg-red-500 text-white hover:bg-red-600"
+                            : "bg-white/90 text-gray-700 hover:bg-white"
+                        } shadow-md transition-colors`}
+                      >
+                        <Heart className={`w-4 h-4 ${isFavorited(product.id) ? "fill-current" : ""}`} />
+                      </button>
+
+                      {/* Product Image/Emoji */}
+                      <div className="h-32 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                        <span className="text-6xl">{product.image}</span>
+                      </div>
+                    </div>
+
+                    {/* Product Details */}
+                    <div className="p-4">
+                      {/* Store Info */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <span className="text-lg">🏪</span>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-sm">{product.storeName}</h3>
+                          <p className="text-xs text-gray-600 flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {product.location}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Product Name */}
+                      <h4 className="font-medium text-gray-900 mb-2">{product.name}</h4>
+                      
+                      {/* Pickup Time */}
+                      <p className="text-sm text-gray-600 flex items-center gap-1 mb-3">
+                        <Clock className="w-4 h-4" />
+                        {product.pickup}
+                      </p>
+
+                      {/* Price and Reserve */}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-xl font-bold text-gray-900">KSh {product.price}</div>
+                          {product.originalPrice > product.price && (
+                            <div className="text-sm text-gray-500 line-through">
+                              KSh {product.originalPrice}
+                            </div>
+                          )}
+                        </div>
+                        <Button
+                          onClick={() => handleReserveItem(product)}
+                          className="bg-gradient-to-r from-brand-green to-brand-yellow text-white hover:from-brand-green/90 hover:to-brand-yellow/90 px-6 py-2 rounded-xl"
+                        >
+                          Reserve
+                        </Button>
+                      </div>
+
+                      {/* Quantity Left */}
+                      <div className="mt-2 text-xs text-gray-500">
+                        {product.quantity} items left
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* More Test Items */}
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold text-gray-900">Pick Up Later - Test Items</h2>
+              <div className="grid grid-cols-1 gap-4">
+                {dummyProducts.slice(3).map((product) => (
+                  <div key={product.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    {/* Product Card */}
+                    <div className="relative">
+                      {/* Favorite Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(product.id);
+                        }}
+                        className={`absolute top-3 right-3 z-10 p-2 rounded-full ${
+                          isFavorited(product.id)
+                            ? "bg-red-500 text-white hover:bg-red-600"
+                            : "bg-white/90 text-gray-700 hover:bg-white"
+                        } shadow-md transition-colors`}
+                      >
+                        <Heart className={`w-4 h-4 ${isFavorited(product.id) ? "fill-current" : ""}`} />
+                      </button>
+
+                      {/* Product Image/Emoji */}
+                      <div className="h-32 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                        <span className="text-6xl">{product.image}</span>
+                      </div>
+                    </div>
+
+                    {/* Product Details */}
+                    <div className="p-4">
+                      {/* Store Info */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <span className="text-lg">🏪</span>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-sm">{product.storeName}</h3>
+                          <p className="text-xs text-gray-600 flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {product.location}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Product Name */}
+                      <h4 className="font-medium text-gray-900 mb-2">{product.name}</h4>
+                      
+                      {/* Pickup Time */}
+                      <p className="text-sm text-gray-600 flex items-center gap-1 mb-3">
+                        <Clock className="w-4 h-4" />
+                        {product.pickup}
+                      </p>
+
+                      {/* Price and Reserve */}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-xl font-bold text-gray-900">KSh {product.price}</div>
+                          {product.originalPrice > product.price && (
+                            <div className="text-sm text-gray-500 line-through">
+                              KSh {product.originalPrice}
+                            </div>
+                          )}
+                        </div>
+                        <Button
+                          onClick={() => handleReserveItem(product)}
+                          className="bg-gradient-to-r from-brand-green to-brand-yellow text-white hover:from-brand-green/90 hover:to-brand-yellow/90 px-6 py-2 rounded-xl"
+                        >
+                          Reserve
+                        </Button>
+                      </div>
+
+                      {/* Quantity Left */}
+                      <div className="mt-2 text-xs text-gray-500">
+                        {product.quantity} items left
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Pick Up Now - Dynamic time-based listings */}
             <div className="space-y-3">
-              <h2 className="text-lg font-semibold text-gray-900">Pick Up Now</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Real Listings - Pick Up Now</h2>
               <ListingsGrid 
                 pickupTimeFilter="now"
                 showSoldOut={false}
@@ -267,13 +818,28 @@ const Discover = () => {
             {/* Categories */}
             <div className="space-y-3">
               <h2 className="text-lg font-semibold text-gray-900">Browse by Category</h2>
-              <CategoryCarousel 
-                onCategoryClick={(categoryName) => {
-                  console.log('Category clicked:', categoryName);
-                  // Navigate to category page
-                  window.location.href = `/category/${encodeURIComponent(categoryName)}`;
-                }}
-              />
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {[
+                  { name: "Fast Food", icon: "🍔", color: "bg-orange-100 text-orange-600" },
+                  { name: "Coffee & Tea", icon: "☕", color: "bg-brown-100 text-brown-600" },
+                  { name: "Bakery", icon: "🥐", color: "bg-yellow-100 text-yellow-600" },
+                  { name: "Healthy", icon: "🥗", color: "bg-green-100 text-green-600" },
+                  { name: "Pizza", icon: "🍕", color: "bg-red-100 text-red-600" },
+                  { name: "Desserts", icon: "🍰", color: "bg-pink-100 text-pink-600" }
+                ].map((category) => (
+                  <button
+                    key={category.name}
+                    onClick={() => {
+                      console.log('Category clicked:', category.name);
+                      window.location.href = `/category/${encodeURIComponent(category.name)}`;
+                    }}
+                    className={`p-4 rounded-lg ${category.color} border border-gray-200 hover:shadow-md transition-all duration-200 text-center`}
+                  >
+                    <div className="text-2xl mb-2">{category.icon}</div>
+                    <div className="text-sm font-medium">{category.name}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Popular Searches */}
@@ -355,7 +921,7 @@ const Discover = () => {
       <DonatePopup
         isOpen={showDonatePopup}
         onClose={() => setShowDonatePopup(false)}
-        clickEvent={donateClickEvent}
+        
       />
 
       {/* Enhanced Location Search */}
@@ -368,6 +934,18 @@ const Discover = () => {
           toast.success(`Found ${deals.length} deals in your area!`);
         }}
       />
+
+      {/* Discover Checkout Popup */}
+      {selectedItem && (
+        <DiscoverCheckoutPopup
+          isOpen={showCheckout}
+          onClose={() => {
+            setShowCheckout(false);
+            setSelectedItem(null);
+          }}
+          item={selectedItem}
+        />
+      )}
     </MobileLayout>
 
   );

@@ -1,18 +1,41 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { initializeBrowserCompatibility } from './utils/browserCompatibility'
-import { initializeSmallScreenOptimization } from './utils/smallScreenOptimization'
-import { initializeCertificateMonitoring } from './config/certificates'
+import { initializeEmailJS } from './config/emailjs'
 
-// Initialize browser compatibility before rendering
-initializeBrowserCompatibility();
+// Performance optimization: Initialize critical features
+const initializeApp = async () => {
+  // Initialize EmailJS
+  try {
+    initializeEmailJS();
+  } catch (error) {
+    console.warn('EmailJS initialization failed:', error);
+  }
 
-// Initialize small screen optimization
-initializeSmallScreenOptimization();
+  // Initialize browser compatibility
+  try {
+    const { initializeBrowserCompatibility } = await import('./utils/browserCompatibility');
+    initializeBrowserCompatibility();
+  } catch (error) {
+    console.warn('Browser compatibility initialization failed:', error);
+  }
 
-// Initialize certificate monitoring
-initializeCertificateMonitoring();
+  // Initialize small screen optimization
+  try {
+    const { initializeSmallScreenOptimization } = await import('./utils/smallScreenOptimization');
+    initializeSmallScreenOptimization();
+  } catch (error) {
+    console.warn('Small screen optimization initialization failed:', error);
+  }
+
+  // Initialize certificate monitoring
+  try {
+    const { initializeCertificateMonitoring } = await import('./config/certificates');
+    initializeCertificateMonitoring();
+  } catch (error) {
+    console.warn('Certificate monitoring initialization failed:', error);
+  }
+};
 
 // Fallback component in case the main app fails to load
 const FallbackApp = () => (
@@ -52,6 +75,9 @@ const rootElement = document.getElementById("root");
 if (rootElement) {
   try {
     const root = createRoot(rootElement);
+    
+    // Initialize app features asynchronously
+    initializeApp();
     
     // Wrap the app in a try-catch to handle any initialization errors
     try {

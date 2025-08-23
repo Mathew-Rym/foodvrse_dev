@@ -13,7 +13,6 @@ interface UserPreferences {
   push_notifications: boolean;
   theme_preference: string;
   language_preference: string;
-  last_activity: string;
   created_at: string;
   updated_at: string;
 }
@@ -61,7 +60,6 @@ export const useUserPreferences = () => {
         push_notifications: data.push_notifications || true,
         theme_preference: 'light',
         language_preference: 'en',
-        last_activity: new Date().toISOString(),
         created_at: data.created_at,
         updated_at: data.updated_at,
       };
@@ -82,8 +80,7 @@ export const useUserPreferences = () => {
     // Don't show if user has already given consent
     if (preferences.cookie_consent) return false;
 
-    // Check if user just completed onboarding
-    const onboardingComplete = localStorage.getItem('foodvrse-onboarding-complete');
+    // Check if user just completed onboarding (first-time users)
     const onboardingJustCompleted = localStorage.getItem('foodvrse-onboarding-just-completed');
     
     if (onboardingJustCompleted === 'true') {
@@ -92,15 +89,24 @@ export const useUserPreferences = () => {
       return true;
     }
 
-    // Check if user is returning after a long time (2 weeks)
-    if (preferences.last_activity) {
-      const lastActivity = new Date(preferences.last_activity);
-      const twoWeeksAgo = new Date();
-      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    // Check if user is returning after a long time (1 month)
+    const lastConsentCheck = localStorage.getItem('foodvrse-last-consent-check');
+    const lastLoginTime = localStorage.getItem('foodvrse-last-login-time');
+    
+    if (lastLoginTime) {
+      const lastLogin = new Date(lastLoginTime);
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
       
-      if (lastActivity < twoWeeksAgo) {
+      // Show consent if user hasn't logged in for 1+ months
+      if (lastLogin < oneMonthAgo) {
         return true;
       }
+    }
+
+    // For new users without any login history, show consent
+    if (!lastLoginTime) {
+      return true;
     }
 
     return false;
@@ -146,11 +152,12 @@ export const useUserPreferences = () => {
   const updateCookieConsent = async (consent: boolean) => {
     await updatePreferences({ 
       cookie_consent: consent,
-      last_activity: new Date().toISOString()
     });
     
     // Also update localStorage for immediate access
-    localStorage.setItem('foodvrse-cookie-consent', consent ? 'accepted' : 'declined');
+    localStorage.setItem("foodvrse-cookie-consent", consent ? "accepted" : "declined");
+    localStorage.setItem("foodvrse-last-consent-check", new Date().toISOString());
+    localStorage.setItem('foodvrse-last-consent-check', new Date().toISOString());
     
     // If analytics consent is being granted, also enable analytics
     if (consent) {
@@ -173,11 +180,10 @@ export const useUserPreferences = () => {
     }
   };
 
-  // Update last activity
+  // Update last activity - removed since last_activity field doesn't exist in schema
   const updateLastActivity = async () => {
-    if (user && preferences) {
-      await updatePreferences({ last_activity: new Date().toISOString() });
-    }
+    // This function is deprecated since last_activity field was removed
+    console.log('updateLastActivity called but last_activity field no longer exists');
   };
 
   // Initialize analytics (Google Analytics)

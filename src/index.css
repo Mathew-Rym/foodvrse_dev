@@ -526,3 +526,47 @@ All colors MUST be HSL.
     }
   }
 }
+
+/* Fix text visibility issues */
+.text-white {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+.text-white\/90 {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Ensure Profile page text is visible */
+.bg-gradient-to-br .text-white,
+.bg-gradient-to-r .text-white {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Fix text visibility issues */
+/* Additional fixes for visual artifacts */
+/* Remove all potential arrow characters and artifacts */
+
+/* Hide all scrollbars globally */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* Remove all pseudo-elements that could create visual artifacts */
+body::before,
+body::after,
+html::before,
+html::after,
+*::before,
+*::after {
+  content: none !important;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}

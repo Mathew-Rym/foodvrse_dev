@@ -15,75 +15,75 @@ interface Partner {
 const PARTNERS: Partner[] = [
   {
     id: '1',
-    name: 'FreshMart',
+    name: 'Food Market',
     logo: 'FreshMart',
-    logoUrl: 'https://via.placeholder.com/120x120/4ade80/ffffff?text=FM',
+    logoUrl: 'https://placehold.co/120x120/4ade80/ffffff?text=FM',
     website: 'https://freshmart.com',
-    description: 'Your neighborhood grocery store committed to reducing food waste',
+    description: 'Fresh produce and groceries',
     category: 'Grocery'
   },
   {
     id: '2',
-    name: 'Cafe Corner',
+    name: 'Coffee Corner',
     logo: 'Cafe Corner',
-    logoUrl: 'https://via.placeholder.com/120x120/fb923c/ffffff?text=CC',
+    logoUrl: 'https://placehold.co/120x120/fb923c/ffffff?text=CC',
     website: 'https://cafecorner.com',
-    description: 'Artisan coffee and fresh pastries, saving surplus daily',
+    description: 'Premium coffee and pastries',
     category: 'Cafe'
   },
   {
     id: '3',
-    name: 'Green Bakery',
+    name: 'Green Basket',
     logo: 'Green Bakery',
-    logoUrl: 'https://via.placeholder.com/120x120/22c55e/ffffff?text=GB',
+    logoUrl: 'https://placehold.co/120x120/22c55e/ffffff?text=GB',
     website: 'https://greenbakery.com',
-    description: 'Organic bakery offering day-old bread at discounted prices',
-    category: 'Bakery'
+    description: 'Organic and healthy foods',
+    category: 'Organic'
   },
   {
     id: '4',
     name: 'Ocean Delights',
     logo: 'Ocean Delights',
-    logoUrl: 'https://via.placeholder.com/120x120/3b82f6/ffffff?text=OD',
+    logoUrl: 'https://placehold.co/120x120/3b82f6/ffffff?text=OD',
     website: 'https://oceandelights.com',
-    description: 'Fresh seafood with sustainable practices',
-    category: 'Restaurant'
+    description: 'Fresh seafood and fish',
+    category: 'Seafood'
   },
   {
     id: '5',
     name: 'Veggie Paradise',
     logo: 'Veggie Paradise',
-    logoUrl: 'https://via.placeholder.com/120x120/84cc16/ffffff?text=VP',
+    logoUrl: 'https://placehold.co/120x120/84cc16/ffffff?text=VP',
     website: 'https://veggieparadise.com',
-    description: 'Farm-to-table vegetables and organic produce',
-    category: 'Market'
+    description: 'Vegetarian and vegan options',
+    category: 'Vegetarian'
   },
   {
     id: '6',
     name: 'Sweet Treats',
     logo: 'Sweet Treats',
-    logoUrl: 'https://via.placeholder.com/120x120/f472b6/ffffff?text=ST',
+    logoUrl: 'https://placehold.co/120x120/f472b6/ffffff?text=ST',
     website: 'https://sweettreats.com',
-    description: 'Artisan desserts and confectionery',
-    category: 'Dessert'
+    description: 'Bakery and desserts',
+    category: 'Bakery'
   },
   {
     id: '7',
-    name: 'Meat & More',
+    name: 'Meat Masters',
     logo: 'Meat & More',
-    logoUrl: 'https://via.placeholder.com/120x120/ef4444/ffffff?text=MM',
+    logoUrl: 'https://placehold.co/120x120/ef4444/ffffff?text=MM',
     website: 'https://meatandmore.com',
-    description: 'Quality meats and deli products',
+    description: 'Quality meat and poultry',
     category: 'Butcher'
   },
   {
     id: '8',
-    name: 'Healthy Eats',
+    name: 'Health Express',
     logo: 'Healthy Eats',
-    logoUrl: 'https://via.placeholder.com/120x120/10b981/ffffff?text=HE',
+    logoUrl: 'https://placehold.co/120x120/10b981/ffffff?text=HE',
     website: 'https://healthyeats.com',
-    description: 'Nutritious meals and healthy food options',
-    category: 'Health Food'
+    description: 'Health foods and supplements',
+    category: 'Health'
   }
 ];
 

@@ -1,0 +1,536 @@
+
+import { useState, useEffect, useRef } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { X, ArrowRight, ArrowLeft, MapPin, Gift, Users, Navigation, MessageCircle } from "lucide-react";
+import { useMediaQuery } from '@/hooks/use-mobile';
+
+interface OnboardingTourProps {
+  onComplete: () => void;
+  onSkip: () => void;
+}
+
+const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [spotlightStyle, setSpotlightStyle] = useState<{
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+    borderRadius?: string;
+  } | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<{
+    top?: string;
+    bottom?: string;
+    left?: string;
+    right?: string;
+    transform?: string;
+  }>({});
+  
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isTablet = useMediaQuery('(min-width: 769px) and (max-width: 1024px)');
+  const isLargeScreen = useMediaQuery('(min-width: 1025px)');
+
+  const steps = [
+    {
+      title: "Welcome to FoodVrse!",
+      content: "Discover amazing rescue meals and help reduce food waste while saving money and the planet",
+      targetId: "hero-section",
+      icon: <MapPin className="w-5 h-5" />,
+      mobilePosition: { top: "15%", left: "50%" },
+      tabletPosition: { top: "20%", left: "50%" },
+      desktopPosition: { top: "25%", left: "50%" }
+    },
+    {
+      title: "Mystery Bags",
+      content: "Try our surprise bags filled with rescued ingredients at great prices - perfect for adventurous foodies!",
+      targetId: "mystery-box-section",
+      icon: <Gift className="w-5 h-5" />,
+      mobilePosition: { top: "30%", left: "50%" },
+      tabletPosition: { top: "35%", left: "50%" },
+      desktopPosition: { top: "40%", left: "50%" }
+    },
+    {
+      title: "Mobile Navigation",
+      content: "When you sign in, you'll see a bottom navigation bar to explore all features and manage your orders",
+      targetId: "mobile-navigation",
+      icon: <Navigation className="w-5 h-5" />,
+      mobilePosition: { bottom: "100px", left: "50%" },
+      tabletPosition: { bottom: "120px", left: "50%" },
+      desktopPosition: { bottom: "140px", left: "50%" }
+    },
+    {
+      title: "Share Feedback",
+      content: "Look for the floating feedback button in the bottom right corner to share your ideas anytime!",
+      targetId: "feedback-fab",
+      icon: <MessageCircle className="w-5 h-5" />,
+      mobilePosition: { bottom: "80px", right: "80px" },
+      tabletPosition: { bottom: "100px", right: "100px" },
+      desktopPosition: { bottom: "120px", right: "120px" }
+    },
+    {
+      title: "Track Your Impact",
+      content: "See how much food waste you've helped prevent and the positive environmental impact you're making",
+      targetId: "partner-section",
+      icon: <Users className="w-5 h-5" />,
+      mobilePosition: { top: "50%", left: "50%" },
+      tabletPosition: { top: "55%", left: "50%" },
+      desktopPosition: { top: "60%", left: "50%" }
+    }
+  ];
+
+  // Enhanced positioning calculation
+  const getResponsivePosition = () => {
+    const currentStepData = steps[currentStep];
+    if (isMobile) return currentStepData.mobilePosition;
+    if (isTablet) return currentStepData.tabletPosition;
+    return currentStepData.desktopPosition;
+  };
+
+  // Smart tooltip positioning that positions tooltip right next to highlighted element
+  const calculateOptimalTooltipPosition = () => {
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const tooltipHeight = isMobile ? 280 : isTablet ? 300 : 320;
+    const tooltipWidth = isMobile ? Math.min(viewportWidth - 40, 320) : isTablet ? 360 : 400;
+    
+    const currentStepData = steps[currentStep];
+    let finalPosition: { top?: string; bottom?: string; left?: string; right?: string; transform?: string } = {};
+    
+    // Get target element for positioning context
+    const targetElement = document.getElementById(currentStepData.targetId) || 
+                         document.getElementById(currentStepData.targetId + '-fallback');
+    
+    if (targetElement && spotlightStyle) {
+      const elementRect = {
+        top: spotlightStyle.top,
+        left: spotlightStyle.left,
+        width: spotlightStyle.width,
+        height: spotlightStyle.height,
+        right: spotlightStyle.left + spotlightStyle.width,
+        bottom: spotlightStyle.top + spotlightStyle.height
+      };
+      
+      // Calculate available space in each direction
+      const spaceAbove = elementRect.top;
+      const spaceBelow = viewportHeight - elementRect.bottom;
+      const spaceLeft = elementRect.left;
+      const spaceRight = viewportWidth - elementRect.right;
+      
+      // Determine optimal position based on available space
+      const positions = [
+        { direction: 'below', space: spaceBelow, condition: spaceBelow >= tooltipHeight + 20 },
+        { direction: 'above', space: spaceAbove, condition: spaceAbove >= tooltipHeight + 20 },
+        { direction: 'right', space: spaceRight, condition: spaceRight >= tooltipWidth + 20 },
+        { direction: 'left', space: spaceLeft, condition: spaceLeft >= tooltipWidth + 20 }
+      ];
+      
+      // Find the best position with most space
+      const bestPosition = positions
+        .filter(p => p.condition)
+        .sort((a, b) => b.space - a.space)[0];
+      
+      if (bestPosition) {
+        switch (bestPosition.direction) {
+          case 'below':
+            finalPosition.top = `${elementRect.bottom + 20}px`;
+            finalPosition.left = `${Math.max(20, Math.min(viewportWidth - tooltipWidth - 20, elementRect.left + elementRect.width / 2 - tooltipWidth / 2))}px`;
+            break;
+          case 'above':
+            finalPosition.top = `${Math.max(20, elementRect.top - tooltipHeight - 20)}px`;
+            finalPosition.left = `${Math.max(20, Math.min(viewportWidth - tooltipWidth - 20, elementRect.left + elementRect.width / 2 - tooltipWidth / 2))}px`;
+            break;
+          case 'right':
+            finalPosition.left = `${elementRect.right + 20}px`;
+            finalPosition.top = `${Math.max(20, Math.min(viewportHeight - tooltipHeight - 20, elementRect.top + elementRect.height / 2 - tooltipHeight / 2))}px`;
+            break;
+          case 'left':
+            finalPosition.left = `${Math.max(20, elementRect.left - tooltipWidth - 20)}px`;
+            finalPosition.top = `${Math.max(20, Math.min(viewportHeight - tooltipHeight - 20, elementRect.top + elementRect.height / 2 - tooltipHeight / 2))}px`;
+            break;
+        }
+      } else {
+        // Fallback: position in center of viewport
+        finalPosition.top = '50%';
+        finalPosition.left = '50%';
+        finalPosition.transform = 'translate(-50%, -50%)';
+      }
+    } else {
+      // Fallback positioning for when element is not found
+      finalPosition.top = '50%';
+      finalPosition.left = '50%';
+      finalPosition.transform = 'translate(-50%, -50%)';
+    }
+    
+    return finalPosition;
+  };
+
+  // Update spotlight effect when step changes
+  useEffect(() => {
+    const updateSpotlight = () => {
+      const currentStepData = steps[currentStep];
+      let targetElement = document.getElementById(currentStepData.targetId);
+      
+      // Enhanced fallback handling for conditional elements
+      if (!targetElement) {
+        switch (currentStepData.targetId) {
+          case 'mobile-navigation':
+            // Create a fallback that represents where mobile navigation will appear
+            targetElement = document.createElement('div');
+            targetElement.id = 'mobile-navigation-fallback';
+            targetElement.style.position = 'fixed';
+            targetElement.style.bottom = '0';
+            targetElement.style.left = '0';
+            targetElement.style.width = '100%';
+            targetElement.style.height = '70px';
+            targetElement.style.backgroundColor = 'rgba(61, 108, 86, 0.15)';
+            targetElement.style.borderTop = '3px solid #3D6C56';
+            targetElement.style.pointerEvents = 'none';
+            targetElement.style.zIndex = '9998';
+            targetElement.style.boxShadow = '0 -2px 15px rgba(61, 108, 86, 0.3)';
+            // Add a text indicator
+            targetElement.innerHTML = '<div style="text-align: center; padding: 20px; color: #3D6C56; font-size: 14px; font-weight: 500;">Navigation will appear here when you sign in</div>';
+            document.body.appendChild(targetElement);
+            break;
+          case 'feedback-fab':
+            // Create a more visible fallback for feedback FAB
+            targetElement = document.createElement('div');
+            targetElement.id = 'feedback-fab-fallback';
+            targetElement.style.position = 'fixed';
+            targetElement.style.bottom = isMobile ? '100px' : '120px';
+            targetElement.style.right = '24px';
+            targetElement.style.width = '56px';
+            targetElement.style.height = '56px';
+            targetElement.style.backgroundColor = 'rgba(252, 218, 91, 0.1)';
+            targetElement.style.border = '3px solid #FCDA5B';
+            targetElement.style.borderRadius = '50%';
+            targetElement.style.pointerEvents = 'none';
+            targetElement.style.zIndex = '9998';
+            targetElement.style.boxShadow = '0 0 20px rgba(252, 218, 91, 0.3)';
+            document.body.appendChild(targetElement);
+            break;
+          case 'partner-section':
+            // Try to find the Become a Partner button
+            targetElement = document.getElementById('become-partner-button') || 
+                           document.getElementById('become-partner-button-mobile') ||
+                           document.querySelector('button[onclick*="handlePartnerClick"]') ||
+                           document.querySelector('button:contains("Become a Partner")');
+            break;
+          case 'hero-section':
+            // Fallback for hero section
+            targetElement = document.querySelector('main') || 
+                           document.querySelector('.hero-section') ||
+                           document.querySelector('section');
+            break;
+          case 'mystery-box-section':
+            // Fallback for mystery box section
+            targetElement = document.querySelector('.mystery-box') || 
+                           document.querySelector('[data-mystery-box]');
+            break;
+          default:
+            break;
+        }
+      }
+      
+      if (targetElement) {
+        const rect = targetElement.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        
+        // Enhanced responsive padding
+        const padding = isMobile ? 24 : isTablet ? 20 : 16;
+        
+        // Ensure the element is visible in viewport
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+        
+        let top, left, width, height;
+        
+        if (currentStepData.targetId === 'feedback-fab' || targetElement.style.position === 'fixed') {
+          // For fixed elements, use viewport coordinates directly
+          top = rect.top - padding;
+          left = rect.left - padding;
+          width = rect.width + (padding * 2);
+          height = rect.height + (padding * 2);
+        } else {
+          // For normal elements, use scroll-adjusted coordinates
+          top = rect.top + scrollTop - padding;
+          left = rect.left + scrollLeft - padding;
+          width = rect.width + (padding * 2);
+          height = rect.height + (padding * 2);
+        }
+        
+        // Enhanced boundary checking with better positioning
+        if (top < 0) {
+          top = 20;
+        }
+        if (left < 0) {
+          left = 20;
+        }
+        if (top + height > viewportHeight) {
+          height = viewportHeight - top - 20;
+        }
+        if (left + width > viewportWidth) {
+          width = viewportWidth - left - 20;
+        }
+        
+        // Ensure minimum size for visibility
+        const minSize = isMobile ? 140 : isTablet ? 120 : 100;
+        
+        const finalStyle = {
+          top: Math.max(0, top),
+          left: Math.max(0, left),
+          width: Math.max(width, minSize),
+          height: Math.max(height, minSize),
+          borderRadius: isMobile ? '24px' : isTablet ? '20px' : '16px'
+        };
+        
+        setSpotlightStyle(finalStyle);
+        
+        // Scroll element into view if needed with improved timing
+        setTimeout(() => {
+          if (targetElement.scrollIntoView) {
+            targetElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center',
+              inline: 'center'
+            });
+          }
+        }, 100);
+        
+        // Clean up fallback elements with delay
+        if (targetElement.id && (targetElement.id.includes('fallback') || targetElement.id.includes('focused'))) {
+          setTimeout(() => {
+            if (targetElement && targetElement.parentNode) {
+              targetElement.parentNode.removeChild(targetElement);
+            }
+          }, 1000);
+        }
+      }
+      
+      // Update tooltip position
+      setTooltipPosition(calculateOptimalTooltipPosition());
+    };
+
+    updateSpotlight();
+    
+    // Add resize listener for responsive updates
+    const handleResize = () => {
+      updateSpotlight();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [currentStep, isMobile, isTablet, isLargeScreen]);
+
+  // Enhanced cleanup function
+  const cleanupFallbacks = () => {
+    const fallbacks = document.querySelectorAll('[id*="fallback"], [id*="focused"]');
+    fallbacks.forEach(fallback => {
+      if (fallback.parentNode) {
+        fallback.parentNode.removeChild(fallback);
+      }
+    });
+  };
+
+  const nextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      cleanupFallbacks();
+      onComplete();
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleSkip = () => {
+    cleanupFallbacks();
+    onSkip();
+  };
+
+  // Enhanced keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextStep();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevStep();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        onSkip();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [currentStep, nextStep, prevStep, onSkip]);
+
+  const currentStepData = steps[currentStep];
+
+  return (
+    <>
+      {/* Enhanced dark overlay with spotlight cutout */}
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
+        {spotlightStyle && (
+          <>
+            {/* Enhanced highlight border */}
+            <div
+              className="absolute border-4 border-brand-green rounded-lg bg-transparent"
+              style={{
+                top: `${spotlightStyle.top}px`,
+                left: `${spotlightStyle.left}px`,
+                width: `${spotlightStyle.width}px`,
+                height: `${spotlightStyle.height}px`,
+                borderRadius: spotlightStyle.borderRadius,
+                zIndex: 55,
+                boxShadow: '0 0 30px rgba(61, 108, 86, 0.8), 0 0 60px rgba(61, 108, 86, 0.4)',
+              }}
+            />
+            {/* Enhanced glow effect */}
+            <div
+              className="absolute bg-transparent rounded-lg"
+              style={{
+                top: `${spotlightStyle.top - 12}px`,
+                left: `${spotlightStyle.left - 12}px`,
+                width: `${spotlightStyle.width + 24}px`,
+                height: `${spotlightStyle.height + 24}px`,
+                borderRadius: spotlightStyle.borderRadius,
+                boxShadow: `0 0 40px rgba(61, 108, 86, 0.3), 0 0 80px rgba(61, 108, 86, 0.2)`,
+                zIndex: 54,
+              }}
+            />
+            {/* Main spotlight cutout */}
+            <div
+              className="absolute bg-transparent border-4 border-brand-green rounded-lg"
+              style={{
+                top: `${spotlightStyle.top}px`,
+                left: `${spotlightStyle.left}px`,
+                width: `${spotlightStyle.width}px`,
+                height: `${spotlightStyle.height}px`,
+                borderRadius: spotlightStyle.borderRadius,
+                boxShadow: `0 0 0 9999px rgba(0,0,0,0.5)`,
+                zIndex: 51,
+              }}
+            />
+            {/* Enhanced white border for better visibility */}
+            <div
+              className="absolute border-4 border-white rounded-lg"
+              style={{
+                top: `${spotlightStyle.top - 4}px`,
+                left: `${spotlightStyle.left - 4}px`,
+                width: `${spotlightStyle.width + 8}px`,
+                height: `${spotlightStyle.height + 8}px`,
+                borderRadius: spotlightStyle.borderRadius,
+                zIndex: 56,
+                boxShadow: '0 0 20px rgba(255, 255, 255, 1), 0 0 40px rgba(255, 255, 255, 0.8), 0 0 60px rgba(255, 255, 255, 0.4)',
+              }}
+            />
+          </>
+        )}
+      </div>
+
+      {/* Enhanced Tooltip Card with improved positioning */}
+      <Card 
+        className={`fixed z-50 bg-card shadow-2xl border-0 transition-all duration-300 ${
+          isMobile ? 'w-[calc(100vw-40px)] max-w-sm mx-5' : isTablet ? 'w-full max-w-lg' : 'w-full max-w-md'
+        }`}
+        style={{
+          ...tooltipPosition,
+          maxHeight: isMobile ? "calc(100vh - 80px)" : "calc(100vh - 100px)",
+          overflowY: "auto",
+        }}
+        role="dialog"
+        aria-labelledby="tour-title"
+        aria-describedby="tour-content"
+      >
+        <CardContent className="p-4 sm:p-6">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center gap-2">
+              <div className="text-brand-green">
+                {currentStepData.icon}
+              </div>
+              <div className="text-sm text-muted-foreground font-medium">
+                Step {currentStep + 1} of {steps.length}
+              </div>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleSkip}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* Content */}
+          <div className="mb-6">
+            <h2 id="tour-title" className="text-xl font-bold text-foreground mb-3">
+              {currentStepData.title}
+            </h2>
+            <p id="tour-content" className="text-muted-foreground leading-relaxed text-sm">
+              {currentStepData.content}
+            </p>
+          </div>
+
+          {/* Enhanced Progress bar */}
+          <div className="flex items-center gap-2 mb-6">
+            {steps.map((_, index) => (
+              <div
+                key={index}
+                className={`h-2 rounded-full flex-1 transition-all duration-300 ${
+                  index <= currentStep ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gray-200'
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Navigation buttons */}
+          <div className="flex justify-between items-center">
+            <Button
+              variant="outline"
+              onClick={prevStep}
+              disabled={currentStep === 0}
+              className="flex items-center gap-2 text-muted-foreground border-border hover:bg-accent"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {isMobile ? '' : 'Back'}
+            </Button>
+
+            <Button
+              onClick={nextStep}
+              className="bg-gradient-to-r from-orange-500 to-red-500 text-white flex items-center gap-2 hover:from-orange-600 hover:to-red-600 transition-all duration-200"
+            >
+              {currentStep === steps.length - 1 ? 'Get Started' : (isMobile ? 'Next' : 'Continue')}
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* Skip button */}
+          <div className="mt-4 text-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSkip}
+              className="text-muted-foreground hover:text-foreground text-sm"
+            >
+              Skip Tour
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  );
+};
+
+export default OnboardingTour;

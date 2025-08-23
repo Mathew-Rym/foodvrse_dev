@@ -1,18 +1,102 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker } from "react-day-picker";
+import { DayPicker, DropdownProps } from "react-day-picker";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
+// Enhanced Calendar with year/month dropdowns
 function Calendar({
   className,
   classNames,
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
+  // Custom components for enhanced navigation
+  const CustomNavigation = ({ displayMonth, goToMonth, nextMonth, previousMonth }: any) => {
+    const currentYear = displayMonth.getFullYear();
+    const currentMonth = displayMonth.getMonth();
+    
+    // Generate years (from 1900 to current year + 10)
+    const years = Array.from({ length: new Date().getFullYear() - 1900 + 10 }, (_, i) => 1900 + i).reverse();
+    
+    // Generate months
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    const handleYearChange = (year: string) => {
+      const newDate = new Date(displayMonth);
+      newDate.setFullYear(parseInt(year));
+      goToMonth(newDate);
+    };
+
+    const handleMonthChange = (month: string) => {
+      const monthIndex = months.indexOf(month);
+      const newDate = new Date(displayMonth);
+      newDate.setMonth(monthIndex);
+      goToMonth(newDate);
+    };
+
+    return (
+      <div className="flex items-center justify-between px-1 py-2">
+        <button
+          onClick={() => previousMonth && goToMonth(previousMonth)}
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+          )}
+          disabled={!previousMonth}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        
+        <div className="flex items-center gap-2">
+          <Select value={months[currentMonth]} onValueChange={handleMonthChange}>
+            <SelectTrigger className="w-24 h-7 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {months.map((month) => (
+                <SelectItem key={month} value={month} className="text-xs">
+                  {month}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select value={currentYear.toString()} onValueChange={handleYearChange}>
+            <SelectTrigger className="w-20 h-7 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="max-h-48">
+              {years.map((year) => (
+                <SelectItem key={year} value={year.toString()} className="text-xs">
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <button
+          onClick={() => nextMonth && goToMonth(nextMonth)}
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+          )}
+          disabled={!nextMonth}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+    );
+  };
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -54,6 +138,7 @@ function Calendar({
       components={{
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
+        Caption: CustomNavigation,
       }}
       {...props}
     />

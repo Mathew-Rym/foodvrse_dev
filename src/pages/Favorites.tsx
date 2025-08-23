@@ -5,30 +5,38 @@ import MobileLayout from "@/components/MobileLayout";
 import { useState, useEffect } from "react";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from "@/contexts/AuthContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import ListingCard from "@/components/ListingCard";
 
 const Favorites = () => {
   const { user } = useAuth();
+  const { favorites: userFavorites, loading: favoritesLoading, addFavorite, removeFavorite } = useFavorites();
   const navigate = useNavigate();
   const [favoriteListings, setFavoriteListings] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [listingsLoading, setListingsLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
+    if (user && !favoritesLoading) {
       fetchFavoriteListings();
-    } else {
-      setLoading(false);
+    } else if (!user) {
+      setListingsLoading(false);
     }
-  }, [user]);
+  }, [user, userFavorites, favoritesLoading]);
 
   const fetchFavoriteListings = async () => {
-    if (!user) return;
+    if (!user || userFavorites.length === 0) {
+      setFavoriteListings([]);
+      setListingsLoading(false);
+      return;
+    }
 
     try {
-      // Get all listings that the user has favorited
-      const { data, error } = await supabase
+      setListingsLoading(true);
+      
+      // Get listings for the favorited businesses from context
+      const { data: listingsData, error: listingsError } = await supabase
         .from('listings')
         .select(`
           *,
@@ -41,25 +49,40 @@ const Favorites = () => {
             rating_count
           )
         `)
-        .contains('favorited_by_user_ids', [user.id])
+        .in('business_id', userFavorites)
         .neq('status', 'sold-out')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (listingsError) throw listingsError;
 
-      setFavoriteListings(data || []);
+      setFavoriteListings(listingsData || []);
     } catch (error) {
       console.error('Error fetching favorites:', error);
       toast.error('Failed to load favorites');
     } finally {
-      setLoading(false);
+      setListingsLoading(false);
     }
   };
 
-  const handleFavorite = (listingId: string, isFavorited: boolean) => {
-    // Update local state immediately for better UX
-    if (!isFavorited) {
-      setFavoriteListings(prev => prev.filter(listing => listing.id !== listingId));
+  const handleFavorite = async (listingId: string, isFavorited: boolean) => {
+    if (!user) {
+      toast.error('Please sign in to manage favorites');
+      return;
+    }
+
+    try {
+      if (isFavorited) {
+        await removeFavorite(listingId);
+        // Update local state
+        setFavoriteListings(prev => prev.filter(listing => listing.business_id !== listingId));
+      } else {
+        await addFavorite(listingId);
+        // Refresh the list to show the new favorite
+        await fetchFavoriteListings();
+      }
+    } catch (error) {
+      console.error('Error updating favorite:', error);
+      toast.error('Failed to update favorite');
     }
   };
 
@@ -81,7 +104,7 @@ const Favorites = () => {
           <p className="text-muted-foreground mt-1">Your saved restaurants and stores</p>
         </div>
 
-        {loading ? (
+        {favoritesLoading || listingsLoading ? (
           <div className="p-4">
             <div className="grid grid-cols-1 gap-6">
               {Array.from({ length: 3 }).map((_, index) => (

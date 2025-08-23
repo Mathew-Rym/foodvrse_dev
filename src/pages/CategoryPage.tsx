@@ -150,7 +150,7 @@ const CategoryPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-start justify-center pt-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-2"></div>
           <p className="text-sm text-gray-600">Loading category...</p>
@@ -161,7 +161,7 @@ const CategoryPage: React.FC = () => {
 
   if (!categoryData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-start justify-center pt-8">
         <div className="text-center">
           <p className="text-lg font-semibold text-gray-900 mb-2">Category not found</p>
           <Button onClick={handleBack}>Go Back</Button>

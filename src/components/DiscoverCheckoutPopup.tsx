@@ -1,0 +1,302 @@
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Clock, MapPin, Star, Plus, Minus, ArrowLeft, Smartphone, CreditCard, Loader2, CheckCircle } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Input } from "@/components/ui/input";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
+
+interface DiscoverCheckoutPopupProps {
+  isOpen: boolean;
+  onClose: () => void;
+  item: {
+    id: string;
+    name: string;
+    price: number;
+    originalPrice: number;
+    storeName: string;
+    location: string;
+    pickup: string;
+    quantity: number;
+    image?: string;
+  };
+}
+
+export const DiscoverCheckoutPopup: React.FC<DiscoverCheckoutPopupProps> = ({
+  isOpen,
+  onClose,
+  item
+}) => {
+  const { user } = useAuth();
+  const { addToCart } = useCart();
+  const [quantity, setQuantity] = useState(1);
+  const [showPayment, setShowPayment] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const totalPrice = item.price * quantity;
+  const totalSavings = (item.originalPrice - item.price) * quantity;
+
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity >= 1 && newQuantity <= item.quantity) {
+      setQuantity(newQuantity);
+    }
+  };
+
+  const handleReserve = () => {
+    if (!user) {
+      toast.error("Please sign in to reserve items");
+      return;
+    }
+    setShowPayment(true);
+  };
+
+  const storeOrder = async () => {
+    if (!user) return;
+
+    try {
+      // Generate pickup code
+      const pickupCode = `FV${Date.now().toString().slice(-6)}`;
+      
+      const orderData = {
+        user_id: user.id,
+        quantity: quantity,
+        total_amount: totalPrice,
+        original_total: item.originalPrice * quantity,
+        status: 'paid',
+        payment_method: 'mpesa',
+        pickup_code: pickupCode,
+        notes: `${item.storeName} - ${item.name}`,
+        created_at: new Date().toISOString()
+      };
+
+      // Store in localStorage until we have proper DB structure
+      const existingOrders = JSON.parse(localStorage.getItem('foodvrse_orders') || '[]');
+      const newOrder = {
+        id: `ord_${Date.now()}`,
+        ...orderData,
+        item_details: item
+      };
+      
+      existingOrders.unshift(newOrder);
+      localStorage.setItem('foodvrse_orders', JSON.stringify(existingOrders));
+      
+      console.log('Order stored:', newOrder);
+    } catch (error) {
+      console.error('Error storing order:', error);
+    }
+  };
+
+  const handlePayment = async (paymentMethod: 'mpesa') => {
+    setIsProcessing(true);
+    
+    try {
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Store the order
+      await storeOrder();
+      
+      toast.success("🎉 You're a FoodVrse Champion!");
+      toast.success(`Successfully reserved ${quantity} x ${item.name} for KSh ${totalPrice}`);
+      toast.success(`You saved KSh ${totalSavings}! Remember to collect your order. 🌱`);
+      
+      onClose();
+    } catch (error) {
+      toast.error("Payment failed. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleAddMoreItems = () => {
+    if (!user) {
+      toast.error("Please sign in to add items to cart");
+      return;
+    }
+
+    // Add current item to cart with selected quantity
+    const cartItem = {
+      id: parseInt(item.id),
+      title: item.name,
+      vendor: item.storeName,
+      price: item.price,
+      originalPrice: item.originalPrice,
+      pickup: item.pickup
+    };
+
+    // Add multiple quantities to cart
+    for (let i = 0; i < quantity; i++) {
+      addToCart(cartItem);
+    }
+
+    toast.success(`Added ${quantity} x ${item.name} to cart! Continue shopping.`);
+    onClose();
+  };
+
+  if (showPayment) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto w-[95vw] fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowPayment(false)}
+                className="p-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <DialogTitle>Payment</DialogTitle>
+            </div>
+          </DialogHeader>
+
+          {/* Order Summary */}
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold mb-2">Order Summary</h3>
+            <div className="flex justify-between items-center mb-2">
+              <span>{quantity} x {item.name}</span>
+              <span>KSh {totalPrice}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm text-green-600 font-medium">
+              <span>You save:</span>
+              <span>KSh {totalSavings}</span>
+            </div>
+            <hr className="my-2" />
+            <div className="flex justify-between items-center font-bold">
+              <span>Total:</span>
+              <span>KSh {totalPrice}</span>
+            </div>
+          </div>
+
+          {/* Payment Methods */}
+          <div className="space-y-3">
+            <Button
+              onClick={() => handlePayment('mpesa')}
+              disabled={isProcessing}
+              className="w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white py-3"
+            >
+              <Smartphone className="w-5 h-5" />
+              {isProcessing ? "Processing..." : "Pay with M-Pesa"}
+            </Button>
+          </div>
+
+          <p className="text-xs text-gray-500 text-center mt-4">
+            Your payment is secure and encrypted
+          </p>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto w-[95vw] fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+        <DialogHeader>
+          <DialogTitle>Reserve Item</DialogTitle>
+        </DialogHeader>
+
+        {/* Item Details */}
+        <div className="space-y-4">
+          {/* Store Info */}
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">🏪</span>
+            </div>
+            <div>
+              <h3 className="font-semibold">{item.storeName}</h3>
+              <p className="text-sm text-gray-600 flex items-center gap-1">
+                <MapPin className="w-3 h-3" />
+                {item.location}
+              </p>
+            </div>
+          </div>
+
+          {/* Item Info */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h4 className="font-medium mb-2">{item.name}</h4>
+            <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+              <Clock className="w-4 h-4" />
+              <span>{item.pickup}</span>
+            </div>
+            
+            {/* Price */}
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-xl font-bold text-gray-900">KSh {item.price}</div>
+                {item.originalPrice > item.price && (
+                  <div className="text-sm text-gray-500 line-through">
+                    KSh {item.originalPrice}
+                  </div>
+                )}
+              </div>
+              <Badge variant="secondary" className="bg-green-100 text-green-700">
+                Save KSh {item.originalPrice - item.price}
+              </Badge>
+            </div>
+          </div>
+
+          {/* Quantity Selector */}
+          <div className="flex items-center justify-between">
+            <span className="font-medium">Quantity</span>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleQuantityChange(quantity - 1)}
+                disabled={quantity <= 1}
+              >
+                <Minus className="w-4 h-4" />
+              </Button>
+              <span className="w-8 text-center font-medium">{quantity}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleQuantityChange(quantity + 1)}
+                disabled={quantity >= item.quantity}
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Total */}
+          <div className="bg-brand-green/10 rounded-lg p-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-medium">Total</span>
+              <span className="text-xl font-bold">KSh {totalPrice}</span>
+            </div>
+            <div className="text-sm text-green-600 font-medium">
+              You save KSh {totalSavings} total!
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <Button
+              onClick={handleReserve}
+              className="w-full bg-gradient-to-r from-brand-green to-brand-yellow text-white py-3"
+            >
+              Reserve Now - KSh {totalPrice}
+            </Button>
+            
+            <Button
+              onClick={handleAddMoreItems}
+              variant="outline"
+              className="w-full py-3"
+            >
+              Add Other Items
+            </Button>
+          </div>
+
+          <p className="text-xs text-gray-500 text-center">
+            Items are reserved for 1 hour. Complete pickup during the specified time window.
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};

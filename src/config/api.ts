@@ -3,7 +3,7 @@
 
 export const API_CONFIG = {
   // Google Maps API
-  GOOGLE_MAPS_API_KEY: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyABKMHMAiFihQZA_ql6rhqi1EsNxWgv8ts',
+  GOOGLE_MAPS_API_KEY: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
   
   // Google OAuth
   GOOGLE_OAUTH_CLIENT_ID: '707536400304-6ogfei7hql85l4csjch467922du99hur.apps.googleusercontent.com',

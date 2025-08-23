@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,43 +7,53 @@ import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { BusinessItemsProvider } from "@/contexts/BusinessItemsContext";
+import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import FeedbackFAB from "@/components/FeedbackFAB";
 import "@/lib/i18n";
-import Index from "./pages/Index";
-import Discover from "./pages/Discover";
-import Cart from "./pages/Cart";
-import Orders from "./pages/Orders";
-import Profile from "./pages/Profile";
-import Favorites from "./pages/Favorites";
-import NotFound from "./pages/NotFound";
-
-import BusinessDashboard from "./pages/BusinessDashboard";
-import Auth from "./pages/Auth";
-import FoodWaste from "./pages/FoodWaste";
-import HowItWorks from "./pages/HowItWorks";
-import HelpCenter from "./pages/HelpCenter";
-import SafetyGuidelines from "./pages/SafetyGuidelines";
-import CommunityGuidelines from "./pages/CommunityGuidelines";
-import TermsOfService from "./pages/TermsOfService";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import CookiePolicy from "./pages/CookiePolicy";
-
-import OurStory from "./pages/OurStory";
-import OurImpact from "./pages/OurImpact";
-import MeetTheTeam from "./pages/MeetTheTeam";
-import Careers from "./pages/Careers";
-import Press from "./pages/Press";
-import ESG from "./pages/ESG";
-import Partners from "./pages/Partners";
-import PartnerApplication from "./pages/PartnerApplication";
-import ComingSoon from "./pages/ComingSoon";
-import GamificationPage from "./pages/GamificationPage";
-import ImpactTrackerPage from "./pages/ImpactTrackerPage";
-import CategoryPage from "./pages/CategoryPage";
-import GoogleOAuthHandler from "./components/GoogleOAuthHandler";
+import { lazy, Suspense, Component, ErrorInfo, ReactNode } from "react";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
-import { Component, ErrorInfo, ReactNode } from "react";
+
+// Lazy load components for better performance
+const Index = lazy(() => import("./pages/Index"));
+const Discover = lazy(() => import("./pages/Discover"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Orders = lazy(() => import("./pages/Orders"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Favorites = lazy(() => import("./pages/Favorites"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const BusinessDashboard = lazy(() => import("./pages/BusinessDashboard"));
+const Auth = lazy(() => import("./pages/Auth"));
+
+const FoodWaste = lazy(() => import("./pages/FoodWaste"));
+const HowItWorks = lazy(() => import("./pages/HowItWorks"));
+const HelpCenter = lazy(() => import("./pages/HelpCenter"));
+const SafetyGuidelines = lazy(() => import("./pages/SafetyGuidelines"));
+const CommunityGuidelines = lazy(() => import("./pages/CommunityGuidelines"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
+const OurStory = lazy(() => import("./pages/OurStory"));
+const OurImpact = lazy(() => import("./pages/OurImpact"));
+const MeetTheTeam = lazy(() => import("./pages/MeetTheTeam"));
+const Careers = lazy(() => import("./pages/Careers"));
+const Press = lazy(() => import("./pages/Press"));
+const ESG = lazy(() => import("./pages/ESG"));
+const Partners = lazy(() => import("./pages/Partners"));
+const PartnerApplication = lazy(() => import("./pages/PartnerApplication"));
+const ComingSoon = lazy(() => import("./pages/ComingSoon"));
+const GamificationPage = lazy(() => import("./pages/GamificationPage"));
+const ImpactTrackerPage = lazy(() => import("./pages/ImpactTrackerPage"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage"));
+const GoogleOAuthHandler = lazy(() => import("./components/GoogleOAuthHandler"));
+
+
+// Loading component
+const LoadingSpinner = () => (
+  <div className="min-h-screen flex items-start justify-center bg-gray-50 pt-8">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green"></div>
+  </div>
+);
 
 // Error Boundary Component
 class ErrorBoundary extends Component<
@@ -95,7 +104,16 @@ class ErrorBoundary extends Component<
   }
 }
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => {
   // Check if this is an OAuth callback
@@ -118,61 +136,65 @@ const App = () => {
           <ThemeProvider>
             <LanguageProvider>
               <AuthProvider>
+                <FavoritesProvider>
                 <BusinessItemsProvider>
                   <CartProvider>
                     <TooltipProvider>
                       <Toaster />
                       <Sonner />
                       <BrowserRouter>
-                        <Routes>
-                        <Route path="/" element={<Index />} />
-                        <Route path="/auth" element={<Auth />} />
-                        <Route path="/oauth-callback" element={
-                          <GoogleOAuthHandler onComplete={() => window.history.replaceState({}, '', '/')} />
-                        } />
-                    <Route path="/discover" element={<Discover />} />
-                    <Route path="/cart" element={<Cart />} />
-                    <Route path="/orders" element={<Orders />} />
-                    <Route path="/impact" element={<GamificationPage />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/favorites" element={<Favorites />} />
+                        <Suspense fallback={<LoadingSpinner />}>
+                          <Routes>
+                            <Route path="/" element={<Index />} />
+                            <Route path="/auth" element={<Auth />} />
+                            <Route path="/oauth-callback" element={
+                              <GoogleOAuthHandler onComplete={() => window.history.replaceState({}, '', '/')} />
+                            } />
+                            <Route path="/discover" element={<Discover />} />
+                            <Route path="/cart" element={<Cart />} />
+                            <Route path="/orders" element={<Orders />} />
+                            <Route path="/impact" element={<GamificationPage />} />
+                            <Route path="/profile" element={<Profile />} />
+                            <Route path="/favorites" element={<Favorites />} />
 
-                    <Route path="/business-dashboard" element={<BusinessDashboard />} />
-                    <Route path="/food-waste" element={<FoodWaste />} />
-                    <Route path="/mystery-boxes" element={<Discover />} />
-                    <Route path="/how-it-works" element={<HowItWorks />} />
-                    <Route path="/impact-tracker" element={<ImpactTrackerPage />} />
-                    <Route path="/help-center" element={<HelpCenter />} />
-                    <Route path="/safety-guidelines" element={<SafetyGuidelines />} />
-                    <Route path="/community-guidelines" element={<CommunityGuidelines />} />
-                    <Route path="/terms-of-service" element={<TermsOfService />} />
-                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                    <Route path="/cookie-policy" element={<CookiePolicy />} />
-                    
-                    <Route path="/our-story" element={<OurStory />} />
-                    <Route path="/our-impact" element={<OurImpact />} />
-                    <Route path="/meet-the-team" element={<MeetTheTeam />} />
-                    <Route path="/careers" element={<Careers />} />
-                    <Route path="/press" element={<Press />} />
-                    <Route path="/esg" element={<ESG />} />
-                    <Route path="/partners" element={<Partners />} />
-                    <Route path="/partner-application" element={<PartnerApplication />} />
-                    <Route path="/coming-soon" element={<ComingSoon />} />
-<Route path="/category/:categoryName" element={<CategoryPage />} />
-<Route path="/gamification" element={<GamificationPage />} />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                  <FeedbackFAB />
-                </BrowserRouter>
-              </TooltipProvider>
-            </CartProvider>
-          </BusinessItemsProvider>
-        </AuthProvider>
-      </LanguageProvider>
-    </ThemeProvider>
-    </QueryClientProvider>
-    </HelmetProvider>
+                            <Route path="/business-dashboard" element={<BusinessDashboard />} />
+                            <Route path="/food-waste" element={<FoodWaste />} />
+                            <Route path="/mystery-boxes" element={<Discover />} />
+                            <Route path="/how-it-works" element={<HowItWorks />} />
+                            <Route path="/impact-tracker" element={<ImpactTrackerPage />} />
+                            <Route path="/help-center" element={<HelpCenter />} />
+                            <Route path="/safety-guidelines" element={<SafetyGuidelines />} />
+                            <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+                            <Route path="/terms-of-service" element={<TermsOfService />} />
+                            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                            <Route path="/cookie-policy" element={<CookiePolicy />} />
+                            
+                            <Route path="/our-story" element={<OurStory />} />
+                            <Route path="/our-impact" element={<OurImpact />} />
+                            <Route path="/meet-the-team" element={<MeetTheTeam />} />
+                            <Route path="/careers" element={<Careers />} />
+                            <Route path="/press" element={<Press />} />
+                            <Route path="/esg" element={<ESG />} />
+                            <Route path="/partners" element={<Partners />} />
+                            <Route path="/partner-application" element={<PartnerApplication />} />
+                            <Route path="/coming-soon" element={<ComingSoon />} />
+                            <Route path="/category/:categoryName" element={<CategoryPage />} />
+                            <Route path="/gamification" element={<GamificationPage />} />
+                            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                            <Route path="*" element={<NotFound />} />
+                          </Routes>
+                        </Suspense>
+                        <FeedbackFAB />
+                      </BrowserRouter>
+                    </TooltipProvider>
+                  </CartProvider>
+                </BusinessItemsProvider>
+                              </FavoritesProvider>
+              </AuthProvider>
+            </LanguageProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </HelmetProvider>
     </ErrorBoundary>
   );
 };

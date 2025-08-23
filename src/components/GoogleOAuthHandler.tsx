@@ -25,7 +25,7 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
       const { data: existingProfile } = await supabase
         .from('user_profiles')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('id', user.id)
         .single();
 
       if (existingProfile) {
@@ -36,7 +36,7 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
           if (existingProfile.user_type === 'business') {
             navigate('/business-dashboard');
           } else {
-            navigate('/');
+            navigate('/profile');
           }
         }, 1500);
         return;
@@ -74,6 +74,7 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
       const { error: profileError } = await supabase
         .from('user_profiles')
         .insert({
+          id: user.id,
           user_id: user.id,
           display_name: firstName,
           avatar_url: user.user_metadata?.avatar_url || null,
@@ -142,7 +143,7 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
         if (isBusinessAuth) {
           navigate('/business-dashboard');
         } else {
-          navigate('/');
+          navigate('/profile');
         }
         onComplete();
       }, 2000);
@@ -158,7 +159,7 @@ const GoogleOAuthHandler: React.FC<GoogleOAuthHandlerProps> = ({ onComplete }) =
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-start justify-center p-4 pt-8">
       <Card className="w-full max-w-md">
         <CardContent className="p-8 text-center">
           {status === 'loading' && (

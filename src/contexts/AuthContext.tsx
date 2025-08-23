@@ -1,9 +1,11 @@
+import { BusinessService } from "@/services/businessService";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { PurchaseImpactService } from "@/services/purchaseImpactService";
+import { checkIfBusinessPartner, registerBusinessPartner } from "@/services/businessPartnerService";
 
 interface AuthContextType {
   user: User | null;
@@ -17,7 +19,9 @@ interface AuthContextType {
   signInWithGoogle: (isBusinessAuth?: boolean) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refreshUserData: () => Promise<void>;
+  ensureUserProfile: () => Promise<any>;
 updateUserImpactFromPurchase: (purchaseData: any) => Promise<void>;
+  getDashboardRedirectPath: (email: string) => Promise<string>;
   isAuthenticated: boolean;
   isBusinessUser: boolean;
 }
@@ -33,26 +37,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Handle OAuth callback and profile creation
+    // Handle OAuth callback - simplified without automatic profile creation
     const handleOAuthCallback = async () => {
       const { data, error } = await supabase.auth.getSession();
       if (data.session) {
         setSession(data.session);
         setUser(data.session.user);
         
-        // Check if user needs profile setup
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('user_id', data.session.user.id)
-          .single();
-
-        if (!profile) {
-          // Create user profile automatically
-          await createUserProfile(data.session.user);
-        }
-
-        await fetchUserData(data.session.user.id);
+        // Track login time for cookie consent logic
+        localStorage.setItem('foodvrse-last-login-time', new Date().toISOString());
+        
+        // Fetch user data in background (non-blocking)
+        fetchUserData(data.session.user.id).catch(error => {
+          console.warn('OAuth callback user data fetch failed:', error);
+        });
       }
       setLoading(false);
     };
@@ -65,16 +63,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Defer additional data fetching to avoid deadlock
-          setTimeout(() => {
-            fetchUserData(session.user.id);
-          }, 0);
+          // Track login time for cookie consent logic
+          localStorage.setItem('foodvrse-last-login-time', new Date().toISOString());
+          
+          // Fast initial setup - don't wait for user data
+          setLoading(false);
+          
+          // Fetch user data in background (non-blocking)
+          fetchUserData(session.user.id).catch(error => {
+            console.warn('Background user data fetch failed:', error);
+          });
         } else {
           setUserProfile(null);
           setUserImpact(null);
           setBusinessProfile(null);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
@@ -82,12 +86,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setLoading(false);
       
       if (session?.user) {
-        setTimeout(() => {
-          fetchUserData(session.user.id);
-        }, 0);
+        // Fetch user data in background (non-blocking)
+        fetchUserData(session.user.id).catch(error => {
+          console.warn('Initial user data fetch failed:', error);
+        });
       }
+    }).catch(error => {
+      console.error('Failed to get session:', error);
       setLoading(false);
     });
 
@@ -111,14 +119,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         firstName = user.email.split('@')[0];
       }
 
-      // Check if this is a business auth
-      const isBusinessAuth = sessionStorage.getItem('google_business_auth') === 'true';
+      // Check if this is a business partner based on email
+      const businessCheck = await checkIfBusinessPartner(user.email);
+      const isBusinessAuth = businessCheck.isBusinessPartner || sessionStorage.getItem('google_business_auth') === 'true';
       sessionStorage.removeItem('google_business_auth');
+
+      // Register as business partner if detected
+      if (businessCheck.isBusinessPartner && businessCheck.businessName) {
+        await registerBusinessPartner(user.email, businessCheck.businessName);
+      }
 
       // Create user profile
       const { error: profileError } = await supabase
         .from('user_profiles')
         .insert({
+          id: user.id,
           user_id: user.id,
           display_name: firstName,
           avatar_url: user.user_metadata?.avatar_url || null,
@@ -185,34 +200,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUserData = async (userId: string) => {
     try {
-      // Fetch user profile
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
-      
-      setUserProfile(profile);
+      // Use parallel requests for better performance
+      const [profileResult, impactResult, businessResult] = await Promise.allSettled([
+        supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle(),
+        supabase
+          .from('user_impact')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle(),
+        supabase
+          .from('business_profiles')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle()
+      ]);
 
-      // Fetch user impact
-      const { data: impact } = await supabase
-        .from('user_impact')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
-      
-      setUserImpact(impact);
+      // Handle user profile
+      if (profileResult.status === 'fulfilled' && !profileResult.value.error) {
+        setUserProfile(profileResult.value.data);
+      } else if (profileResult.status === 'rejected' || profileResult.value.error) {
+        console.warn('User profile not found or error:', profileResult.status === 'rejected' ? profileResult.reason : profileResult.value.error);
+        setUserProfile(null);
+      }
 
-      // Fetch business profile if user is a business owner
-      const { data: business } = await supabase
-        .from('business_profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
-      
-      setBusinessProfile(business);
+      // Handle user impact
+      if (impactResult.status === 'fulfilled' && !impactResult.value.error) {
+        setUserImpact(impactResult.value.data);
+      } else {
+        setUserImpact(null);
+      }
+
+      // Handle business profile
+      if (businessResult.status === 'fulfilled' && !businessResult.value.error) {
+        setBusinessProfile(businessResult.value.data);
+      } else {
+        setBusinessProfile(null);
+      }
     } catch (error) {
       console.error('Error fetching user data:', error);
+      // Set defaults on error
+      setUserProfile(null);
+      setUserImpact(null);
+      setBusinessProfile(null);
     }
   };
 
@@ -279,9 +312,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent',
+            prompt: 'select_account', // Faster than 'consent'
           },
-          scopes: 'email profile openid',
+          scopes: 'email profile',
         }
       });
 
@@ -296,7 +329,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         sessionStorage.setItem('google_business_auth', 'true');
       }
 
-      toast.success('Redirecting to Google...');
       return { error: null };
     } catch (error: any) {
       console.error('Google OAuth exception:', error);
@@ -311,7 +343,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) {
         toast.error(error.message);
       } else {
+        // Clear remember me data on sign out
+        localStorage.removeItem('foodvrse_saved_email');
+        localStorage.removeItem('foodvrse_remember_me');
         toast.success('Signed out successfully');
+        // Clear remember me data on sign out
+        localStorage.removeItem('foodvrse_saved_email');
+        localStorage.removeItem('foodvrse_remember_me');
       }
     } catch (error) {
       console.error('Sign out error:', error);
@@ -322,6 +360,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshUserData = async () => {
     if (user) {
       await fetchUserData(user.id);
+    }
+  };
+
+  // Lazy profile creation - only create when specifically needed
+  const ensureUserProfile = async () => {
+    if (!user) return null;
+    
+    // If profile already exists, return it
+    if (userProfile) return userProfile;
+    
+    try {
+      // Check if profile exists in database
+      const { data: existingProfile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+      
+      if (existingProfile) {
+        setUserProfile(existingProfile);
+        return existingProfile;
+      }
+      
+      // Create profile only if it doesn't exist
+      await createUserProfile(user);
+      await fetchUserData(user.id);
+      return userProfile;
+    } catch (error) {
+      console.error('Error ensuring user profile:', error);
+      toast.error('Unable to create user profile. Please try again.');
+      return null;
     }
   };
 
@@ -343,6 +412,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const getDashboardRedirectPath = async (email: string): Promise<string> => {
+    try {
+      const businessCheck = await checkIfBusinessPartner(email);
+      
+      if (businessCheck.isBusinessPartner) {
+        return '/business-dashboard';
+      } else {
+        return '/user-dashboard';
+      }
+    } catch (error) {
+      console.error('Error determining dashboard path:', error);
+      // Default to user dashboard on error
+      return '/user-dashboard';
+    }
+  };
+
   const isAuthenticated = !!user;
   const isBusinessUser = !!businessProfile;
 
@@ -358,7 +443,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signInWithGoogle,
     signOut,
     refreshUserData,
-updateUserImpactFromPurchase,
+    ensureUserProfile,
+    updateUserImpactFromPurchase,
+    getDashboardRedirectPath,
     isAuthenticated,
     isBusinessUser,
   };

@@ -10,23 +10,51 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: [
+      'react', 
+      'react-dom', 
+      '@supabase/supabase-js',
+      'react-router-dom',
+      'lucide-react'
+    ]
+  },
   build: {
     target: 'es2015',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-toast'],
-          supabase: ['@supabase/supabase-js'],
-          maps: ['@googlemaps/js-api-loader']
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-components': [
+            '@radix-ui/react-dialog', 
+            '@radix-ui/react-dropdown-menu', 
+            '@radix-ui/react-toast',
+            '@radix-ui/react-progress',
+            '@radix-ui/react-switch',
+            '@radix-ui/react-tooltip'
+          ],
+          'supabase': ['@supabase/supabase-js'],
+          'maps': ['@googlemaps/js-api-loader'],
+          'icons': ['lucide-react'],
+          'utils': ['sonner', 'clsx', 'tailwind-merge'],
+          'forms': ['react-hook-form', '@hookform/resolvers', 'zod']
         }
       }
     },
-    optimizeDeps: {
-      include: ['react', 'react-dom', '@supabase/supabase-js']
-    }
+    chunkSizeWarningLimit: 1000
   },
   server: {
+    port: 3000,
+    host: true
+  },
+  preview: {
     port: 3000,
     host: true
   }

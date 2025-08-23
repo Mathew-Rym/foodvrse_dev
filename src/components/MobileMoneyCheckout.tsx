@@ -51,7 +51,7 @@ const MobileMoneyCheckout = ({ isOpen, onClose }: MobileMoneyCheckoutProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto w-[95vw] sm:w-[425px] fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Smartphone className="w-5 h-5" />
