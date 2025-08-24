@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { initializeEmailJS } from './config/emailjs'
-import { Analytics } from '@vercel/analytics/react'
 
 // Performance optimization: Initialize critical features
 const initializeApp = async () => {

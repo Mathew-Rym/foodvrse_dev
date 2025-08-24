@@ -419,12 +419,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (businessCheck.isBusinessPartner) {
         return '/business-dashboard';
       } else {
-        return '/user-dashboard';
+        return '/discover';
       }
     } catch (error) {
       console.error('Error determining dashboard path:', error);
       // Default to user dashboard on error
-      return '/user-dashboard';
+      return '/discover';
     }
   };
 

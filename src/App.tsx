@@ -137,59 +137,59 @@ const App = () => {
             <LanguageProvider>
               <AuthProvider>
                 <FavoritesProvider>
-                <BusinessItemsProvider>
-                  <CartProvider>
-                    <TooltipProvider>
-                      <Toaster />
-                      <Sonner />
-                      <BrowserRouter>
-                        <Suspense fallback={<LoadingSpinner />}>
-                          <Routes>
-                            <Route path="/" element={<Index />} />
-                            <Route path="/auth" element={<Auth />} />
-                            <Route path="/oauth-callback" element={
-                              <GoogleOAuthHandler onComplete={() => window.history.replaceState({}, '', '/')} />
-                            } />
-                            <Route path="/discover" element={<Discover />} />
-                            <Route path="/cart" element={<Cart />} />
-                            <Route path="/orders" element={<Orders />} />
-                            <Route path="/impact" element={<GamificationPage />} />
-                            <Route path="/profile" element={<Profile />} />
-                            <Route path="/favorites" element={<Favorites />} />
+                    <BusinessItemsProvider>
+                    <CartProvider>
+                      <TooltipProvider>
+                        <Toaster />
+                        <Sonner />
+                        <BrowserRouter>
+                          <Suspense fallback={<LoadingSpinner />}>
+                            <Routes>
+                              <Route path="/" element={<Index />} />
+                              <Route path="/auth" element={<Auth />} />
+                              <Route path="/oauth-callback" element={
+                                <GoogleOAuthHandler onComplete={() => window.history.replaceState({}, '', '/')} />
+                              } />
+                              <Route path="/discover" element={<Discover />} />
+                              <Route path="/cart" element={<Cart />} />
+                              <Route path="/orders" element={<Orders />} />
+                              <Route path="/impact" element={<GamificationPage />} />
+                              <Route path="/profile" element={<Profile />} />
+                              <Route path="/favorites" element={<Favorites />} />
 
-                            <Route path="/business-dashboard" element={<BusinessDashboard />} />
-                            <Route path="/food-waste" element={<FoodWaste />} />
-                            <Route path="/mystery-boxes" element={<Discover />} />
-                            <Route path="/how-it-works" element={<HowItWorks />} />
-                            <Route path="/impact-tracker" element={<ImpactTrackerPage />} />
-                            <Route path="/help-center" element={<HelpCenter />} />
-                            <Route path="/safety-guidelines" element={<SafetyGuidelines />} />
-                            <Route path="/community-guidelines" element={<CommunityGuidelines />} />
-                            <Route path="/terms-of-service" element={<TermsOfService />} />
-                            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                            <Route path="/cookie-policy" element={<CookiePolicy />} />
-                            
-                            <Route path="/our-story" element={<OurStory />} />
-                            <Route path="/our-impact" element={<OurImpact />} />
-                            <Route path="/meet-the-team" element={<MeetTheTeam />} />
-                            <Route path="/careers" element={<Careers />} />
-                            <Route path="/press" element={<Press />} />
-                            <Route path="/esg" element={<ESG />} />
-                            <Route path="/partners" element={<Partners />} />
-                            <Route path="/partner-application" element={<PartnerApplication />} />
-                            <Route path="/coming-soon" element={<ComingSoon />} />
-                            <Route path="/category/:categoryName" element={<CategoryPage />} />
-                            <Route path="/gamification" element={<GamificationPage />} />
-                            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                            <Route path="*" element={<NotFound />} />
-                          </Routes>
-                        </Suspense>
-                        <FeedbackFAB />
-                      </BrowserRouter>
-                    </TooltipProvider>
-                  </CartProvider>
-                </BusinessItemsProvider>
-                              </FavoritesProvider>
+                              <Route path="/business-dashboard" element={<BusinessDashboard />} />
+                              <Route path="/food-waste" element={<FoodWaste />} />
+                              <Route path="/mystery-boxes" element={<Discover />} />
+                              <Route path="/how-it-works" element={<HowItWorks />} />
+                              <Route path="/impact-tracker" element={<ImpactTrackerPage />} />
+                              <Route path="/help-center" element={<HelpCenter />} />
+                              <Route path="/safety-guidelines" element={<SafetyGuidelines />} />
+                              <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+                              <Route path="/terms-of-service" element={<TermsOfService />} />
+                              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                              <Route path="/cookie-policy" element={<CookiePolicy />} />
+                              
+                              <Route path="/our-story" element={<OurStory />} />
+                              <Route path="/our-impact" element={<OurImpact />} />
+                              <Route path="/meet-the-team" element={<MeetTheTeam />} />
+                              <Route path="/careers" element={<Careers />} />
+                              <Route path="/press" element={<Press />} />
+                              <Route path="/esg" element={<ESG />} />
+                              <Route path="/partners" element={<Partners />} />
+                              <Route path="/partner-application" element={<PartnerApplication />} />
+                              <Route path="/coming-soon" element={<ComingSoon />} />
+                              <Route path="/category/:categoryName" element={<CategoryPage />} />
+                              <Route path="/gamification" element={<GamificationPage />} />
+                              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                              <Route path="*" element={<NotFound />} />
+                            </Routes>
+                          </Suspense>
+                          <FeedbackFAB />
+                        </BrowserRouter>
+                      </TooltipProvider>
+                    </CartProvider>
+                    </BusinessItemsProvider>
+                </FavoritesProvider>
               </AuthProvider>
             </LanguageProvider>
           </ThemeProvider>
