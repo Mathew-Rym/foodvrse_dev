@@ -40,6 +40,14 @@ const Auth = () => {
     }
   }, [form]);
 
+  // Open FAB for error reporting
+  const openFeedbackFAB = () => {
+    const fabButton = document.getElementById('feedback-fab');
+    if (fabButton) {
+      fabButton.click();
+    }
+  };
+
   // Handle successful authentication with business partner detection
   const handleAuthSuccess = async (email: string) => {
     setRedirecting(true);
@@ -91,12 +99,14 @@ const Auth = () => {
         return;
       }
       
-      // Both failed
-      toast.error('Authentication failed. Please check your credentials.');
+      // Both failed - open FAB for error reporting - open FAB for error reporting
+      toast.error('Authentication failed. Opening feedback form to report the issue.');
+      openFeedbackFAB();
       
     } catch (error) {
       console.error('Authentication error:', error);
-      toast.error('An error occurred during authentication.');
+      toast.error('An error occurred. Opening feedback form to report the issue.');
+      openFeedbackFAB();
     } finally {
       setIsLoading(false);
     }
@@ -113,11 +123,13 @@ const Auth = () => {
         const userEmail = form.getValues('email') || 'user@example.com';
         await handleAuthSuccess(userEmail);
       } else {
-        toast.error('Google authentication failed. Please try again.');
+        toast.error('Google authentication failed. Opening feedback form to report the issue.');
+        openFeedbackFAB();
       }
     } catch (error) {
       console.error('Google sign-in error:', error);
-      toast.error('An error occurred during Google authentication.');
+      toast.error('An error occurred during Google authentication. Opening feedback form.');
+      openFeedbackFAB();
     } finally {
       setIsLoading(false);
     }
