@@ -51,6 +51,7 @@
     "@types/google.maps": "^3.58.1",
     "@types/react-google-recaptcha": "^2.1.9",
     "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
