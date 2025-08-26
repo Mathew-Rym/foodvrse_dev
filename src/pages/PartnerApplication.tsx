@@ -137,8 +137,7 @@ This application was submitted through the FoodVrse website.
               location: formData.location,
               description: formData.description,
               website_url: formData.website,
-              status: 'pending_approval',
-              is_approved: false
+              status: 'pending_approval'
             });
           
           if (error) {

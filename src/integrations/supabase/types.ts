@@ -7,189 +7,555 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
   public: {
     Tables: {
+      achievement_milestones: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          is_active: boolean | null
+          milestone_type: string
+          milestone_value: number
+          name: string
+          reward_badge_id: string | null
+          reward_points: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          is_active?: boolean | null
+          milestone_type: string
+          milestone_value: number
+          name: string
+          reward_badge_id?: string | null
+          reward_points?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          is_active?: boolean | null
+          milestone_type?: string
+          milestone_value?: number
+          name?: string
+          reward_badge_id?: string | null
+          reward_points?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "achievement_milestones_reward_badge_id_fkey"
+            columns: ["reward_badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       badges: {
         Row: {
+          category: string
           color: string | null
           created_at: string
           description: string | null
           icon: string | null
           id: string
+          is_active: boolean | null
           name: string
+          rarity: string | null
+          requirement_type: string
+          requirement_value: number
         }
         Insert: {
+          category?: string
           color?: string | null
           created_at?: string
           description?: string | null
           icon?: string | null
           id?: string
+          is_active?: boolean | null
           name: string
+          rarity?: string | null
+          requirement_type?: string
+          requirement_value?: number
         }
         Update: {
+          category?: string
           color?: string | null
           created_at?: string
           description?: string | null
           icon?: string | null
           id?: string
+          is_active?: boolean | null
           name?: string
+          rarity?: string | null
+          requirement_type?: string
+          requirement_value?: number
+        }
+        Relationships: []
+      }
+      business_notifications: {
+        Row: {
+          action_url: string | null
+          business_id: string | null
+          created_at: string | null
+          id: string
+          message: string
+          priority: string | null
+          read: boolean | null
+          title: string
+          type: string
+        }
+        Insert: {
+          action_url?: string | null
+          business_id?: string | null
+          created_at?: string | null
+          id?: string
+          message: string
+          priority?: string | null
+          read?: boolean | null
+          title: string
+          type: string
+        }
+        Update: {
+          action_url?: string | null
+          business_id?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string
+          priority?: string | null
+          read?: boolean | null
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_notifications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_analytics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_notifications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_dashboard_data"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_notifications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_operating_hours: {
+        Row: {
+          break_end: string | null
+          break_start: string | null
+          business_id: string | null
+          close_time: string | null
+          created_at: string | null
+          day_of_week: number
+          id: string
+          is_closed: boolean | null
+          open_time: string | null
+        }
+        Insert: {
+          break_end?: string | null
+          break_start?: string | null
+          business_id?: string | null
+          close_time?: string | null
+          created_at?: string | null
+          day_of_week: number
+          id?: string
+          is_closed?: boolean | null
+          open_time?: string | null
+        }
+        Update: {
+          break_end?: string | null
+          break_start?: string | null
+          business_id?: string | null
+          close_time?: string | null
+          created_at?: string | null
+          day_of_week?: number
+          id?: string
+          is_closed?: boolean | null
+          open_time?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_operating_hours_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_analytics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_operating_hours_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_dashboard_data"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_operating_hours_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_partners: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          business_name: string
+          created_at: string | null
+          domain: string | null
+          email: string
+          id: string
+          is_approved: boolean | null
+          registered_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          business_name: string
+          created_at?: string | null
+          domain?: string | null
+          email: string
+          id?: string
+          is_approved?: boolean | null
+          registered_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          business_name?: string
+          created_at?: string | null
+          domain?: string | null
+          email?: string
+          id?: string
+          is_approved?: boolean | null
+          registered_at?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
       business_profiles: {
         Row: {
           address: string
+          admin_notes: string | null
+          analytics_enabled: boolean | null
+          auto_accept_orders: boolean | null
           average_rating: number | null
+          business_description: string | null
+          business_hours: Json | null
+          business_license: string | null
           business_logo_url: string | null
           business_name: string
           business_thumbnail_url: string | null
           carbon_credits_earned: number | null
+          category: Database["public"]["Enums"]["business_category"] | null
           co2_missed_kg: number | null
+          commission_rate: number | null
+          contact_email: string | null
+          contact_person: string | null
+          contact_phone: string | null
           created_at: string
+          delivery_radius: number | null
           description: string | null
+          dietary_options: string[] | null
           email: string | null
+          featured_until: string | null
           id: string
+          is_featured: boolean | null
+          last_activity: string | null
           last_month_revenue: number | null
           last_month_sales: number | null
           latitude: number | null
           location: string
           longitude: number | null
+          max_daily_orders: number | null
+          minimum_order_amount: number | null
+          notes: string | null
+          onboarding_completed: boolean | null
+          operating_hours: Json | null
+          payment_methods: string[] | null
           phone: string | null
+          preparation_time_minutes: number | null
           rating_count: number | null
+          social_media: Json | null
+          special_offers: string | null
+          status: Database["public"]["Enums"]["business_status"] | null
+          sustainability_practices: string[] | null
+          tax_id: string | null
           total_co2_saved_kg: number | null
           total_revenue: number | null
           total_sales: number | null
           updated_at: string
           user_id: string
           user_type: Database["public"]["Enums"]["user_type"]
-          status: string | null
-          category: string | null
-          verified_at: string | null
+          verification_date: string | null
           verification_document_url: string | null
-          business_hours: Json | null
-          contact_person: string | null
-          tax_id: string | null
-          business_license: string | null
-          is_featured: boolean | null
-          featured_until: string | null
-          is_approved: boolean | null
+          verification_documents: Json | null
+          verification_level:
+            | Database["public"]["Enums"]["verification_level"]
+            | null
+          verified_at: string | null
           website_url: string | null
-          status: string | null
-          category: string | null
-          verified_at: string | null
-          verification_document_url: string | null
-          business_hours: Json | null
-          contact_person: string | null
-          tax_id: string | null
-          business_license: string | null
-          is_featured: boolean | null
-          featured_until: string | null
-          is_approved: boolean | null
         }
         Insert: {
           address: string
+          admin_notes?: string | null
+          analytics_enabled?: boolean | null
+          auto_accept_orders?: boolean | null
           average_rating?: number | null
+          business_description?: string | null
+          business_hours?: Json | null
+          business_license?: string | null
           business_logo_url?: string | null
           business_name: string
           business_thumbnail_url?: string | null
           carbon_credits_earned?: number | null
+          category?: Database["public"]["Enums"]["business_category"] | null
           co2_missed_kg?: number | null
+          commission_rate?: number | null
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
           created_at?: string
+          delivery_radius?: number | null
           description?: string | null
+          dietary_options?: string[] | null
           email?: string | null
+          featured_until?: string | null
           id?: string
+          is_featured?: boolean | null
+          last_activity?: string | null
           last_month_revenue?: number | null
           last_month_sales?: number | null
           latitude?: number | null
           location: string
           longitude?: number | null
+          max_daily_orders?: number | null
+          minimum_order_amount?: number | null
+          notes?: string | null
+          onboarding_completed?: boolean | null
+          operating_hours?: Json | null
+          payment_methods?: string[] | null
           phone?: string | null
+          preparation_time_minutes?: number | null
           rating_count?: number | null
+          social_media?: Json | null
+          special_offers?: string | null
+          status?: Database["public"]["Enums"]["business_status"] | null
+          sustainability_practices?: string[] | null
+          tax_id?: string | null
           total_co2_saved_kg?: number | null
           total_revenue?: number | null
           total_sales?: number | null
           updated_at?: string
           user_id: string
           user_type?: Database["public"]["Enums"]["user_type"]
-          status?: string | null
-          category?: string | null
-          verified_at?: string | null
+          verification_date?: string | null
           verification_document_url?: string | null
-          business_hours?: Json | null
-          contact_person?: string | null
-          tax_id?: string | null
-          business_license?: string | null
-          is_featured?: boolean | null
-          featured_until?: string | null
-          is_approved?: boolean | null
-          status?: string | null
-          category?: string | null
+          verification_documents?: Json | null
+          verification_level?:
+            | Database["public"]["Enums"]["verification_level"]
+            | null
           verified_at?: string | null
-          verification_document_url?: string | null
-          business_hours?: Json | null
-          contact_person?: string | null
-          tax_id?: string | null
-          business_license?: string | null
-          is_featured?: boolean | null
-          featured_until?: string | null
-          is_approved?: boolean | null
           website_url?: string | null
         }
         Update: {
           address?: string
+          admin_notes?: string | null
+          analytics_enabled?: boolean | null
+          auto_accept_orders?: boolean | null
           average_rating?: number | null
+          business_description?: string | null
+          business_hours?: Json | null
+          business_license?: string | null
           business_logo_url?: string | null
           business_name?: string
           business_thumbnail_url?: string | null
           carbon_credits_earned?: number | null
+          category?: Database["public"]["Enums"]["business_category"] | null
           co2_missed_kg?: number | null
+          commission_rate?: number | null
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
           created_at?: string
+          delivery_radius?: number | null
           description?: string | null
+          dietary_options?: string[] | null
           email?: string | null
+          featured_until?: string | null
           id?: string
+          is_featured?: boolean | null
+          last_activity?: string | null
           last_month_revenue?: number | null
           last_month_sales?: number | null
           latitude?: number | null
           location?: string
           longitude?: number | null
+          max_daily_orders?: number | null
+          minimum_order_amount?: number | null
+          notes?: string | null
+          onboarding_completed?: boolean | null
+          operating_hours?: Json | null
+          payment_methods?: string[] | null
           phone?: string | null
+          preparation_time_minutes?: number | null
           rating_count?: number | null
+          social_media?: Json | null
+          special_offers?: string | null
+          status?: Database["public"]["Enums"]["business_status"] | null
+          sustainability_practices?: string[] | null
+          tax_id?: string | null
           total_co2_saved_kg?: number | null
           total_revenue?: number | null
           total_sales?: number | null
           updated_at?: string
           user_id?: string
           user_type?: Database["public"]["Enums"]["user_type"]
-          status?: string | null
-          category?: string | null
-          verified_at?: string | null
+          verification_date?: string | null
           verification_document_url?: string | null
-          business_hours?: Json | null
-          contact_person?: string | null
-          tax_id?: string | null
-          business_license?: string | null
-          is_featured?: boolean | null
-          featured_until?: string | null
-          is_approved?: boolean | null
-          status?: string | null
-          category?: string | null
+          verification_documents?: Json | null
+          verification_level?:
+            | Database["public"]["Enums"]["verification_level"]
+            | null
           verified_at?: string | null
-          verification_document_url?: string | null
-          business_hours?: Json | null
-          contact_person?: string | null
-          tax_id?: string | null
-          business_license?: string | null
-          is_featured?: boolean | null
-          featured_until?: string | null
-          is_approved?: boolean | null
           website_url?: string | null
         }
         Relationships: []
+      }
+      business_settings: {
+        Row: {
+          business_id: string | null
+          created_at: string | null
+          id: string
+          setting_key: string
+          setting_value: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          business_id?: string | null
+          created_at?: string | null
+          id?: string
+          setting_key: string
+          setting_value?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          business_id?: string | null
+          created_at?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_analytics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_dashboard_data"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_verification: {
+        Row: {
+          business_id: string | null
+          created_at: string | null
+          document_type: string | null
+          document_url: string | null
+          id: string
+          notes: string | null
+          status: string | null
+          submitted_at: string | null
+          verification_type: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          business_id?: string | null
+          created_at?: string | null
+          document_type?: string | null
+          document_url?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          verification_type: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          business_id?: string | null
+          created_at?: string | null
+          document_type?: string | null
+          document_url?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          verification_type?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_verification_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_analytics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_verification_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_dashboard_data"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_verification_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       carbon_credit_waitlist: {
         Row: {
@@ -290,6 +656,101 @@ export type Database = {
         }
         Relationships: []
       }
+      community_challenges: {
+        Row: {
+          challenge_type: string
+          created_at: string | null
+          current_value: number | null
+          description: string
+          end_date: string
+          goal_value: number
+          id: string
+          is_active: boolean | null
+          name: string
+          reward_badge_id: string | null
+          start_date: string
+          updated_at: string | null
+        }
+        Insert: {
+          challenge_type: string
+          created_at?: string | null
+          current_value?: number | null
+          description: string
+          end_date: string
+          goal_value: number
+          id?: string
+          is_active?: boolean | null
+          name: string
+          reward_badge_id?: string | null
+          start_date: string
+          updated_at?: string | null
+        }
+        Update: {
+          challenge_type?: string
+          created_at?: string | null
+          current_value?: number | null
+          description?: string
+          end_date?: string
+          goal_value?: number
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          reward_badge_id?: string | null
+          start_date?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_challenges_reward_badge_id_fkey"
+            columns: ["reward_badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leaderboard: {
+        Row: {
+          co2_saved: number | null
+          created_at: string | null
+          id: string
+          meals_saved: number | null
+          money_saved: number | null
+          period_end: string | null
+          period_start: string
+          period_type: string
+          rank: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          co2_saved?: number | null
+          created_at?: string | null
+          id?: string
+          meals_saved?: number | null
+          money_saved?: number | null
+          period_end?: string | null
+          period_start: string
+          period_type: string
+          rank?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          co2_saved?: number | null
+          created_at?: string | null
+          id?: string
+          meals_saved?: number | null
+          money_saved?: number | null
+          period_end?: string | null
+          period_start?: string
+          period_type?: string
+          rank?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       listing_performance: {
         Row: {
           business_id: string
@@ -332,7 +793,7 @@ export type Database = {
         }
         Relationships: []
       }
-      mystery_bags: {
+      listings: {
         Row: {
           business_id: string
           business_thumbnail_url: string | null
@@ -404,7 +865,21 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "mystery_bags_business_id_fkey"
+            foreignKeyName: "listings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_analytics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "listings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_dashboard_data"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "listings_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "business_profiles"
@@ -508,6 +983,20 @@ export type Database = {
             foreignKeyName: "mystery_bags_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "business_analytics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "mystery_bags_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_dashboard_data"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "mystery_bags_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "business_profiles"
             referencedColumns: ["id"]
           },
@@ -599,6 +1088,20 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "orders_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_analytics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "orders_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_dashboard_data"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "orders_business_id_fkey"
             columns: ["business_id"]
@@ -720,6 +1223,20 @@ export type Database = {
             foreignKeyName: "ratings_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "business_analytics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ratings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_dashboard_data"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ratings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "business_profiles"
             referencedColumns: ["id"]
           },
@@ -731,6 +1248,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_activity_log: {
+        Row: {
+          activity_data: Json | null
+          activity_type: string
+          created_at: string | null
+          id: string
+          points_earned: number | null
+          user_id: string | null
+        }
+        Insert: {
+          activity_data?: Json | null
+          activity_type: string
+          created_at?: string | null
+          id?: string
+          points_earned?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          activity_data?: Json | null
+          activity_type?: string
+          created_at?: string | null
+          id?: string
+          points_earned?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       user_badges: {
         Row: {
@@ -806,6 +1350,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_community_challenges: {
+        Row: {
+          community_challenge_id: string | null
+          completed_at: string | null
+          contribution_value: number | null
+          created_at: string | null
+          id: string
+          is_completed: boolean | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          community_challenge_id?: string | null
+          completed_at?: string | null
+          contribution_value?: number | null
+          created_at?: string | null
+          id?: string
+          is_completed?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          community_challenge_id?: string | null
+          completed_at?: string | null
+          contribution_value?: number | null
+          created_at?: string | null
+          id?: string
+          is_completed?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_community_challenges_community_challenge_id_fkey"
+            columns: ["community_challenge_id"]
+            isOneToOne: false
+            referencedRelation: "community_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_favorites: {
         Row: {
           business_id: string
@@ -872,6 +1457,92 @@ export type Database = {
         }
         Relationships: []
       }
+      user_milestones: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          current_value: number | null
+          id: string
+          is_completed: boolean | null
+          milestone_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_value?: number | null
+          id?: string
+          is_completed?: boolean | null
+          milestone_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_value?: number | null
+          id?: string
+          is_completed?: boolean | null
+          milestone_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_milestones_milestone_id_fkey"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "achievement_milestones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_preferences: {
+        Row: {
+          analytics_consent: boolean | null
+          cookie_consent: boolean | null
+          created_at: string | null
+          email_notifications: boolean | null
+          id: string
+          language_preference: string | null
+          last_activity: string | null
+          marketing_consent: boolean | null
+          push_notifications: boolean | null
+          theme_preference: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          analytics_consent?: boolean | null
+          cookie_consent?: boolean | null
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          language_preference?: string | null
+          last_activity?: string | null
+          marketing_consent?: boolean | null
+          push_notifications?: boolean | null
+          theme_preference?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          analytics_consent?: boolean | null
+          cookie_consent?: boolean | null
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          language_preference?: string | null
+          last_activity?: string | null
+          marketing_consent?: boolean | null
+          push_notifications?: boolean | null
+          theme_preference?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           address: string | null
@@ -889,17 +1560,6 @@ export type Database = {
           updated_at: string
           user_id: string
           user_type: Database["public"]["Enums"]["user_type"]
-          status: string | null
-          category: string | null
-          verified_at: string | null
-          verification_document_url: string | null
-          business_hours: Json | null
-          contact_person: string | null
-          tax_id: string | null
-          business_license: string | null
-          is_featured: boolean | null
-          featured_until: string | null
-          is_approved: boolean | null
         }
         Insert: {
           address?: string | null
@@ -917,28 +1577,6 @@ export type Database = {
           updated_at?: string
           user_id: string
           user_type?: Database["public"]["Enums"]["user_type"]
-          status?: string | null
-          category?: string | null
-          verified_at?: string | null
-          verification_document_url?: string | null
-          business_hours?: Json | null
-          contact_person?: string | null
-          tax_id?: string | null
-          business_license?: string | null
-          is_featured?: boolean | null
-          featured_until?: string | null
-          is_approved?: boolean | null
-          status?: string | null
-          category?: string | null
-          verified_at?: string | null
-          verification_document_url?: string | null
-          business_hours?: Json | null
-          contact_person?: string | null
-          tax_id?: string | null
-          business_license?: string | null
-          is_featured?: boolean | null
-          featured_until?: string | null
-          is_approved?: boolean | null
         }
         Update: {
           address?: string | null
@@ -956,43 +1594,207 @@ export type Database = {
           updated_at?: string
           user_id?: string
           user_type?: Database["public"]["Enums"]["user_type"]
-          status?: string | null
-          category?: string | null
-          verified_at?: string | null
-          verification_document_url?: string | null
-          business_hours?: Json | null
-          contact_person?: string | null
-          tax_id?: string | null
-          business_license?: string | null
-          is_featured?: boolean | null
-          featured_until?: string | null
-          is_approved?: boolean | null
-          status?: string | null
-          category?: string | null
-          verified_at?: string | null
-          verification_document_url?: string | null
-          business_hours?: Json | null
-          contact_person?: string | null
-          tax_id?: string | null
-          business_license?: string | null
-          is_featured?: boolean | null
-          featured_until?: string | null
-          is_approved?: boolean | null
+        }
+        Relationships: []
+      }
+      user_progress: {
+        Row: {
+          created_at: string | null
+          current_streak: number | null
+          experience_points: number | null
+          experience_to_next_level: number | null
+          id: string
+          level: number | null
+          longest_streak: number | null
+          total_co2_saved: number | null
+          total_meals_saved: number | null
+          total_money_saved: number | null
+          total_water_saved: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_streak?: number | null
+          experience_points?: number | null
+          experience_to_next_level?: number | null
+          id?: string
+          level?: number | null
+          longest_streak?: number | null
+          total_co2_saved?: number | null
+          total_meals_saved?: number | null
+          total_money_saved?: number | null
+          total_water_saved?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_streak?: number | null
+          experience_points?: number | null
+          experience_to_next_level?: number | null
+          id?: string
+          level?: number | null
+          longest_streak?: number | null
+          total_co2_saved?: number | null
+          total_meals_saved?: number | null
+          total_money_saved?: number | null
+          total_water_saved?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      weekly_challenges: {
+        Row: {
+          badge_awarded_id: string | null
+          challenge_type: string
+          completed_at: string | null
+          created_at: string | null
+          current_value: number | null
+          goal_value: number
+          id: string
+          is_completed: boolean | null
+          updated_at: string | null
+          user_id: string | null
+          week_start_date: string
+        }
+        Insert: {
+          badge_awarded_id?: string | null
+          challenge_type: string
+          completed_at?: string | null
+          created_at?: string | null
+          current_value?: number | null
+          goal_value: number
+          id?: string
+          is_completed?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+          week_start_date: string
+        }
+        Update: {
+          badge_awarded_id?: string | null
+          challenge_type?: string
+          completed_at?: string | null
+          created_at?: string | null
+          current_value?: number | null
+          goal_value?: number
+          id?: string
+          is_completed?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+          week_start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_challenges_badge_awarded_id_fkey"
+            columns: ["badge_awarded_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      business_analytics: {
+        Row: {
+          active_listings: number | null
+          average_rating: number | null
+          business_id: string | null
+          business_name: string | null
+          category: Database["public"]["Enums"]["business_category"] | null
+          created_at: string | null
+          rating_count: number | null
+          status: Database["public"]["Enums"]["business_status"] | null
+          total_co2_saved_kg: number | null
+          total_listings: number | null
+          total_revenue: number | null
+          total_sales: number | null
+        }
+        Relationships: []
+      }
+      business_dashboard_data: {
+        Row: {
+          active_listings: number | null
+          average_rating: number | null
+          avg_rating: number | null
+          business_id: string | null
+          business_name: string | null
+          category: Database["public"]["Enums"]["business_category"] | null
+          created_at: string | null
+          rating_count: number | null
+          status: Database["public"]["Enums"]["business_status"] | null
+          total_co2_saved_kg: number | null
+          total_listings: number | null
+          total_revenue: number | null
+          total_reviews: number | null
+          total_sales: number | null
         }
         Relationships: []
       }
     }
-    Views: {
-      [_ in never]: never
-    }
     Functions: {
+      award_badge_to_user: {
+        Args: { badge_uuid: string; user_uuid: string }
+        Returns: boolean
+      }
       calculate_distance: {
-        Args: { lat1: number; lon1: number; lat2: number; lon2: number }
+        Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number
+      }
+      calculate_user_level: {
+        Args: { exp_points: number }
+        Returns: {
+          exp_to_next: number
+          level: number
+        }[]
       }
       check_and_award_weekly_badge: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      create_business_notification: {
+        Args: {
+          p_business_id: string
+          p_message: string
+          p_priority?: string
+          p_title: string
+          p_type: string
+        }
+        Returns: string
+      }
+      get_all_businesses_with_owners: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          address: string
+          average_rating: number
+          business_id: string
+          business_name: string
+          category: Database["public"]["Enums"]["business_category"]
+          created_at: string
+          location: string
+          owner_email: string
+          owner_id: string
+          owner_name: string
+          status: Database["public"]["Enums"]["business_status"]
+          total_revenue: number
+          total_sales: number
+        }[]
+      }
+      get_business_owner_details: {
+        Args: { business_uuid: string }
+        Returns: {
+          address: string
+          business_id: string
+          business_name: string
+          category: Database["public"]["Enums"]["business_category"]
+          location: string
+          owner_email: string
+          owner_id: string
+          owner_name: string
+          status: Database["public"]["Enums"]["business_status"]
+        }[]
       }
       get_current_user_type: {
         Args: Record<PropertyKey, never>
@@ -1000,35 +1802,35 @@ export type Database = {
       }
       get_listings_with_distance: {
         Args: {
+          category_filter?: string
+          max_distance?: number
+          search_query?: string
           user_lat?: number
           user_lon?: number
-          max_distance?: number
-          category_filter?: string
-          search_query?: string
         }
         Returns: {
+          average_rating: number
+          business_id: string
+          business_lat: number
+          business_logo_url: string
+          business_lon: number
+          business_name: string
+          business_thumbnail_url: string
+          category: string
+          description: string
+          distance_km: number
+          favorited_by_user_ids: string[]
           id: string
           item_name: string
-          description: string
-          quantity: number
-          price: number
-          original_price: number
-          pickup_start: string
-          pickup_end: string
-          status: string
-          category: string
-          thumbnail_url: string
-          business_thumbnail_url: string
-          favorited_by_user_ids: string[]
-          business_id: string
-          business_name: string
-          business_logo_url: string
           location: string
-          average_rating: number
+          original_price: number
+          pickup_end: string
+          pickup_start: string
+          price: number
+          quantity: number
           rating_count: number
-          business_lat: number
-          business_lon: number
-          distance_km: number
+          status: string
+          thumbnail_url: string
         }[]
       }
       get_mystery_bags_by_pickup_time: {
@@ -1038,25 +1840,98 @@ export type Database = {
           pickup_category: string
         }[]
       }
+      get_or_create_user_preferences: {
+        Args: { user_uuid: string }
+        Returns: {
+          analytics_consent: boolean | null
+          cookie_consent: boolean | null
+          created_at: string | null
+          email_notifications: boolean | null
+          id: string
+          language_preference: string | null
+          last_activity: string | null
+          marketing_consent: boolean | null
+          push_notifications: boolean | null
+          theme_preference: string | null
+          updated_at: string | null
+          user_id: string
+        }
+      }
+      get_or_create_user_progress: {
+        Args: { user_uuid: string }
+        Returns: {
+          created_at: string | null
+          current_streak: number | null
+          experience_points: number | null
+          experience_to_next_level: number | null
+          id: string
+          level: number | null
+          longest_streak: number | null
+          total_co2_saved: number | null
+          total_meals_saved: number | null
+          total_money_saved: number | null
+          total_water_saved: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+      }
       get_user_type: {
         Args: { user_uuid?: string }
         Returns: Database["public"]["Enums"]["user_type"]
       }
+      is_business_partner_email: {
+        Args: { email_to_check: string }
+        Returns: boolean
+      }
       process_purchase: {
-        Args: { p_listing_id: string; p_user_id: string; p_quantity?: number }
+        Args: { p_listing_id: string; p_quantity?: number; p_user_id: string }
         Returns: Json
       }
       track_listing_favorite: {
-        Args: { listing_uuid: string; is_favorited: boolean }
+        Args: { is_favorited: boolean; listing_uuid: string }
         Returns: undefined
       }
       track_listing_view: {
         Args: { listing_uuid: string }
         Returns: undefined
       }
+      update_weekly_challenge_progress: {
+        Args: {
+          challenge_type_val: string
+          increment_value: number
+          user_uuid: string
+        }
+        Returns: boolean
+      }
+      verify_business: {
+        Args: { admin_user_id: string; business_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
+      business_category:
+        | "restaurant"
+        | "cafe"
+        | "bakery"
+        | "grocery_store"
+        | "supermarket"
+        | "hotel"
+        | "catering_service"
+        | "food_manufacturer"
+        | "food_distributor"
+        | "convenience_store"
+        | "food_truck"
+        | "farmers_market"
+        | "other"
+      business_status:
+        | "pending"
+        | "active"
+        | "verified"
+        | "suspended"
+        | "rejected"
+        | "inactive"
       user_type: "consumer" | "business"
+      verification_level: "unverified" | "basic" | "documented" | "premium"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1184,7 +2059,31 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      business_category: [
+        "restaurant",
+        "cafe",
+        "bakery",
+        "grocery_store",
+        "supermarket",
+        "hotel",
+        "catering_service",
+        "food_manufacturer",
+        "food_distributor",
+        "convenience_store",
+        "food_truck",
+        "farmers_market",
+        "other",
+      ],
+      business_status: [
+        "pending",
+        "active",
+        "verified",
+        "suspended",
+        "rejected",
+        "inactive",
+      ],
       user_type: ["consumer", "business"],
+      verification_level: ["unverified", "basic", "documented", "premium"],
     },
   },
 } as const
