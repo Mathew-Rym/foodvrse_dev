@@ -71,9 +71,9 @@ const BusinessDashboard = () => {
         if (profileError) throw profileError;
         setBusinessProfile(profile);
 
-        // Get business listings
-        const { data: listingsData, error: listingsError } = await supabase
-          .from('listings')
+            // Get business listings
+    const { data: listingsData, error: listingsError } = await supabase
+      .from('mystery_bags')
           .select('*')
           .eq('business_id', profile.id)
           .order('created_at', { ascending: false });
@@ -113,7 +113,7 @@ const BusinessDashboard = () => {
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
-        table: 'listings',
+        table: 'mystery_bags',
         filter: businessProfile ? `business_id=eq.${businessProfile.id}` : undefined
       }, () => {
         fetchBusinessData();
@@ -130,7 +130,7 @@ const BusinessDashboard = () => {
     
     try {
       const { data, error } = await supabase
-        .from('listings')
+        .from('mystery_bags')
         .insert([{
           business_id: businessProfile.id,
           item_name: newItem.name,
@@ -169,7 +169,7 @@ const BusinessDashboard = () => {
     
     try {
       const { error } = await supabase
-        .from('listings')
+        .from('mystery_bags')
         .update(updates)
         .eq('id', editingItem.id);
 
@@ -191,7 +191,7 @@ const BusinessDashboard = () => {
   const handleDeleteItem = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('listings')
+        .from('mystery_bags')
         .delete()
         .eq('id', id);
 
@@ -257,7 +257,7 @@ const BusinessDashboard = () => {
       // Update all existing listings with the new business thumbnail
       if (imageType === 'thumbnail') {
         await supabase
-          .from('listings')
+          .from('mystery_bags')
           .update({ business_thumbnail_url: publicUrl })
           .eq('business_id', businessProfile.id);
           
@@ -303,7 +303,7 @@ const BusinessDashboard = () => {
       // Update all existing listings to remove the business thumbnail
       if (imageType === 'thumbnail') {
         await supabase
-          .from('listings')
+          .from('mystery_bags')
           .update({ business_thumbnail_url: null })
           .eq('business_id', businessProfile.id);
           
@@ -331,7 +331,7 @@ const BusinessDashboard = () => {
     // Update existing listings with new location
     if (businessProfile) {
       supabase
-        .from('listings')
+        .from('mystery_bags')
         .update({
           latitude: location.lat,
           longitude: location.lng

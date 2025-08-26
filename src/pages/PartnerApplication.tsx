@@ -1,3 +1,5 @@
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +13,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import { RECAPTCHA_CONFIG } from '@/config/recaptcha';
 
 const PartnerApplication = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -77,10 +80,10 @@ const PartnerApplication = () => {
         company: formData.company,
         job_title: formData.jobTitle,
         phone: formData.phone,
-        business_type: formData.businessType,
+        category: formData.businessType,
         location: formData.location,
         employee_count: formData.employeeCount,
-        website: formData.website,
+        website_url: formData.website,
         description: formData.description,
         partnership_interest: formData.partnershipInterest,
         monthly_waste: formData.monthlyWaste,
@@ -118,6 +121,35 @@ This application was submitted through the FoodVrse website.
       );
       
       toast.success("Business application submitted successfully! Email sent to partner@foodvrse.com");
+      
+      // Insert into business_profiles table if user is logged in
+      if (user) {
+        try {
+          const { error } = await supabase
+            .from('business_profiles')
+            .insert({
+              user_id: user.id,
+              business_name: formData.company,
+              contact_person: formData.name,
+              email: formData.email,
+              phone: formData.phone,
+              category: formData.businessType,
+              location: formData.location,
+              description: formData.description,
+              website_url: formData.website,
+              status: 'pending_approval',
+              is_approved: false
+            });
+          
+          if (error) {
+            console.error("Database error:", error);
+          } else {
+            console.log("Business profile created successfully");
+          }
+        } catch (dbError) {
+          console.error("Database error:", dbError);
+        }
+      }
       
       // Redirect to landing page after 7 seconds
       setTimeout(() => {

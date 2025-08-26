@@ -182,7 +182,7 @@ export class RatingService {
         const averageRating = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
         
         await supabase
-          .from('listings')
+          .from('mystery_bags')
           .update({
             average_rating: Math.round(averageRating * 100) / 100,
             rating_count: ratings.length,

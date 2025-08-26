@@ -41,6 +41,8 @@ const Press = lazy(() => import("./pages/Press"));
 const ESG = lazy(() => import("./pages/ESG"));
 const Partners = lazy(() => import("./pages/Partners"));
 const PartnerApplication = lazy(() => import("./pages/PartnerApplication"));
+const PendingApproval = lazy(() => import("./pages/PendingApproval"));
+const ApplicationRejected = lazy(() => import("./pages/ApplicationRejected"));
 const ComingSoon = lazy(() => import("./pages/ComingSoon"));
 const GamificationPage = lazy(() => import("./pages/GamificationPage"));
 const ImpactTrackerPage = lazy(() => import("./pages/ImpactTrackerPage"));
@@ -177,6 +179,8 @@ const App = () => {
                               <Route path="/esg" element={<ESG />} />
                               <Route path="/partners" element={<Partners />} />
                               <Route path="/partner-application" element={<PartnerApplication />} />
+<Route path="/pending-approval" element={<PendingApproval />} />
+<Route path="/application-rejected" element={<ApplicationRejected />} />
                               <Route path="/coming-soon" element={<ComingSoon />} />
                               <Route path="/category/:categoryName" element={<CategoryPage />} />
                               <Route path="/gamification" element={<GamificationPage />} />

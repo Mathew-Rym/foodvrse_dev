@@ -37,7 +37,7 @@ const Favorites = () => {
       
       // Get listings for the favorited businesses from context
       const { data: listingsData, error: listingsError } = await supabase
-        .from('listings')
+        .from('mystery_bags')
         .select(`
           *,
           business:business_profiles(

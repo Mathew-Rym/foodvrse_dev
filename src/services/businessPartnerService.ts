@@ -29,6 +29,8 @@ const APPROVED_BUSINESS_EMAILS = [
 ];
 
 export interface BusinessPartnerCheck {
+  status?: string;
+  userId?: string;
   isBusinessPartner: boolean;
   partnerType: 'domain' | 'email' | 'database' | null;
   businessName?: string;
@@ -62,34 +64,38 @@ export const checkIfBusinessPartner = async (email: string): Promise<BusinessPar
 
     // Third check: Database lookup for registered business partners
     const { data: businessPartner, error } = await supabase
-      .from('business_partners')
-      .select('*')
+      .from('business_profiles')
+      .select('business_name, status, user_id')
       .eq('email', emailLower)
-      .eq('is_approved', true)
       .single();
 
     if (!error && businessPartner) {
-      return {
-        isBusinessPartner: true,
-        partnerType: 'database',
-        businessName: businessPartner.business_name
-      };
-    }
-
-    // Fourth check: Check if user already has a business profile
-    const { data: existingBusiness } = await supabase
-      .from('business_profiles')
-      .select('business_name, status')
-      .eq('email', emailLower)
-      .eq('status', 'active')
-      .single();
-
-    if (existingBusiness) {
-      return {
-        isBusinessPartner: true,
-        partnerType: 'database',
-        businessName: existingBusiness.business_name
-      };
+      // Check status and return appropriate response
+      if (businessPartner.status === 'approved') {
+        return {
+          isBusinessPartner: true,
+          partnerType: 'database',
+          businessName: businessPartner.business_name,
+          status: businessPartner.status,
+          userId: businessPartner.user_id
+        };
+      } else if (businessPartner.status === 'pending_approval') {
+        return {
+          isBusinessPartner: false,
+          partnerType: 'pending',
+          businessName: businessPartner.business_name,
+          status: businessPartner.status,
+          userId: businessPartner.user_id
+        };
+      } else if (businessPartner.status === 'rejected') {
+        return {
+          isBusinessPartner: false,
+          partnerType: 'rejected',
+          businessName: businessPartner.business_name,
+          status: businessPartner.status,
+          userId: businessPartner.user_id
+        };
+      }
     }
 
     // Not a business partner

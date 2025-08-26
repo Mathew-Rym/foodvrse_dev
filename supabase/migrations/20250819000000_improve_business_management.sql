@@ -5,7 +5,7 @@
 DO $$ 
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'business_status') THEN
-        CREATE TYPE public.business_status AS ENUM ('pending', 'active', 'suspended', 'verified');
+        CREATE TYPE public.business_status AS ENUM ('pending_approval', 'approved', 'rejected');
     END IF;
 END $$;
 
@@ -29,7 +29,7 @@ END $$;
 
 -- Add missing columns to business_profiles table
 ALTER TABLE public.business_profiles 
-ADD COLUMN IF NOT EXISTS status public.business_status DEFAULT 'pending',
+ADD COLUMN IF NOT EXISTS status public.business_status DEFAULT 'pending_approval',
 ADD COLUMN IF NOT EXISTS category public.business_category DEFAULT 'other',
 ADD COLUMN IF NOT EXISTS verified_at TIMESTAMP WITH TIME ZONE,
 ADD COLUMN IF NOT EXISTS verification_document_url TEXT,
@@ -88,7 +88,7 @@ BEGIN
     -- Update business status to verified
     UPDATE public.business_profiles 
     SET 
-        status = 'verified',
+        status = 'approved',
         verified_at = NOW(),
         updated_at = NOW()
     WHERE id = business_uuid;
@@ -126,9 +126,9 @@ BEGIN
         bp.category,
         bp.location,
         bp.address,
-        bp.total_sales,
-        bp.total_revenue,
-        bp.average_rating,
+        0 as total_sales,
+        0 as total_revenue,
+        0 as average_rating,
         bp.created_at
     FROM public.business_profiles bp
     JOIN auth.users au ON bp.user_id = au.id
@@ -156,7 +156,7 @@ WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Public can view active and verified businesses" 
 ON public.business_profiles FOR SELECT 
-USING (status IN ('active', 'verified'));
+USING (status IN ('approved'));
 
 -- Create trigger to update updated_at timestamp
 CREATE OR REPLACE FUNCTION public.update_business_updated_at()
@@ -184,18 +184,17 @@ SELECT
     bp.business_name,
     bp.category,
     bp.status,
-    bp.total_sales,
-    bp.total_revenue,
-    bp.total_co2_saved_kg,
-    bp.average_rating,
-    bp.rating_count,
+    0 as total_sales,
+    0 as total_revenue,
+    0 as total_co2_saved_kg,
+    0 as average_rating,
+    0 as rating_count,
     bp.created_at,
-    COUNT(l.id) as total_listings,
-    COUNT(CASE WHEN l.status = 'active' THEN 1 END) as active_listings
+    COUNT(mb.id) as total_listings,
+    COUNT(CASE WHEN mb.is_active = true THEN 1 END) as active_listings
 FROM public.business_profiles bp
-LEFT JOIN public.listings l ON bp.id = l.business_id
-GROUP BY bp.id, bp.business_name, bp.category, bp.status, bp.total_sales, 
-         bp.total_revenue, bp.total_co2_saved_kg, bp.average_rating, bp.rating_count, bp.created_at;
+LEFT JOIN public.mystery_bags mb ON bp.id = mb.business_id
+GROUP BY bp.id, bp.business_name, bp.category, bp.status, bp.created_at;
 
 -- Recreate the business_dashboard_data view if it was dropped
 -- Note: Using a simple view without reviews table since it may not exist

@@ -266,7 +266,7 @@ export type Database = {
         }
         Relationships: []
       }
-      listings: {
+      mystery_bags: {
         Row: {
           business_id: string
           business_thumbnail_url: string | null
@@ -338,7 +338,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "listings_business_id_fkey"
+            foreignKeyName: "mystery_bags_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "business_profiles"

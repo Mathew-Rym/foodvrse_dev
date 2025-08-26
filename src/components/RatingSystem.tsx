@@ -115,7 +115,7 @@ export const RatingSystem: React.FC<RatingSystemProps> = ({
     try {
       const tableName = targetType === 'business' ? 'business_ratings' : 'listing_ratings';
       const idField = targetType === 'business' ? 'business_id' : 'listing_id';
-      const updateTable = targetType === 'business' ? 'business_profiles' : 'listings';
+      const updateTable = targetType === 'business' ? 'business_profiles' : 'mystery_bags';
 
       const { data: ratings, error } = await supabase
         .from(tableName)

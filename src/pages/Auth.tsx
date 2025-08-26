@@ -63,8 +63,15 @@ const Auth = () => {
         toast.success(`Welcome ${(businessCheck as any).businessName || 'Business Partner'}!`);
         navigate('/business-dashboard', { replace: true });
         setIsOpen(false);
+      } else if ((businessCheck as any).partnerType === 'pending') {
+        toast.info(`Your application is under review, ${(businessCheck as any).businessName || 'Business'}`);
+        navigate('/pending-approval', { replace: true });
+        setIsOpen(false);
+      } else if ((businessCheck as any).partnerType === 'rejected') {
+        toast.error(`Your application was not approved, ${(businessCheck as any).businessName || 'Business'}`);
+        navigate('/application-rejected', { replace: true });
+        setIsOpen(false);
       } else {
-        toast.success('Welcome to FoodVrse!');
         navigate('/discover', { replace: true });
         setIsOpen(false);
       }

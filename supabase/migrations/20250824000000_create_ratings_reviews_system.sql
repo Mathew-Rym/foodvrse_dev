@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS public.business_ratings (
 -- Create listing ratings table for individual listing ratings
 CREATE TABLE IF NOT EXISTS public.listing_ratings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  listing_id UUID NOT NULL REFERENCES public.listings(id) ON DELETE CASCADE,
+  mystery_bag_id UUID NOT NULL REFERENCES public.mystery_bags(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
   review_text TEXT,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS public.listing_ratings (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
   -- Ensure one rating per user per listing
-  UNIQUE(listing_id, user_id)
+  UNIQUE(mystery_bag_id, user_id)
 );
 
 -- Add rating columns to existing tables if they don't exist
@@ -38,7 +38,7 @@ ALTER TABLE public.business_profiles
 ADD COLUMN IF NOT EXISTS average_rating DECIMAL(3,2) DEFAULT 0.00,
 ADD COLUMN IF NOT EXISTS rating_count INTEGER DEFAULT 0;
 
-ALTER TABLE public.listings 
+ALTER TABLE public.mystery_bags 
 ADD COLUMN IF NOT EXISTS average_rating DECIMAL(3,2) DEFAULT 0.00,
 ADD COLUMN IF NOT EXISTS rating_count INTEGER DEFAULT 0;
 
