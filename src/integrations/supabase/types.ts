@@ -67,7 +67,29 @@ export type Database = {
           updated_at: string
           user_id: string
           user_type: Database["public"]["Enums"]["user_type"]
+          status: string | null
+          category: string | null
+          verified_at: string | null
+          verification_document_url: string | null
+          business_hours: Json | null
+          contact_person: string | null
+          tax_id: string | null
+          business_license: string | null
+          is_featured: boolean | null
+          featured_until: string | null
+          is_approved: boolean | null
           website_url: string | null
+          status: string | null
+          category: string | null
+          verified_at: string | null
+          verification_document_url: string | null
+          business_hours: Json | null
+          contact_person: string | null
+          tax_id: string | null
+          business_license: string | null
+          is_featured: boolean | null
+          featured_until: string | null
+          is_approved: boolean | null
         }
         Insert: {
           address: string
@@ -94,6 +116,28 @@ export type Database = {
           updated_at?: string
           user_id: string
           user_type?: Database["public"]["Enums"]["user_type"]
+          status?: string | null
+          category?: string | null
+          verified_at?: string | null
+          verification_document_url?: string | null
+          business_hours?: Json | null
+          contact_person?: string | null
+          tax_id?: string | null
+          business_license?: string | null
+          is_featured?: boolean | null
+          featured_until?: string | null
+          is_approved?: boolean | null
+          status?: string | null
+          category?: string | null
+          verified_at?: string | null
+          verification_document_url?: string | null
+          business_hours?: Json | null
+          contact_person?: string | null
+          tax_id?: string | null
+          business_license?: string | null
+          is_featured?: boolean | null
+          featured_until?: string | null
+          is_approved?: boolean | null
           website_url?: string | null
         }
         Update: {
@@ -121,6 +165,28 @@ export type Database = {
           updated_at?: string
           user_id?: string
           user_type?: Database["public"]["Enums"]["user_type"]
+          status?: string | null
+          category?: string | null
+          verified_at?: string | null
+          verification_document_url?: string | null
+          business_hours?: Json | null
+          contact_person?: string | null
+          tax_id?: string | null
+          business_license?: string | null
+          is_featured?: boolean | null
+          featured_until?: string | null
+          is_approved?: boolean | null
+          status?: string | null
+          category?: string | null
+          verified_at?: string | null
+          verification_document_url?: string | null
+          business_hours?: Json | null
+          contact_person?: string | null
+          tax_id?: string | null
+          business_license?: string | null
+          is_featured?: boolean | null
+          featured_until?: string | null
+          is_approved?: boolean | null
           website_url?: string | null
         }
         Relationships: []
@@ -823,6 +889,17 @@ export type Database = {
           updated_at: string
           user_id: string
           user_type: Database["public"]["Enums"]["user_type"]
+          status: string | null
+          category: string | null
+          verified_at: string | null
+          verification_document_url: string | null
+          business_hours: Json | null
+          contact_person: string | null
+          tax_id: string | null
+          business_license: string | null
+          is_featured: boolean | null
+          featured_until: string | null
+          is_approved: boolean | null
         }
         Insert: {
           address?: string | null
@@ -840,6 +917,28 @@ export type Database = {
           updated_at?: string
           user_id: string
           user_type?: Database["public"]["Enums"]["user_type"]
+          status?: string | null
+          category?: string | null
+          verified_at?: string | null
+          verification_document_url?: string | null
+          business_hours?: Json | null
+          contact_person?: string | null
+          tax_id?: string | null
+          business_license?: string | null
+          is_featured?: boolean | null
+          featured_until?: string | null
+          is_approved?: boolean | null
+          status?: string | null
+          category?: string | null
+          verified_at?: string | null
+          verification_document_url?: string | null
+          business_hours?: Json | null
+          contact_person?: string | null
+          tax_id?: string | null
+          business_license?: string | null
+          is_featured?: boolean | null
+          featured_until?: string | null
+          is_approved?: boolean | null
         }
         Update: {
           address?: string | null
@@ -857,6 +956,28 @@ export type Database = {
           updated_at?: string
           user_id?: string
           user_type?: Database["public"]["Enums"]["user_type"]
+          status?: string | null
+          category?: string | null
+          verified_at?: string | null
+          verification_document_url?: string | null
+          business_hours?: Json | null
+          contact_person?: string | null
+          tax_id?: string | null
+          business_license?: string | null
+          is_featured?: boolean | null
+          featured_until?: string | null
+          is_approved?: boolean | null
+          status?: string | null
+          category?: string | null
+          verified_at?: string | null
+          verification_document_url?: string | null
+          business_hours?: Json | null
+          contact_person?: string | null
+          tax_id?: string | null
+          business_license?: string | null
+          is_featured?: boolean | null
+          featured_until?: string | null
+          is_approved?: boolean | null
         }
         Relationships: []
       }
