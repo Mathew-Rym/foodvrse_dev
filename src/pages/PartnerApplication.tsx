@@ -154,8 +154,8 @@ This application was submitted through the FoodVrse website.
       
       // Redirect to landing page after 7 seconds
       setTimeout(() => {
-        navigate('/');
-      }, 7000);
+        if (user) { navigate('/pending-approval') } else { navigate('/') };
+      }, 3000);
       
       // Reset form
       setFormData({
@@ -179,7 +179,7 @@ This application was submitted through the FoodVrse website.
       // Redirect to landing page after 7 seconds
       setTimeout(() => {
         navigate('/');
-      }, 7000);
+      }, 3000);
       
     } catch (emailError) {
       console.error("EmailJS error:", emailError);
@@ -189,7 +189,7 @@ This application was submitted through the FoodVrse website.
       // Redirect to landing page after 7 seconds
       setTimeout(() => {
         navigate('/');
-      }, 7000);
+      }, 3000);
     } finally {
       setIsSubmitting(false);
     }
