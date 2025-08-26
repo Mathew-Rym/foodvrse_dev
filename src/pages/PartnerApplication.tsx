@@ -82,6 +82,7 @@ const PartnerApplication = () => {
         phone: formData.phone,
         category: formData.businessType,
         location: formData.location,
+              address: formData.location, // Using location as address for now
         employee_count: formData.employeeCount,
         website_url: formData.website,
         description: formData.description,
@@ -135,6 +136,7 @@ This application was submitted through the FoodVrse website.
               phone: formData.phone,
               category: formData.businessType,
               location: formData.location,
+              address: formData.location, // Using location as address for now
               description: formData.description,
               website_url: formData.website,
               status: 'pending_approval'
