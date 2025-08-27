@@ -41,6 +41,19 @@ const GamificationPage = () => {
     totalUsers: 0
   });
 
+  // Authentication check - redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+  }, [user, navigate]);
+
+  // Don't render anything if user is not authenticated
+  if (!user) {
+    return null;
+  }
+
   // Calculate level and experience
   const calculateLevel = (exp: number) => {
     if (exp < 100) return { level: 1, expToNext: 100 - exp, progress: (exp / 100) * 100 };

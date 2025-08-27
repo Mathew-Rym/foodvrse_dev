@@ -53,6 +53,19 @@ const Profile = () => {
     { id: 2, type: "Credit Card", number: "**** **** **** 1234", default: false }
   ]);
 
+  // Authentication check - redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+  }, [user, navigate]);
+
+  // Don't render anything if user is not authenticated
+  if (!user) {
+    return null;
+  }
+
   // Ensure user profile exists and sync profileData when it loads
   useEffect(() => {
     const initializeProfile = async () => {

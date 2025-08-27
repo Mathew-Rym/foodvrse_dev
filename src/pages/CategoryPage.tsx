@@ -7,10 +7,25 @@ import ListingsGrid from '@/components/ListingsGrid';
 import { FilterPopup, FilterOptions } from '@/components/FilterPopup';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 const CategoryPage: React.FC = () => {
   const { categoryName } = useParams<{ categoryName: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Authentication check - redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+  }, [user, navigate]);
+
+  // Don't render anything if user is not authenticated
+  if (!user) {
+    return null;
+  }
   const [categoryData, setCategoryData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showFilter, setShowFilter] = useState(false);

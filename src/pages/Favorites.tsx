@@ -17,6 +17,19 @@ const Favorites = () => {
   const [favoriteListings, setFavoriteListings] = useState<any[]>([]);
   const [listingsLoading, setListingsLoading] = useState(true);
 
+  // Authentication check - redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+  }, [user, navigate]);
+
+  // Don't render anything if user is not authenticated
+  if (!user) {
+    return null;
+  }
+
   useEffect(() => {
     if (user && !favoritesLoading) {
       fetchFavoriteListings();

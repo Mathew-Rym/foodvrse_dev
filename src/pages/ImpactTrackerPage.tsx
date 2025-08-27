@@ -4,12 +4,26 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import MobileLayout from "@/components/MobileLayout";
 import BackToTop from "@/components/BackToTop";
+import { useEffect } from "react";
 
 const ImpactTrackerPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const hideNavbar = location.state?.hideNavbar;
+
+  // Authentication check - redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+  }, [user, navigate]);
+
+  // Don't render anything if user is not authenticated
+  if (!user) {
+    return null;
+  }
 
   const handleBack = () => {
     navigate(-1);

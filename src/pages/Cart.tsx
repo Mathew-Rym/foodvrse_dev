@@ -3,11 +3,28 @@ import { Button } from "@/components/ui/button";
 import MobileLayout from "@/components/MobileLayout";
 import { useCart } from "@/contexts/CartContext";
 import MobileMoneyCheckout from "@/components/MobileMoneyCheckout";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const { items, totalItems, totalPrice, updateQuantity, removeFromCart, selectedAddOns } = useCart();
   const [showCheckout, setShowCheckout] = useState(false);
+
+  // Authentication check - redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+  }, [user, navigate]);
+
+  // Don't render anything if user is not authenticated
+  if (!user) {
+    return null;
+  }
 
   if (totalItems === 0) {
     return (

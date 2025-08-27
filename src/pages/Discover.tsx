@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { checkIfBusinessPartner } from "@/services/businessPartnerService";
+import { useNavigate } from "react-router-dom";
 
 const Discover = () => {
   const { user } = useAuth();
@@ -48,6 +49,8 @@ const Discover = () => {
   const [mysteryBags, setMysteryBags] = useState<any[]>([]);
   const [partnerBusinesses, setPartnerBusinesses] = useState<any[]>([]);
   const [loadingMysteryBags, setLoadingMysteryBags] = useState(false);
+
+  const navigate = useNavigate();
 
   // Mock data for demonstration - Dummy products with working favorites
   const dummyProducts = [
@@ -157,6 +160,19 @@ const Discover = () => {
   ];
 
   const popularSearches = ["Pizza", "Coffee", "Burgers", "Desserts", "Healthy"];
+
+  // Authentication check - redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+  }, [user, navigate]);
+
+  // Don't render anything if user is not authenticated
+  if (!user) {
+    return null;
+  }
 
   // Fetch mystery bags when location changes
   useEffect(() => {
