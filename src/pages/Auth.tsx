@@ -9,7 +9,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { checkIfBusinessPartner } from '@/services/businessPartnerService';
 import { supabase } from '@/integrations/supabase/client';
-import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
 
 interface AuthFormData {
@@ -55,36 +54,77 @@ const Auth = () => {
   const handleAuthSuccess = async (email: string) => {
     setRedirecting(true);
     
+    if (isBusinessLogin) {
+      // === Business Login Flow ===
+      try {
+        const { data, error } = await supabase
+          .from("business_profiles")
+          .select("status")
+          .eq("email", email)
+          .single();
+
+        if (error || !data) {
+          // No business profile → send them back to customer dashboard
+          toast.info("No business profile found. Please apply to become a partner.");
+          navigate("/discover");
+          return;
+        }
+
+        // Route based on business profile status
+        switch (data.status) {
+          case "active":
+          case "verified":
+            navigate("/business-dashboard");
+            break;
+          case "pending":
+            navigate("/pending-approval");
+            break;
+          case "suspended":
+            toast.error("Your account has been suspended. Please contact support.");
+            navigate("/discover");
+            break;
+          case "rejected":
+            navigate("/application-rejected");
+            break;
+          default:
+            navigate("/discover"); // fallback to customer dashboard
+        }
+        setIsOpen(false);
+        return;
+      } catch (err) {
+        console.error("Business login flow error:", err);
+        toast.error("Something went wrong during business login.");
+        navigate("/discover");
+        setIsOpen(false);
+        return;
+      }
+    }
+    
+    // === Customer Login Flow ===
     try {
       // Fast business partner check with timeout
       const businessCheck = await Promise.race([
         checkIfBusinessPartner(email),
-        new Promise(resolve => setTimeout(() => resolve({ isBusinessPartner: false }), 300))
+        new Promise(resolve => setTimeout(() => resolve({ isBusinessPartner: false, partnerType: 'customer' }), 3000))
       ]);
-      
+
       if ((businessCheck as any).isBusinessPartner) {
-        toast.success(`Welcome ${(businessCheck as any).businessName || 'Business Partner'}!`);
-        navigate('/business-dashboard', { replace: true });
-        setIsOpen(false);
-      } else if ((businessCheck as any).partnerType === 'pending') {
-        toast.info(`Your application is under review, ${(businessCheck as any).businessName || 'Business'}`);
-        navigate('/pending-approval', { replace: true });
-        setIsOpen(false);
-      } else if ((businessCheck as any).partnerType === 'rejected') {
-        toast.error(`Your application was not approved, ${(businessCheck as any).businessName || 'Business'}`);
-        navigate('/application-rejected', { replace: true });
-        setIsOpen(false);
+        if ((businessCheck as any).partnerType === 'pending') {
+          navigate('/pending-approval');
+        } else if ((businessCheck as any).partnerType === 'rejected') {
+          navigate('/application-rejected');
+        } else {
+          navigate('/business-dashboard');
+        }
       } else {
-        navigate('/discover', { replace: true });
-        setIsOpen(false);
+        navigate('/discover');
       }
     } catch (error) {
       console.error('Error checking business status:', error);
-      // Default to discover on error
-      toast.success('Welcome to FoodVrse!');
-      navigate('/discover', { replace: true });
-      setIsOpen(false);
+      navigate('/discover');
     }
+    
+    setIsOpen(false);
   };
 
   // Unified authentication handler
@@ -305,6 +345,34 @@ const Auth = () => {
                     'Continue with email'
                   )}
                 </Button>
+
+                {/* My Store Link */}
+                {!isBusinessLogin && (
+                  <div className="text-center mt-4">
+                    <Button
+                      type="button"
+                      variant="link"
+                      onClick={() => navigate('/business-login')}
+                      className="text-green-400 hover:text-green-300 text-sm"
+                    >
+                      My Store (Business Login)
+                    </Button>
+                  </div>
+                )}
+
+                {/* Back to Customer Login */}
+                {isBusinessLogin && (
+                  <div className="text-center mt-4">
+                    <Button
+                      type="button"
+                      variant="link"
+                      onClick={() => navigate('/auth')}
+                      className="text-green-400 hover:text-green-300 text-sm"
+                    >
+                      ← Back to Customer Login
+                    </Button>
+                  </div>
+                )}
               </form>
             </Form>
           ) : (
