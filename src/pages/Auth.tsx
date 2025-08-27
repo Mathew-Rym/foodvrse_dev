@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { checkIfBusinessPartner } from '@/services/businessPartnerService';
+import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
 
 interface AuthFormData {
@@ -24,6 +25,7 @@ const Auth = () => {
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isBusinessLogin = location.pathname === '/business-login';
   
   const form = useForm<AuthFormData>({
     defaultValues: {
