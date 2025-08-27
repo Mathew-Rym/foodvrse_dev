@@ -149,6 +149,8 @@ const App = () => {
                             <Routes>
                               <Route path="/" element={<Index />} />
                               <Route path="/auth" element={<Auth />} />
+                              <Route path="/business-login" element={<Auth />} />
+                              <Route path="/business-login" element={<Auth />} />
                               <Route path="/oauth-callback" element={
                                 <GoogleOAuthHandler onComplete={() => window.history.replaceState({}, '', '/')} />
                               } />
