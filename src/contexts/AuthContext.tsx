@@ -109,14 +109,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const createUserProfile = async (user: any) => {
     try {
-      // Extract first name from Google user data
-      let firstName = 'User';
+      // Extract display name from user data - prioritize user_metadata over email
+      let displayName = 'User';
       if (user.user_metadata?.full_name) {
-        firstName = user.user_metadata.full_name.split(' ')[0];
+        displayName = user.user_metadata.full_name;
       } else if (user.user_metadata?.name) {
-        firstName = user.user_metadata.name.split(' ')[0];
+        displayName = user.user_metadata.name;
+      } else if (user.user_metadata?.display_name) {
+        displayName = user.user_metadata.display_name;
       } else if (user.email) {
-        firstName = user.email.split('@')[0];
+        displayName = user.email.split('@')[0];
       }
 
       // Check if this is a business partner based on email
@@ -135,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .insert({
           id: user.id,
           user_id: user.id,
-          display_name: firstName,
+          display_name: displayName,
           avatar_url: user.user_metadata?.avatar_url || null,
           user_type: isBusinessAuth ? 'business' : 'consumer',
           email_notifications: true,
@@ -171,27 +173,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Don't fail the whole process for impact creation error
       }
 
-              // If business auth, create business profile
-        if (isBusinessAuth) {
-          const { error: businessError } = await supabase
-            .from('business_profiles')
-            .insert({
-              user_id: user.id,
-              business_name: `${firstName}'s Business`,
-              address: 'To be updated',
-              location: 'To be updated',
-              user_type: 'business',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            });
+      // If business auth, create business profile
+      if (isBusinessAuth) {
+        const { error: businessError } = await supabase
+          .from('business_profiles')
+          .insert({
+            user_id: user.id,
+            business_name: `${displayName}'s Business`,
+            address: 'To be updated',
+            location: 'To be updated',
+            user_type: 'business',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
 
-          if (businessError) {
-            console.error('Business profile creation error:', businessError);
-            // Don't fail the whole process for business profile error
-          }
+        if (businessError) {
+          console.error('Business profile creation error:', businessError);
+          // Don't fail the whole process for business profile error
         }
+      }
 
-      toast.success(`Welcome ${firstName}! Your account has been set up successfully.`);
+      toast.success(`Welcome ${displayName}! Your account has been set up successfully.`);
     } catch (error) {
       console.error('Profile creation error:', error);
       toast.error('Failed to create profile. Please try again.');
@@ -221,7 +223,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Handle user profile
       if (profileResult.status === 'fulfilled' && !profileResult.value.error) {
-        setUserProfile(profileResult.value.data);
+        const profile = profileResult.value.data;
+        setUserProfile(profile);
+        
+        // Sync display name from auth user if different
+        if (profile && user) {
+          const authDisplayName = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.display_name;
+          if (authDisplayName && profile.display_name !== authDisplayName) {
+            await syncDisplayName(userId, authDisplayName);
+          }
+        }
       } else if (profileResult.status === 'rejected' || profileResult.value.error) {
         console.warn('User profile not found or error:', profileResult.status === 'rejected' ? profileResult.reason : profileResult.value.error);
         setUserProfile(null);
@@ -246,6 +257,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUserProfile(null);
       setUserImpact(null);
       setBusinessProfile(null);
+    }
+  };
+
+  // Sync display name from authentication user to user_profiles
+  const syncDisplayName = async (userId: string, displayName: string) => {
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ 
+          display_name: displayName,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Error syncing display name:', error);
+      } else {
+        // Update local state
+        setUserProfile(prev => prev ? { ...prev, display_name: displayName } : null);
+      }
+    } catch (error) {
+      console.error('Error syncing display name:', error);
     }
   };
 
