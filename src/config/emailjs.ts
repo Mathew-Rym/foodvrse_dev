@@ -18,7 +18,7 @@ export const EMAILJS_CONFIG = {
   TEMPLATE_ID: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_business_application',
   
   // Recipient email addresses
-  TO_EMAIL_PARTNER: 'partner@foodvrse.com',
+  TO_EMAIL_PARTNER: 'hello@foodvrse.com',
   TO_EMAIL_SUPPORT: 'support@foodvrse.com',
   TO_EMAIL_HEBREW: 'hebrew@foodvrse.com',
   TO_EMAIL_RACHEL: 'rachel@foodvrse.com',

@@ -121,7 +121,7 @@ This application was submitted through the FoodVrse website.
         EMAILJS_CONFIG.PUBLIC_KEY
       );
       
-      toast.success("Business application submitted successfully! Email sent to partner@foodvrse.com");
+      toast.success("Business application submitted successfully! Email sent to hello@foodvrse.com");
       
       // Insert into business_profiles table if user is logged in
       if (user) {
@@ -139,23 +139,22 @@ This application was submitted through the FoodVrse website.
               address: formData.location, // Using location as address for now
               description: formData.description,
               website_url: formData.website,
-              status: 'pending'
+              status: 'pending',
+              is_approved: false
             });
           
           if (error) {
             console.error("Database error:", error);
+            toast.error("Failed to create business profile. Please try again.");
           } else {
             console.log("Business profile created successfully");
+            toast.success("Business profile created and pending approval");
           }
         } catch (dbError) {
           console.error("Database error:", dbError);
+          toast.error("Failed to create business profile. Please try again.");
         }
       }
-      
-      // Redirect to landing page after 7 seconds
-      setTimeout(() => {
-        if (user) { navigate('/pending-approval') } else { navigate('/') };
-      }, 3000);
       
       // Reset form
       setFormData({
@@ -176,9 +175,13 @@ This application was submitted through the FoodVrse website.
       setRecaptchaToken(null);
       recaptchaRef.current?.reset();
       
-      // Redirect to landing page after 7 seconds
+      // Redirect based on user authentication status
       setTimeout(() => {
-        navigate('/');
+        if (user) { 
+          navigate('/pending-approval');
+        } else { 
+          navigate('/');
+        }
       }, 3000);
       
     } catch (emailError) {
