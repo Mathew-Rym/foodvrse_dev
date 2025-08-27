@@ -71,7 +71,7 @@ export const checkIfBusinessPartner = async (email: string): Promise<BusinessPar
 
     if (!error && businessPartner) {
       // Check status and return appropriate response
-      if (businessPartner.status === 'approved') {
+      if (businessPartner.status === 'verified') {
         return {
           isBusinessPartner: true,
           partnerType: 'database',
@@ -79,7 +79,7 @@ export const checkIfBusinessPartner = async (email: string): Promise<BusinessPar
           status: businessPartner.status,
           userId: businessPartner.user_id
         };
-      } else if (businessPartner.status === 'pending_approval') {
+      } else if (businessPartner.status === 'pending') {
         return {
           isBusinessPartner: false,
           partnerType: 'pending',

@@ -11,7 +11,7 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
                    WHERE table_name = 'business_profiles' AND column_name = 'status') THEN
-        ALTER TABLE business_profiles ADD COLUMN status VARCHAR(20) DEFAULT 'pending_approval';
+        ALTER TABLE business_profiles ADD COLUMN status VARCHAR(20) DEFAULT 'pending';
     END IF;
 END $$;
 
@@ -28,13 +28,13 @@ END $$;
 -- Add constraint to ensure valid status values
 ALTER TABLE business_profiles 
 ADD CONSTRAINT check_business_status 
-CHECK (status IN ('pending_approval', 'approved', 'rejected'));
+CHECK (status IN ('pending', 'active', 'verified', 'suspended', 'rejected'));
 
 -- Create function to sync is_approved with status
 CREATE OR REPLACE FUNCTION sync_business_approval_status()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.is_approved := (NEW.status = 'approved');
+    NEW.is_approved := (NEW.status = 'verified');
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -48,7 +48,7 @@ CREATE TRIGGER sync_business_approval_trigger
 
 -- Update existing records to have proper status
 UPDATE business_profiles 
-SET status = 'approved' 
+SET status = 'verified' 
 WHERE is_approved = true AND (status IS NULL OR status = 'pending_approval');
 
 -- Grant permissions

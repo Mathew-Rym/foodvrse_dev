@@ -181,7 +181,6 @@ const App = () => {
                               <Route path="/partner-application" element={<PartnerApplication />} />
 <Route path="/pending-approval" element={<PendingApproval />} />
 <Route path="/application-rejected" element={<ApplicationRejected />} />
-<Route path="/demo-pages" element={<DemoPages />} />
                               <Route path="/coming-soon" element={<ComingSoon />} />
                               <Route path="/category/:categoryName" element={<CategoryPage />} />
                               <Route path="/gamification" element={<GamificationPage />} />

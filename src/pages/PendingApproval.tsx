@@ -23,7 +23,7 @@ const PendingApproval = () => {
     }
 
     // Redirect if business is already approved
-    if (businessProfile.status === 'approved') {
+    if (businessProfile.status === 'verified') {
       navigate('/business-dashboard');
       return;
     }

@@ -5,7 +5,7 @@
 DO $$ 
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'business_status') THEN
-        CREATE TYPE public.business_status AS ENUM ('pending_approval', 'approved', 'rejected');
+        CREATE TYPE public.business_status AS ENUM ('pending', 'active', 'verified', 'suspended', 'rejected');
     END IF;
 END $$;
 
@@ -29,7 +29,7 @@ END $$;
 
 -- Add missing columns to business_profiles table
 ALTER TABLE public.business_profiles 
-ADD COLUMN IF NOT EXISTS status public.business_status DEFAULT 'pending_approval',
+ADD COLUMN IF NOT EXISTS status public.business_status DEFAULT 'pending',
 ADD COLUMN IF NOT EXISTS category public.business_category DEFAULT 'other',
 ADD COLUMN IF NOT EXISTS verified_at TIMESTAMP WITH TIME ZONE,
 ADD COLUMN IF NOT EXISTS verification_document_url TEXT,
@@ -88,7 +88,7 @@ BEGIN
     -- Update business status to verified
     UPDATE public.business_profiles 
     SET 
-        status = 'approved',
+        status = 'verified',
         verified_at = NOW(),
         updated_at = NOW()
     WHERE id = business_uuid;
