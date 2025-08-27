@@ -133,19 +133,15 @@ const BusinessDashboard = () => {
         .from('mystery_bags')
         .insert([{
           business_id: businessProfile.id,
-          item_name: newItem.name,
+          title: newItem.name,
           description: newItem.description,
           original_price: newItem.originalPrice,
           price: newItem.discountPrice,
-          quantity: newItem.quantity,
-          initial_quantity: newItem.quantity,
-          category: newItem.category,
-          tags: newItem.tags || [],
-          pickup_start: newItem.pickupStart,
-          pickup_end: newItem.pickupEnd,
-          co2_saved_per_item_kg: 0.8,
-          thumbnail_url: newItem.thumbnailUrl,
-          business_thumbnail_url: newItem.businessThumbnailUrl
+          items_available: newItem.quantity,
+          category_name: newItem.category,
+          pickup_start_time: newItem.pickupStart,
+          pickup_end_time: newItem.pickupEnd,
+          is_active: true,
         }])
         .select()
         .single();
@@ -238,7 +234,7 @@ const BusinessDashboard = () => {
       if (uploadError) throw uploadError;
 
       // Get public URL
-      const { data: { publicUrl } } = supabase.storage
+      const { data: { business_thumbnail_url } } = supabase.storage
         .from('business-images')
         .getPublicUrl(fileName);
       
@@ -246,27 +242,16 @@ const BusinessDashboard = () => {
       
       const { error } = await supabase
         .from('business_profiles')
-        .update({ [updateField]: publicUrl })
+        .update({ [updateField]: business_thumbnail_url })
         .eq('id', businessProfile.id);
 
       if (error) throw error;
 
-      setBusinessProfile(prev => ({ ...prev, [updateField]: publicUrl }));
+      setBusinessProfile(prev => ({ ...prev, [updateField]: business_thumbnail_url }));
       toast.success(`Business ${imageType} uploaded successfully!`);
       
-      // Update all existing listings with the new business thumbnail
-      if (imageType === 'thumbnail') {
-        await supabase
-          .from('mystery_bags')
-          .update({ business_thumbnail_url: publicUrl })
-          .eq('business_id', businessProfile.id);
-          
-        // Update local listings state
-        setListings(prev => prev.map(listing => ({
-          ...listing,
-          business_thumbnail_url: publicUrl
-        })));
-      }
+      // Note: mystery_bags table doesn't have business_thumbnail_url column
+      // Business thumbnail is stored in business_profiles table only
     } catch (error) {
       console.error('Error uploading image:', error);
       toast.error(`Failed to upload ${imageType}`);
@@ -304,13 +289,11 @@ const BusinessDashboard = () => {
       if (imageType === 'thumbnail') {
         await supabase
           .from('mystery_bags')
-          .update({ business_thumbnail_url: null })
           .eq('business_id', businessProfile.id);
           
         // Update local listings state
         setListings(prev => prev.map(listing => ({
           ...listing,
-          business_thumbnail_url: null
         })));
       }
     } catch (error) {
@@ -322,8 +305,6 @@ const BusinessDashboard = () => {
   const handleLocationUpdate = (location: { lat: number; lng: number; address: string }) => {
     setBusinessProfile(prev => prev ? {
       ...prev,
-      latitude: location.lat,
-      longitude: location.lng,
       address: location.address,
       location: location.address
     } : null);
@@ -333,16 +314,12 @@ const BusinessDashboard = () => {
       supabase
         .from('mystery_bags')
         .update({
-          latitude: location.lat,
-          longitude: location.lng
         })
         .eq('business_id', businessProfile.id)
         .then(() => {
           // Update local listings state
           setListings(prev => prev.map(listing => ({
             ...listing,
-            latitude: location.lat,
-            longitude: location.lng
           })));
         });
     }
