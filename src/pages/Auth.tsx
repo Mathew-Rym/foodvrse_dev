@@ -9,6 +9,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { checkIfBusinessPartner } from '@/services/businessPartnerService';
 import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
 
 interface AuthFormData {
