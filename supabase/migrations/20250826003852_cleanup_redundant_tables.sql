@@ -49,7 +49,7 @@ CREATE TRIGGER sync_business_approval_trigger
 -- Update existing records to have proper status
 UPDATE business_profiles 
 SET status = 'verified' 
-WHERE is_approved = true AND (status IS NULL OR status = 'pending_approval');
+WHERE is_approved = true AND (status IS NULL OR status = 'pending');
 
 -- Grant permissions
 GRANT USAGE ON SCHEMA public TO authenticated;

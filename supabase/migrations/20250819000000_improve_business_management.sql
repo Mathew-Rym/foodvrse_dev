@@ -156,7 +156,7 @@ WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Public can view active and verified businesses" 
 ON public.business_profiles FOR SELECT 
-USING (status IN ('approved'));
+USING (status IN ('active', 'verified'));
 
 -- Create trigger to update updated_at timestamp
 CREATE OR REPLACE FUNCTION public.update_business_updated_at()

@@ -10,6 +10,20 @@ CREATE TABLE public.categories (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
+-- Create user_profiles table for user information
+CREATE TABLE public.user_profiles (
+  id UUID NOT NULL PRIMARY KEY,
+  user_id UUID NOT NULL,
+  display_name TEXT,
+  avatar_url TEXT,
+  user_type TEXT DEFAULT 'consumer',
+  email_notifications BOOLEAN DEFAULT true,
+  push_notifications BOOLEAN DEFAULT true,
+  notifications_enabled BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
 -- Create business_profiles table for enhanced business information
 CREATE TABLE public.business_profiles (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
