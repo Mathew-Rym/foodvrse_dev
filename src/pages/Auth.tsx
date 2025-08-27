@@ -222,7 +222,7 @@ const Auth = () => {
               <Logo size="lg" className="w-16 h-16" />
             </div>
             <DialogTitle className="text-2xl font-bold text-white mb-2">
-              Welcome to FoodVrse
+              {isBusinessLogin ? 'My Store Login' : 'Welcome to FoodVrse'}
             </DialogTitle>
             <DialogDescription className="text-gray-300">
               Continue to save food and reduce waste
