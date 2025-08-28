@@ -5,7 +5,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { PurchaseImpactService } from "@/services/purchaseImpactService";
-import { checkIfBusinessPartner, registerBusinessPartner } from "@/services/businessPartnerService";
+import { checkIfBusinessPartner } from "@/services/businessPartnerService";
 
 interface AuthContextType {
   user: User | null;
@@ -126,15 +126,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const isBusinessAuth = businessCheck.isBusinessPartner || sessionStorage.getItem('google_business_auth') === 'true';
       sessionStorage.removeItem('google_business_auth');
 
-      // Register as business partner if detected
-      if (businessCheck.isBusinessPartner && businessCheck.businessName) {
-        await registerBusinessPartner(user.email, businessCheck.businessName);
-      }
+      // Note: registerBusinessPartner removed as business_partners table was dropped
+      // Business partner registration is now handled through business_profiles table
 
       // Create user profile
       const { error: profileError } = await supabase
         .from('user_profiles')
         .insert({
+          id: user.id,
+          user_id: user.id,
           display_name: displayName,
           avatar_url: user.user_metadata?.avatar_url || null,
           user_type: isBusinessAuth ? 'business' : 'consumer',
@@ -153,6 +153,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error: impactError } = await supabase
         .from('user_impact')
         .insert({
+          id: user.id,
+          user_id: user.id,
           total_orders: 0,
           total_savings: 0,
           total_co2_saved: 0,
@@ -171,6 +173,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { error: businessError } = await supabase
           .from('business_profiles')
           .insert({
+          id: user.id,
+          user_id: user.id,
             business_name: `${displayName}'s Business`,
             address: 'To be updated',
             location: 'To be updated',

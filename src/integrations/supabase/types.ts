@@ -216,44 +216,6 @@ export type Database = {
           },
         ]
       }
-      business_partners: {
-        Row: {
-          approved_at: string | null
-          approved_by: string | null
-          business_name: string
-          created_at: string | null
-          domain: string | null
-          email: string
-          id: string
-          is_approved: boolean | null
-          registered_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          approved_at?: string | null
-          approved_by?: string | null
-          business_name: string
-          created_at?: string | null
-          domain?: string | null
-          email: string
-          id?: string
-          is_approved?: boolean | null
-          registered_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          approved_at?: string | null
-          approved_by?: string | null
-          business_name?: string
-          created_at?: string | null
-          domain?: string | null
-          email?: string
-          id?: string
-          is_approved?: boolean | null
-          registered_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
       }
       business_profiles: {
         Row: {

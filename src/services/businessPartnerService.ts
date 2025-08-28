@@ -66,7 +66,7 @@ export const checkIfBusinessPartner = async (email: string): Promise<BusinessPar
     const { data: businessPartner, error } = await supabase
       .from('business_profiles')
       .select('business_name, status, user_id')
-      .eq('email', emailLower)
+      .eq('contact_email', emailLower)
       .single();
 
     if (!error && businessPartner) {
@@ -154,24 +154,5 @@ const getBusinessNameFromEmail = (email: string): string => {
   return emailMap[email] || 'Business Partner';
 };
 
-/**
- * Create business_partners table entry for tracking
- */
-export const registerBusinessPartner = async (email: string, businessName: string) => {
-  try {
-    const { error } = await supabase
-      .from('business_partners')
-      .upsert({
-        email: email.toLowerCase(),
-        business_name: businessName,
-        is_approved: true,
-        registered_at: new Date().toISOString()
-      });
-
-    if (error) {
-      console.error('Error registering business partner:', error);
-    }
-  } catch (error) {
-    console.error('Error in registerBusinessPartner:', error);
-  }
-};
+// Note: registerBusinessPartner function removed as business_partners table was dropped
+// Business partner registration is now handled through business_profiles table

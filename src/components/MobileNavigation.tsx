@@ -12,7 +12,6 @@ const MobileNavigation = () => {
   const { totalItems } = useCart();
   const { isAuthenticated, isBusinessUser } = useAuth();
   const { t } = useTranslation();
-  const [isVisible, setIsVisible] = useState(false);
 
   // Don't show navigation for business users or unauthenticated users
   useEffect(() => {
@@ -49,7 +48,7 @@ const MobileNavigation = () => {
       {/* Fixed navigation bar that appears when scrolling */}
       <div 
         id="mobile-navigation" 
-        className={`fixed bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] shadow-lg transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`sticky bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] shadow-lg transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}
         style={{
           paddingBottom: 'env(safe-area-inset-bottom, 0px)'
         }}
