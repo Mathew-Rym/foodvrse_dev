@@ -12,7 +12,7 @@ const MobileNavigation = () => {
   const { isAuthenticated, isBusinessUser } = useAuth();
   const { t } = useTranslation();
 
-  // Don.t show navigation for business users or unauthenticated users or unauthenticated users
+  // Don't show navigation for business users or unauthenticated users
   if (isBusinessUser || !isAuthenticated) {
     return null;
   }
@@ -32,12 +32,12 @@ const MobileNavigation = () => {
   return (
     <>
       {/* Spacer to prevent content from being hidden behind navigation */}
-      <div className="h-24 md:hidden" />
+      <div className="h-24" />
       
       {/* Fixed navigation bar - stays visible when scrolling */}
       <div 
         id="mobile-navigation" 
-        className="fixed bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] md:hidden shadow-lg"
+        className="fixed bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] shadow-lg"
         style={{
           paddingBottom: 'env(safe-area-inset-bottom, 0px)'
         }}
