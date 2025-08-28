@@ -1,4 +1,3 @@
-
 import MobileNavigation from "./MobileNavigation";
 import { useAuth } from "@/contexts/AuthContext";
 

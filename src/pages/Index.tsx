@@ -1,4 +1,3 @@
-
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 
@@ -28,7 +27,7 @@ const Index = () => {
       <WelcomeMessage isFirstTime={isFirstVisit} />
       <Header />
       <LocationNotification />
-      <div className="overflow-x-hidden"> {/* Add overflow-x-hidden to prevent horizontal scroll */}
+      <div className="overflow-x-hidden">
         <div id="hero-section">
           <HeroSection />
         </div>
@@ -43,13 +42,12 @@ const Index = () => {
         </div>
         <Footer />
       </div>
-      {/* Mobile navigation removed from landing page - only shows on authenticated pages */}
       <AddOnPopup />
       <OrderCompletePopup />
       <CookieConsent />
       <BackToTop />
       <FeedbackFAB />
-{isAuthenticated && <MobileNavigation />}
+      {isAuthenticated && <MobileNavigation />}
       {showOnboarding && (
         <OnboardingTour 
           onComplete={completeOnboarding}

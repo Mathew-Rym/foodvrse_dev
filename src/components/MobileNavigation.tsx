@@ -1,4 +1,3 @@
-
 import { Home, Search, Award, User, Heart } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
@@ -35,10 +34,10 @@ const MobileNavigation = () => {
       {/* Spacer to prevent content from being hidden behind navigation */}
       <div className="h-24 md:hidden" />
       
-      {/* Fixed navigation bar */}
+      {/* Fixed navigation bar - stays visible when scrolling */}
       <div 
         id="mobile-navigation" 
-        className="fixed bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] shadow-lg md:hidden shadow-lg"
+        className="fixed bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] md:hidden shadow-lg"
         style={{
           paddingBottom: 'env(safe-area-inset-bottom, 0px)'
         }}
