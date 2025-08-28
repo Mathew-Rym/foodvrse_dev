@@ -31,13 +31,10 @@ const MobileNavigation = () => {
 
   return (
     <>
-      {/* Spacer to prevent content from being hidden behind navigation */}
-      <div className="h-24" />
-      
-      {/* Fixed navigation bar - stays visible when scrolling */}
+      {/* Sticky navigation bar - scrolls with content, then sticks to bottom */}
       <div 
         id="mobile-navigation" 
-        className="fixed bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] shadow-lg"
+        className="sticky bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] shadow-lg"
         style={{
           paddingBottom: 'env(safe-area-inset-bottom, 0px)'
         }}
