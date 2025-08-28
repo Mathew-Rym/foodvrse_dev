@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import PersonalInfoDialog from "@/components/PersonalInfoDialog";
+import PaymentMethodsDialog from "@/components/PaymentMethodsDialog";
 import LocationsDialog from "@/components/LocationsDialog";
 import MobileLayout from "@/components/MobileLayout";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +20,7 @@ const Profile = () => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showPaymentMethods, setShowPaymentMethods] = useState(false);
+  const [showPaymentMethodsDialog, setShowPaymentMethodsDialog] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
   const [showAddPayment, setShowAddPayment] = useState(false);
   const [editingPayment, setEditingPayment] = useState<any>(null);
@@ -755,13 +757,6 @@ const Profile = () => {
           open={showPersonalInfo}
           onOpenChange={setShowPersonalInfo}
           profileData={profileData}
-          onSave={handlePersonalInfoSave}
-        />
-
-        {/* Locations Dialog */}
-        <LocationsDialog
-          open={showLocations}
-          onOpenChange={setShowLocations}
           locations={locations}
           onSave={(data) => {
             setLocations(data);
