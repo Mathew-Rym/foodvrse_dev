@@ -12,6 +12,7 @@ const MobileNavigation = () => {
   const { totalItems } = useCart();
   const { isAuthenticated, isBusinessUser } = useAuth();
   const { t } = useTranslation();
+  const [isVisible, setIsVisible] = useState(false);
 
   // Don't show navigation for business users or unauthenticated users
   useEffect(() => {
