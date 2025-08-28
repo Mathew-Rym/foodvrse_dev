@@ -255,7 +255,7 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
         <Card className="w-full max-w-sm shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
           <CardContent className="p-6">
             <div className="flex items-start gap-3 mb-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white">
+              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-end justify-center text-white">
                 {steps[currentStep].icon}
               </div>
               <div className="flex-1">

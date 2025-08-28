@@ -323,8 +323,8 @@ const Footer = () => {
           <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0">
             {/* Language and Theme Toggles */}
             <div className="flex items-center space-x-4">
-              <LanguageToggle />
-              <ThemeToggle />
+              {/* <LanguageToggle /> */}
+              {/* <ThemeToggle /> */}
             </div>
             
             {/* Copyright */}
