@@ -9,11 +9,11 @@ const MobileNavigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { totalItems } = useCart();
-  const { isBusinessUser } = useAuth();
+  const { isAuthenticated, isBusinessUser } = useAuth();
   const { t } = useTranslation();
 
-  // Don't show navigation for business users
-  if (isBusinessUser) {
+  // Don.t show navigation for business users or unauthenticated users or unauthenticated users
+  if (isBusinessUser || !isAuthenticated) {
     return null;
   }
 
