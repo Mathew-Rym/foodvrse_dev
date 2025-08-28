@@ -68,6 +68,7 @@ class ErrorBoundary extends Component<
   }
 
   static getDerivedStateFromError(error: Error) {
+    console.error('ErrorBoundary caught error:', error);
     return { hasError: true, error };
   }
 
@@ -84,6 +85,7 @@ class ErrorBoundary extends Component<
           fontFamily: 'system-ui, sans-serif'
         }}>
           <h1>Something went wrong</h1>
+          <p>Error: {this.state.error?.message}</p>
           <p>Please refresh the page or try again later.</p>
           <button 
             onClick={() => window.location.reload()}
@@ -117,6 +119,14 @@ const queryClient = new QueryClient({
   },
 });
 
+// Simple test component
+const TestComponent = () => (
+  <div style={{ padding: '20px', textAlign: 'center' }}>
+    <h1>FoodVrse Test Page</h1>
+    <p>If you can see this, the basic React app is working!</p>
+  </div>
+);
+
 const App = () => {
   // Check if this is an OAuth callback
   const isOAuthCallback = window.location.search.includes('access_token') || 
@@ -139,31 +149,31 @@ const App = () => {
             <LanguageProvider>
               <AuthProvider>
                 <FavoritesProvider>
-                    <BusinessItemsProvider>
+                  <BusinessItemsProvider>
                     <CartProvider>
                       <TooltipProvider>
-                        <Toaster />
-                        <Sonner />
                         <BrowserRouter>
                           <Suspense fallback={<LoadingSpinner />}>
                             <Routes>
+                              {/* Test route */}
+                              <Route path="/test" element={<TestComponent />} />
+                              
+                              {/* OAuth callback route */}
+                              {isOAuthCallback && (
+                                <Route path="/" element={<GoogleOAuthHandler />} />
+                              )}
+                              
+                              {/* Main routes */}
                               <Route path="/" element={<Index />} />
-                              <Route path="/auth" element={<Auth />} />
-                              <Route path="/business-login" element={<Auth />} />
-                              <Route path="/business-login" element={<Auth />} />
-                              <Route path="/oauth-callback" element={
-                                <GoogleOAuthHandler onComplete={() => window.history.replaceState({}, '', '/')} />
-                              } />
                               <Route path="/discover" element={<Discover />} />
                               <Route path="/cart" element={<Cart />} />
                               <Route path="/orders" element={<Orders />} />
-                              <Route path="/impact" element={<GamificationPage />} />
                               <Route path="/profile" element={<Profile />} />
                               <Route path="/favorites" element={<Favorites />} />
-
+                              <Route path="/auth" element={<Auth />} />
                               <Route path="/business-dashboard" element={<BusinessDashboard />} />
+                              
                               <Route path="/food-waste" element={<FoodWaste />} />
-                              <Route path="/mystery-boxes" element={<Discover />} />
                               <Route path="/how-it-works" element={<HowItWorks />} />
                               <Route path="/impact-tracker" element={<ImpactTrackerPage />} />
                               <Route path="/help-center" element={<HelpCenter />} />
@@ -181,8 +191,8 @@ const App = () => {
                               <Route path="/esg" element={<ESG />} />
                               <Route path="/partners" element={<Partners />} />
                               <Route path="/partner-application" element={<PartnerApplication />} />
-<Route path="/pending-approval" element={<PendingApproval />} />
-<Route path="/application-rejected" element={<ApplicationRejected />} />
+                              <Route path="/pending-approval" element={<PendingApproval />} />
+                              <Route path="/application-rejected" element={<ApplicationRejected />} />
                               <Route path="/coming-soon" element={<ComingSoon />} />
                               <Route path="/category/:categoryName" element={<CategoryPage />} />
                               <Route path="/gamification" element={<GamificationPage />} />
@@ -194,13 +204,15 @@ const App = () => {
                         </BrowserRouter>
                       </TooltipProvider>
                     </CartProvider>
-                    </BusinessItemsProvider>
+                  </BusinessItemsProvider>
                 </FavoritesProvider>
               </AuthProvider>
             </LanguageProvider>
           </ThemeProvider>
         </QueryClientProvider>
       </HelmetProvider>
+      <Toaster />
+      <Sonner />
     </ErrorBoundary>
   );
 };
