@@ -4,6 +4,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
 
 const MobileNavigation = () => {
   const location = useLocation();
@@ -11,8 +12,22 @@ const MobileNavigation = () => {
   const { totalItems } = useCart();
   const { isAuthenticated, isBusinessUser } = useAuth();
   const { t } = useTranslation();
+  const [isVisible, setIsVisible] = useState(false);
 
   // Don't show navigation for business users or unauthenticated users
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > 100) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   if (isBusinessUser || !isAuthenticated) {
     return null;
   }
@@ -31,10 +46,10 @@ const MobileNavigation = () => {
 
   return (
     <>
-      {/* Sticky navigation bar - scrolls with content, then sticks to bottom */}
+      {/* Fixed navigation bar that appears when scrolling */}
       <div 
         id="mobile-navigation" 
-        className="sticky bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] shadow-lg"
+        className={`fixed bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] shadow-lg transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}
         style={{
           paddingBottom: 'env(safe-area-inset-bottom, 0px)'
         }}
