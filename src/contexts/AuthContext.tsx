@@ -135,16 +135,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error: profileError } = await supabase
         .from('user_profiles')
         .insert({
-          id: user.id,
-          user_id: user.id,
           display_name: displayName,
           avatar_url: user.user_metadata?.avatar_url || null,
           user_type: isBusinessAuth ? 'business' : 'consumer',
           email_notifications: true,
           push_notifications: true,
           notifications_enabled: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
         });
 
       if (profileError) {
@@ -157,15 +153,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error: impactError } = await supabase
         .from('user_impact')
         .insert({
-          user_id: user.id,
           total_orders: 0,
           total_savings: 0,
           total_co2_saved: 0,
           total_food_waste_prevented: 0,
           weekly_challenge_progress: 0,
           community_achievements: 0,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
         });
 
       if (impactError) {
@@ -178,13 +171,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { error: businessError } = await supabase
           .from('business_profiles')
           .insert({
-            user_id: user.id,
             business_name: `${displayName}'s Business`,
             address: 'To be updated',
             location: 'To be updated',
             user_type: 'business',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
           });
 
         if (businessError) {
@@ -267,7 +257,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from('user_profiles')
         .update({ 
           display_name: displayName,
-          updated_at: new Date().toISOString()
         })
         .eq('id', userId);
 

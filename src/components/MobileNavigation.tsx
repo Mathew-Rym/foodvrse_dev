@@ -31,35 +31,47 @@ const MobileNavigation = () => {
   };
 
   return (
-    <div id="mobile-navigation" className="fixed bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999]">
-      <div className="flex items-center justify-around py-2">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = location.pathname === tab.path;
-          
-          return (
-            <button
-              key={tab.id}
-              onClick={() => handleTabClick(tab.path)}
-              className={`flex flex-col items-center justify-center px-3 py-2 min-w-0 flex-1 transition-colors relative ${
-                                  isActive 
+    <>
+      {/* Spacer to prevent content from being hidden behind navigation */}
+      <div className="h-20 md:hidden" />
+      
+      {/* Fixed navigation bar */}
+      <div 
+        id="mobile-navigation" 
+        className="fixed bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] md:hidden"
+        style={{
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+        }}
+      >
+        <div className="flex items-center justify-around py-2">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = location.pathname === tab.path;
+            
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleTabClick(tab.path)}
+                className={`flex flex-col items-center justify-center px-3 py-2 min-w-0 flex-1 transition-colors relative ${
+                  isActive 
                     ? "text-brand-yellow" 
                     : "text-white/80 hover:text-white"
-              }`}
-            >
-              <Icon 
-                className={`w-6 h-6 mb-1 ${isActive ? "text-brand-yellow" : "text-white/80"}`}
-              />
-                              <span className={`text-xs font-medium truncate ${
+                }`}
+              >
+                <Icon 
+                  className={`w-6 h-6 mb-1 ${isActive ? "text-brand-yellow" : "text-white/80"}`}
+                />
+                <span className={`text-xs font-medium truncate ${
                   isActive ? "text-brand-yellow" : "text-white/80"
                 }`}>
-                {tab.label}
-              </span>
-            </button>
-          );
-        })}
+                  {tab.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

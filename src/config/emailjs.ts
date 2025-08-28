@@ -15,7 +15,7 @@ export const EMAILJS_CONFIG = {
   SERVICE_RYM: import.meta.env.VITE_EMAILJS_SERVICE_RYM || 'service_5ttdiys',
   
   // Your EmailJS template ID (found in Email Templates)
-  TEMPLATE_ID: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_business_application',
+  TEMPLATE_ID: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_contact_form',
   
   // Recipient email addresses
   TO_EMAIL_PARTNER: 'hello@foodvrse.com',

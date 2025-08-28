@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { sendEmail } from "@/utils/emailService";
 import { useAuth } from '@/contexts/AuthContext';
 
 import { useState, useEffect, useRef } from "react";
@@ -7,8 +8,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, ArrowRight, Building, MapPin, Users, Clock, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import emailjs from '@emailjs/browser';
-import { EMAILJS_CONFIG } from '@/config/emailjs';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { RECAPTCHA_CONFIG } from '@/config/recaptcha';
 
@@ -48,11 +47,6 @@ const PartnerApplication = () => {
     co2Prevented: 500
   });
 
-  // Initialize EmailJS
-  useEffect(() => {
-    emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -61,34 +55,19 @@ const PartnerApplication = () => {
       return;
     }
 
-      // reCAPTCHA validation is now required
-  if (!recaptchaToken) {
-    toast.error("Please complete the reCAPTCHA verification");
-    return;
-  }
+    // reCAPTCHA validation is now required
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA verification");
+      return;
+    }
 
     setIsSubmitting(true);
 
     try {
       console.log("Partner Application Form Data:", formData);
       
-      // Prepare email template parameters
-      const templateParams = {
-        to_email: EMAILJS_CONFIG.TO_EMAIL_PARTNER,
-        from_name: formData.name,
-        from_email: formData.email,
-        company: formData.company,
-        job_title: formData.jobTitle,
-        phone: formData.phone,
-        category: formData.businessType,
-        location: formData.location,
-              address: formData.location, // Using location as address for now
-        employee_count: formData.employeeCount,
-        website_url: formData.website,
-        description: formData.description,
-        partnership_interest: formData.partnershipInterest,
-        monthly_waste: formData.monthlyWaste,
-        message: `
+      // Prepare email message
+      const emailMessage = `
 Business Partnership Application from FoodVrse Website:
 
 Contact Information:
@@ -110,19 +89,23 @@ Partnership Details:
 - Monthly Food Waste: ${formData.monthlyWaste}
 
 This application was submitted through the FoodVrse website.
-        `
-      };
+      `;
 
-      // Send email using EmailJS with partner service
-      await emailjs.send(
-        EMAILJS_CONFIG.SERVICE_PARTNER,
-        EMAILJS_CONFIG.TEMPLATE_ID,
-        templateParams,
-        EMAILJS_CONFIG.PUBLIC_KEY
-      );
-      
-      toast.success("Business application submitted successfully! Email sent to hello@foodvrse.com");
-      
+      // Send email using cPanel email service
+      const emailSuccess = await sendEmail({
+        to: 'hello@foodvrse.com',
+        from: formData.email,
+        subject: 'Business Partnership Application - ' + formData.company,
+        message: emailMessage,
+        name: formData.name
+      });
+
+      if (emailSuccess) {
+        toast.success("Business application submitted successfully! Email sent to hello@foodvrse.com");
+      } else {
+        toast.error("Failed to send email, but application was recorded");
+      }
+
       // Insert into business_profiles table if user is logged in
       if (user) {
         try {
@@ -132,15 +115,15 @@ This application was submitted through the FoodVrse website.
               user_id: user.id,
               business_name: formData.company,
               contact_person: formData.name,
-              email: formData.email,
-              phone: formData.phone,
-              category: formData.businessType,
+              contact_contact_email: formData.email,
+              contact_contact_phone: formData.phone,
+              category: formData.businessType as any || 'other',
               location: formData.location,
-              address: formData.location, // Using location as address for now
+              address: formData.location,
               description: formData.description,
               website_url: formData.website,
               status: 'pending',
-              is_approved: false
+              user_type: 'business'
             });
           
           if (error) {
@@ -158,18 +141,9 @@ This application was submitted through the FoodVrse website.
       
       // Reset form
       setFormData({
-        email: "",
-        company: "",
-        name: "",
-        phone: "",
-        jobTitle: "",
-        businessType: "",
-        location: "",
-        employeeCount: "",
-        website: "",
-        description: "",
-        partnershipInterest: "",
-        monthlyWaste: ""
+        email: "", company: "", name: "", phone: "", jobTitle: "",
+        businessType: "", location: "", employeeCount: "", website: "",
+        description: "", partnershipInterest: "", monthlyWaste: ""
       });
       setConsent(false);
       setRecaptchaToken(null);
@@ -184,20 +158,15 @@ This application was submitted through the FoodVrse website.
         }
       }, 3000);
       
-    } catch (emailError) {
-      console.error("EmailJS error:", emailError);
-      // Continue with success message even if email fails
-      toast.success("Business application submitted successfully! We'll get back to you soon.");
-      
-      // Redirect to landing page after 7 seconds
-      setTimeout(() => {
-        navigate('/');
-      }, 3000);
+    } catch (error) {
+      console.error("Application error:", error);
+      toast.error("Failed to submit application. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // ESG Calculator functions
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
@@ -205,7 +174,6 @@ This application was submitted through the FoodVrse website.
     });
   };
 
-  // ESG Calculator functions
   const calculateESGImpact = (monthlyRevenue: number) => {
     const foodWastePercent = 10; // Fixed default
     const foodWasteValue = (monthlyRevenue * foodWastePercent) / 100;
