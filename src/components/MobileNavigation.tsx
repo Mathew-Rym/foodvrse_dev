@@ -12,21 +12,29 @@ const MobileNavigation = () => {
   const { totalItems } = useCart();
   const { isAuthenticated, isBusinessUser } = useAuth();
   const { t } = useTranslation();
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
-  // Don't show navigation for business users or unauthenticated users
+  // Show/hide navigation based on scroll direction
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > 100) {
+      
+      // Show navigation when scrolling up or at top
+      if (currentScrollY < lastScrollY || currentScrollY < 100) {
         setIsVisible(true);
       } else {
-        setIsVisible(false);
+        setLastScrollY(currentScrollY);
+        // Hide navigation when scrolling down (but not at top)
+        setLastScrollY(currentScrollY);
       }
+      
+      setLastScrollY(currentScrollY);
     };
+    
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   if (isBusinessUser || !isAuthenticated) {
     return null;
@@ -46,10 +54,10 @@ const MobileNavigation = () => {
 
   return (
     <>
-      {/* Fixed navigation bar that appears when scrolling */}
+      {/* Fixed navigation bar that shows/hides based on scroll */}
       <div 
         id="mobile-navigation" 
-        className={`sticky bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] shadow-lg transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`fixed bottom-0 left-0 right-0 bg-brand-green border-t border-brand-green safe-area-pb z-[9999] shadow-lg transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}
         style={{
           paddingBottom: 'env(safe-area-inset-bottom, 0px)'
         }}
