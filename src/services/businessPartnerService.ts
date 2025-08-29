@@ -66,8 +66,8 @@ export const checkIfBusinessPartner = async (email: string): Promise<BusinessPar
     const { data: businessPartner, error } = await supabase
       .from('business_profiles')
       .select('business_name, status, user_id')
-      .eq('contact_email', emailLower)
-      .single();
+      .eq('contact_email', emailLower).maybeSingle()
+      .maybeSingle();
 
     if (!error && businessPartner) {
       // Check status and return appropriate response
