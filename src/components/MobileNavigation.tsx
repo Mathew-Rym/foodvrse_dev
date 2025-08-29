@@ -12,11 +12,11 @@ const MobileNavigation = () => {
   const { totalItems } = useCart();
   const { isAuthenticated, isBusinessUser } = useAuth();
   const { t } = useTranslation();
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(true); // Always visible for now
   const [lastScrollY, setLastScrollY] = useState(0);
 
   // Show/hide navigation based on scroll direction
-  useEffect(() => {
+  // useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       
@@ -33,7 +33,7 @@ const MobileNavigation = () => {
     
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  // }, [lastScrollY]);
 
   if (isBusinessUser || !isAuthenticated) {
     return null;
