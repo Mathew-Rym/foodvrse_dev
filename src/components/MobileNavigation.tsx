@@ -24,9 +24,8 @@ const MobileNavigation = () => {
       if (currentScrollY < lastScrollY || currentScrollY < 100) {
         setIsVisible(true);
       } else {
-        setLastScrollY(currentScrollY);
         // Hide navigation when scrolling down (but not at top)
-        setLastScrollY(currentScrollY);
+        setIsVisible(false);
       }
       
       setLastScrollY(currentScrollY);
